@@ -34,7 +34,7 @@ static int close_usb(void)
 {
     if(!opened)return 0;
     int r=vnet_usb_stop();if(r<0){unsafe=1;return r;}
-    opened=0;unsafe=0;return 0;
+    opened=0;return 0;
 }
 static int worker(SceSize size,void *args)
 {
@@ -58,13 +58,7 @@ static int worker(SceSize size,void *args)
             unsigned began=sceKernelGetSystemTimeLow();
             while(running && owner_alive() && sceKernelGetSystemTimeLow()-began<20000000u) {
                 vnet_usb_poll(ignored,sizeof(ignored));
-                if(!vnet_usb_ready()) {
-                    /* A new USB epoch discards the previous wire transaction.
-                     * Retain the local profile until this request completes. */
-                    started=0;control->phase=5;
-                    sceKernelDelayThread(1000);continue;
-                }
-                if(!started) {
+                if(vnet_usb_ready() && !started) {
                     int r=command==WIFI_NATIVE_CONNECT_COMMAND?vnet_usb_profile_begin(request,&profile):
                         command==WIFI_NATIVE_SCAN_COMMAND?vnet_usb_scan_begin(request,NATIVE_SCAN_LIMIT):-1;
                     control->phase=6;control->detail=r;
@@ -115,8 +109,6 @@ int module_stop(SceSize size,void *args)
 {
     (void)size;(void)args;running=0;
     if(thread>=0){unsigned timeout=2000000;if(sceKernelWaitThreadEnd(thread,&timeout)<0)return -2;}
-    /* The worker has exited, so it no longer owns the transport. A
-     * cancellation timeout may have resolved since its final stop attempt. */
-    if(close_usb()<0 || unsafe || opened)return -2;
+    if(unsafe || opened)return -2;
     if(thread>=0){sceKernelDeleteThread(thread);thread=-1;}return 0;
 }

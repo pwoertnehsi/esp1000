@@ -29,5 +29,3 @@ main.o: frame_queue.h log_queue.h ../../common/packet_trace.h
 main.o usb_transport.o: usb_transport.h
 
 usb_transport.o: ../../common/native_wifi_scan.h ../../common/native_wifi_profile.h ../../common/packet_link.h ../../common/link_protocol.h
-
-usb_transport.o: ../../common/link_diagnostics.h

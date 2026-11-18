@@ -15,5 +15,3 @@ accessory.o: ../../virtual_net/driver/accessory.S
 main.o: ../native_control.h
 
 main.o usb_transport.o: ../../common/native_wifi_profile.h ../../common/link_protocol.h
-
-usb_transport.o: ../../common/link_diagnostics.h

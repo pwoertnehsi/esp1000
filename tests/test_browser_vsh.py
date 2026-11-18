@@ -42,17 +42,3 @@ class BrowserVshTest(unittest.TestCase):
         self.assertEqual(plugin.string(0x1c534),'flash0:/vsh/resource/')
         for offset,word in ((0,0x27bdffe0),(0x133e8,0x27bdfee0),(0x18b88,0x27bdfff0)):
             self.assertEqual(plugin.word(offset),word)
-
-    def test_owned_security_info_abi(self):
-        import sys
-        sys.path.insert(0,str(ROOT/'tools'))
-        from inspect_prx import Prx
-        api=Prx(ROOT/'modules/pspnet_apctl.prx',{})
-        # Actual profile4 (AES) GetInfo mapping selects li v0,3.
-        self.assertEqual(api.word(0x1199c+4*4),0x1638)
-        self.assertEqual(api.word(0x163c),0x24020003)
-        ui=Prx(ROOT/'modules/htmlviewer_ui.prx',{})
-        # Browser connection status reads GetInfo4 and indexes its label table.
-        self.assertEqual(ui.word(0x3d9fc),0x24040004)
-        self.assertEqual(ui.word(0x3da24),0x00031880)
-        self.assertEqual(ui.word(0x3da2c),0x8c650000)

@@ -35,7 +35,6 @@
 #include "host/hcd.h"
 #include "host/usbh.h"
 #include "dwc2_common.h"
-#include "diagnostics.h"
 
   // Debug level for DWC2
   #define DWC2_DEBUG 2
@@ -861,30 +860,6 @@ TU_ATTR_ALWAYS_INLINE static inline void print_hcint(uint32_t hcint) {
 }
 #endif
 
-TU_ATTR_WEAK void hcd_dwc2_diag_rx_cb(unsigned phase,unsigned channel,unsigned bytes,unsigned offset,
-                                     unsigned capacity,const void *buffer) {
-  (void)phase;(void)channel;(void)bytes;(void)offset;(void)capacity;(void)buffer;
-}
-unsigned hcd_dwc2_diag_channels(uint8_t rhport,psp_dwc2_channel_diag_t *out,unsigned capacity) {
-  dwc2_regs_t *dwc2=DWC2_REG(rhport);
-  unsigned count=dwc2_channel_count(dwc2);
-  if(count>capacity)count=capacity;
-  for(unsigned i=0;i<count;++i) {
-    dwc2_channel_t *channel=&dwc2->channel[i];
-    hcd_xfer_t *xfer=&_hcd_data.xfer[i];
-    const uint8_t ep_id=xfer->ep_id;
-    out[i]=(psp_dwc2_channel_diag_t){.hcchar=channel->hcchar,.hctsiz=channel->hctsiz,
-      .hcint=channel->hcint,.hcintmsk=channel->hcintmsk,.transferred=xfer->xferred_bytes,
-      .allocated=xfer->allocated && ep_id<CFG_TUH_DWC2_ENDPOINT_MAX,.endpoint=0xff};
-    if(out[i].allocated) {
-      hcd_endpoint_t *edpt=&_hcd_data.edpt[ep_id];
-      out[i].endpoint=tu_edpt_addr(edpt->hcchar_bm.ep_num,edpt->hcchar_bm.ep_dir);
-      out[i].capacity=edpt->buflen;
-    }
-  }
-  return count;
-}
-
 #if CFG_TUH_DWC2_SLAVE_ENABLE
 static void handle_rxflvl_irq(uint8_t rhport) {
   dwc2_regs_t* dwc2 = DWC2_REG(rhport);
@@ -902,9 +877,7 @@ static void handle_rxflvl_irq(uint8_t rhport) {
       hcd_endpoint_t* edpt = &_hcd_data.edpt[xfer->ep_id];
 
       if (byte_count > 0) {
-        hcd_dwc2_diag_rx_cb(0,ch_id,byte_count,xfer->xferred_bytes,edpt->buflen,edpt->buffer);
         tu_hwfifo_read(dwc2->fifo[0], edpt->buffer + xfer->xferred_bytes, byte_count, NULL);
-        hcd_dwc2_diag_rx_cb(1,ch_id,byte_count,xfer->xferred_bytes,edpt->buflen,edpt->buffer);
         xfer->xferred_bytes += byte_count;
         xfer->fifo_bytes = byte_count;
       }

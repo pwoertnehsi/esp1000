@@ -77,13 +77,6 @@ TU_ATTR_WEAK bool tuh_enum_descriptor_configuration_cb(uint8_t daddr, uint8_t cf
   return true;
 }
 
-// Project-local diagnostic observer. Owner-task only; no control or descriptor data.
-// phase0 begin,1 delay,2 control completion,3 enumeration complete.
-TU_ATTR_WEAK void tuh_enum_diagnostic_cb(uint8_t phase, uint8_t address,
-                                        uint32_t stage, uint8_t result, uint32_t bytes) {
-  (void)phase; (void)address; (void)stage; (void)result; (void)bytes;
-}
-
 TU_ATTR_WEAK void tuh_event_hook_cb(uint8_t rhport, uint32_t eventid, bool in_isr) {
   (void) rhport; (void) eventid; (void) in_isr;
 }
@@ -1747,7 +1740,6 @@ enum {
 
 // process async delay in enumeration
 static void enum_delay_async(uintptr_t state) {
-  tuh_enum_diagnostic_cb(1, 0, (uint32_t)state, 0, 0);
   tuh_bus_info_t *dev0_bus = &_usbh_data.dev0_bus;
   switch (state) {
     case ENUM_AFTER_DEBOUNCING_DELAY:
@@ -1840,7 +1832,6 @@ static void enum_delay_async(uintptr_t state) {
 
 // start a new enumeration process
 static void enum_new_device(hcd_event_t *event) {
-  tuh_enum_diagnostic_cb(0, 0, 0, 0, 0);
   tuh_bus_info_t *dev0_bus = &_usbh_data.dev0_bus;
   dev0_bus->rhport         = event->rhport;
   dev0_bus->hub_addr       = event->connection.hub_addr;
@@ -1850,10 +1841,6 @@ static void enum_new_device(hcd_event_t *event) {
 
 // process device enumeration
 static void process_enumeration(tuh_xfer_t *xfer) {
-  // ADDR0_DEVICE_DESC is also entered with a synthetic transfer; its actual_len
-  // is not initialized upstream, so never inspect it for that dispatch.
-  tuh_enum_diagnostic_cb(2, xfer->daddr, (uint32_t)xfer->user_data, xfer->result,
-                         xfer->user_data == ENUM_ADDR0_DEVICE_DESC ? 0 : xfer->actual_len);
   if (XFER_RESULT_FAILED == xfer->result) {
     enum_full_complete(false); // failed to enum
     return;
@@ -2242,7 +2229,6 @@ void usbh_driver_set_config_complete(uint8_t dev_addr, uint8_t itf_num) {
 }
 
 static void enum_full_complete(bool success) {
-  tuh_enum_diagnostic_cb(3, 0, 0, success ? 1 : 0, 0);
   (void)success;
   TU_LOG_USBH("Enumeration complete: success = %u\r\n", success);
 
