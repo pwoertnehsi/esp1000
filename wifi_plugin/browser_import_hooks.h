@@ -8,13 +8,13 @@ typedef struct {
     const browser_import_entry_t *entries;unsigned entry_count;
 } browser_import_guard_t;
 #include "browser_import_guards.h"
-static unsigned browser_owner_text[3];
+static unsigned browser_owner_text[WIFI_NATIVE_CONSUMERS];
 static int patch_browser_imports(SceModule *m)
 {
     if(!hooks || !m)return 0;
     unsigned index;
-    for(index=0;index<3;++index)if(!strcmp(m->modname,browser_import_guards[index]->name))break;
-    if(index==3)return 0;
+    for(index=0;index<WIFI_NATIVE_CONSUMERS;++index)if(!strcmp(m->modname,browser_import_guards[index]->name))break;
+    if(index==WIFI_NATIVE_CONSUMERS)return 0;
     const browser_import_guard_t *g=browser_import_guards[index];
     SceModule *bridge=sceKernelFindModuleByUID(bridge_owner);
     if(!bridge || bridge->text_addr!=bridge_text)return hooks->browser_status=-30;
@@ -44,5 +44,5 @@ static int patch_browser_imports(SceModule *m)
     }
     sceKernelDcacheWritebackInvalidateAll();sceKernelIcacheInvalidateAll();
     browser_owner_text[index]=m->text_addr;hooks->browser_owners[index]=m->modid;
-    hooks->browser_status=1;return 0;
+    hooks->consumer_mask|=1u<<index;hooks->browser_status=1;return 0;
 }

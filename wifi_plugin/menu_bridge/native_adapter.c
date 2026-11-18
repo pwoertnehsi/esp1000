@@ -17,7 +17,7 @@ extern int wifiNativeRegister(unsigned,unsigned);
 extern int wifiNativeRefresh(void);
 static unsigned owned_net_modules;
 typedef void (*event_fn)(int,int,int,int,void *);
-static wifi_native_hooks_t hooks={.magic=WIFI_NATIVE_HOOK_MAGIC,.abi=2};
+static wifi_native_hooks_t hooks={.magic=WIFI_NATIVE_HOOK_MAGIC,.abi=3};
 static wifi_native_usb_control_t usb={.magic=WIFI_NATIVE_USB_MAGIC,.abi=WIFI_NATIVE_USB_ABI};
 static SceUID lock=-1,thread=-1,service=-1;
 static int service_started,acc_owned,service_failed;
@@ -139,7 +139,7 @@ static int browser_alive(void)
 static int callback_owner(int id)
 {
     if(id==hooks.owner)return 1;
-    for(unsigned i=0;i<3;++i)if(id==hooks.browser_owners[i] && id>=0)return 1;
+    for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i)if(id==hooks.browser_owners[i] && id>=0)return 1;
     return 0;
 }
 static int add_handler(event_fn fn,void *arg)
@@ -333,6 +333,7 @@ int wifi_native_adapter_start(void)
     memcpy(hooks.callbacks,callbacks,sizeof(callbacks));
     r=wifiNativeRegister((unsigned)&hooks,sizeof(hooks));
     if(r<0)wifi_native_adapter_stop();
+    else wifiNativeRefresh();
     return r;
 }
 int wifi_native_adapter_stop(void)

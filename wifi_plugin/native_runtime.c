@@ -94,7 +94,7 @@ static int observe(SceModule *m)
 {
     if(m && !strcmp(m->modname,"sceNetApctl_Library")) {
         int r=owner>=0?patch_netconf(sceKernelFindModuleByUID(owner),1):0;
-        for(unsigned i=0;i<3;++i) {
+        for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i) {
             SceModule *client=sceKernelFindModuleByName(browser_import_guards[i]->name);
             if(client && patch_browser_imports(client)<0)r=-1;
         }
@@ -109,7 +109,7 @@ int wifiNativeRefresh(void)
 {
     unsigned k1=pspSdkSetK1(0);int intr=sceKernelCpuSuspendIntr();
     int result=owner>=0?patch_netconf(sceKernelFindModuleByUID(owner),1):0;
-    for(unsigned i=0;i<3;++i) {
+    for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i) {
         SceModule *m=sceKernelFindModuleByName(browser_import_guards[i]->name);
         if(m && patch_browser_imports(m)<0)result=-1;
     }
@@ -121,9 +121,9 @@ int wifiNativeRegister(unsigned address,unsigned size)
     SceModule *m=sceKernelFindModuleByName("ESP WiFi XMB Bridge");
     if(!hooks && size==sizeof(wifi_native_hooks_t) && owned(m,address,size,0)) {
         wifi_native_hooks_t *request=(void *)address;
-        if(request->magic==WIFI_NATIVE_HOOK_MAGIC && request->abi==2) {
+        if(request->magic==WIFI_NATIVE_HOOK_MAGIC && request->abi==3) {
             unsigned i;for(i=0;i<WIFI_NATIVE_CALLBACKS;++i)if(!owned(m,request->callbacks[i],4,1))break;
-            if(i==WIFI_NATIVE_CALLBACKS){hooks=request;bridge_owner=m->modid;bridge_text=m->text_addr;hooks->status=0;hooks->owner=-1;for(unsigned j=0;j<3;++j)hooks->browser_owners[j]=-1;result=0;}
+            if(i==WIFI_NATIVE_CALLBACKS){hooks=request;bridge_owner=m->modid;bridge_text=m->text_addr;hooks->status=0;hooks->owner=-1;for(unsigned j=0;j<WIFI_NATIVE_CONSUMERS;++j)hooks->browser_owners[j]=-1;result=0;}
         }
     }
     pspSdkSetK1(k1);return result;
@@ -133,7 +133,7 @@ int wifi_native_init(void)
 int wifi_native_stop(void)
 {
     if(owner>=0 && sceKernelFindModuleByUID(owner))return -2;
-    if(hooks)for(unsigned i=0;i<3;++i)if(hooks->browser_owners[i]>=0 && sceKernelFindModuleByUID(hooks->browser_owners[i]))return -2;
+    if(hooks)for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i)if(hooks->browser_owners[i]>=0 && sceKernelFindModuleByUID(hooks->browser_owners[i]))return -2;
     if(installed){STMOD_HANDLER current=sctrlHENSetStartModuleHandler(previous);if(current!=on_start){sctrlHENSetStartModuleHandler(current);return -2;}installed=0;}
     hooks=NULL;return 0;
 }
@@ -145,3 +145,5 @@ unsigned wifi_native_detail(void){return hooks?hooks->detail:0;}
 void wifi_native_observed(unsigned out[4]){memcpy(out,observed_words,sizeof(observed_words));}
 
 int wifi_native_browser_status(void){return hooks?hooks->browser_status:-20;}
+
+unsigned wifi_native_browser_consumers(void){return hooks?hooks->consumer_mask:0;}

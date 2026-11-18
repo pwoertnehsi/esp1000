@@ -45,7 +45,7 @@ int kuKernelLoadModule(const char *a,int b,void *c){(void)a;(void)b;(void)c;retu
 int wifiNativeRefresh(void){return 0;}
 int sceUtilityLoadNetModule(int n){(void)n;return 0;}
 int sceUtilityUnloadNetModule(int n){(void)n;return 0;}
-int wifiNativeRegister(unsigned a,unsigned b){assert(a && b==sizeof(hooks));for(unsigned i=0;i<3;++i)hooks.browser_owners[i]=-1;return 0;}
+int wifiNativeRegister(unsigned a,unsigned b){assert(a && b==sizeof(hooks));for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i)hooks.browser_owners[i]=-1;return 0;}
 static void __attribute__((aligned(4))) event(int old,int next,int code,int error,void *arg)
 {(void)old;(void)next;(void)error;assert(arg==(void *)1);assert(event_count<8);events_seen[event_count++]=code;}
 int main(void)

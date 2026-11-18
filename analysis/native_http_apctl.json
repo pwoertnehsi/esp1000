@@ -1,0 +1,21 @@
+{
+  "module": "SceHttp_Library",
+  "sha256": "ffbae22d0750ccf410ced4d4ac2cf9b0941524674999bd12cc0194ce3e249524",
+  "text_size": 101660,
+  "apctl_import": {
+    "library": "sceNetApctl",
+    "table_address": "0x00017D48",
+    "version": "0x0011",
+    "flags": "0x0001",
+    "function_count": 1,
+    "variable_count": 0,
+    "entries": [
+      {
+        "nid": "0x2BEFDF23",
+        "address": "0x000179E8",
+        "kind": "function"
+      }
+    ]
+  },
+  "finding": "sceNetApctlGetInfo returns 80410A05 when real APCTL has no association; the ESP facade must cover this HTTP consumer too."
+}

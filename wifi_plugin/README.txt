@@ -1,10 +1,13 @@
-ESP WiFi native browser candidate v0.15 — E1000 / owned 6.61 / ARK-5 / ESP15
+ESP WiFi native browser candidate v0.16 — E1000 / owned 6.61 / ARK-5 / ESP15
 
 Browser and Online Manual now use Sony's original VSH actions. L+R+SQUARE queues
 that same native browser action. The plugin does not load an EBOOT, draw a GU
 screen, or call ExitGame for these entries. Sony owns browser rendering, exit
 and its existing restriction/password flow; that flow is not bypassed or replaced.
-Native browser launch/exit and the four-digit prompt still need hardware testing.
+Native browser launch and exit passed on hardware with v0.15. The four-digit
+prompt remains untested. v0.16 also routes Sony HTTP GetInfo to the ESP session;
+this fixes the missed consumer implicated in instant 80410A05 on remote pages.
+Remote pages still require a hardware retry with v0.16.
 The standalone browser EBOOT is retained as a separate diagnostic fallback.
 
 Install wifi_vsh.prx and wifi_menu.prx together (shared control ABI changed).

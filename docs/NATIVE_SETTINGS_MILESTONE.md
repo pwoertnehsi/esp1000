@@ -39,3 +39,20 @@ Install the v0.15 kernel and user bridge together. ESP15 and the existing privat
 browser assets are unchanged. Hardware acceptance still requires opening and
 closing the browser without a black transition or VSH restart, reopening it,
 checking saved-profile browsing, then USB storage and camera coexistence.
+
+## Native browser launch/exit passed; HTTP consumer correction v0.16
+
+The user confirmed that v0.15 opens and closes the browser cleanly, with local
+file pages working. Remote pages failed immediately with 80410A05 after choosing
+the saved working access point. Owned 6.61 libhttp imports sceNetApctlGetInfo
+independently of the three browser consumers covered by v0.15; it was reaching
+the original APCTL instance, whose GetInfo returns 80410A05 when disconnected.
+
+V0.16 adds that exact HTTP import to the existing guarded ESP facade and refreshes
+already-loaded consumers when the user bridge registers. It leaves the APCTL
+provider itself unchanged. Native hook ABI3 requires installing the kernel and
+user bridge together. The diagnostic consumer mask records successful bindings:
+bit0 browser plugin, bit1 UI, bit2 engine, bit3 HTTP. It records observations,
+not current module lifetime. Firmware provenance is in
+analysis/native_http_apctl.json. Native launch/exit is confirmed; the HTTP fix
+still needs hardware verification. ESP15 and the saved profile are unchanged.

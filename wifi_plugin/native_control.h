@@ -4,6 +4,7 @@
 #include "../common/native_wifi_profile.h"
 #define WIFI_NATIVE_USB_MAGIC 0x574e5501u
 #define WIFI_NATIVE_CALLBACKS 12u
+#define WIFI_NATIVE_CONSUMERS 4u
 #define WIFI_NATIVE_USB_ABI 4u
 #define WIFI_NATIVE_SCAN_COMMAND 1u
 #define WIFI_NATIVE_CONNECT_COMMAND 2u
@@ -29,8 +30,9 @@ typedef struct {
     unsigned magic,abi,callbacks[WIFI_NATIVE_CALLBACKS];
     volatile int status,owner;
     volatile unsigned detail;
-    volatile int browser_owners[3];
+    volatile int browser_owners[WIFI_NATIVE_CONSUMERS];
     volatile int browser_status;
+    volatile unsigned consumer_mask;
 } wifi_native_hooks_t;
 #define WIFI_NATIVE_SESSION_MAGIC 0x574e5301u
 typedef struct {

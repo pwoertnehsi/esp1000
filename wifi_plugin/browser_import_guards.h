@@ -31,4 +31,12 @@ static const browser_import_entry_t browser_entries_2[]={
     {0x110ee0,0x113268,0x5deac81b,0xb7c,WIFI_NATIVE_STATE,"sceNetApctl"},
 };
 static const browser_import_guard_t browser_guard_2={"sceHVNetfront_Module",1,1,0x122ce8,browser_libraries_2,sizeof(browser_libraries_2)/sizeof(browser_libraries_2[0]),browser_entries_2,sizeof(browser_entries_2)/sizeof(browser_entries_2[0])};
-static const browser_import_guard_t *const browser_import_guards[]={&browser_guard_0,&browser_guard_1,&browser_guard_2};
+/* Sony HTTP calls APCTL independently of the browser/UI imports. */
+static const browser_import_library_t browser_libraries_3[]={
+    {0x17d48,0x17e98,0x10011,0x10005,0x1830c,0x179e8,"sceNetApctl"},
+};
+static const browser_import_entry_t browser_entries_3[]={
+    {0x179e8,0x1830c,0x2befdf23,0x9e4,WIFI_NATIVE_INFO,"sceNetApctl"},
+};
+static const browser_import_guard_t browser_guard_3={"SceHttp_Library",1,2,0x18d1c,browser_libraries_3,1,browser_entries_3,1};
+static const browser_import_guard_t *const browser_import_guards[]={&browser_guard_0,&browser_guard_1,&browser_guard_2,&browser_guard_3};

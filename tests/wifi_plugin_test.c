@@ -13,6 +13,7 @@ void wifi_native_observed(unsigned out[4]){memset(out,0,16);}
 unsigned wifi_native_detail(void){return 0;}
 int wifi_native_status(void){return 0;}
 int wifi_native_browser_status(void){return 0;}
+unsigned wifi_native_browser_consumers(void){return 0;}
 int wifi_native_init(void){return 0;}
 int wifi_native_stop(void){return 0;}
 static unsigned clock_us,buttons,devkit=0x06060110;

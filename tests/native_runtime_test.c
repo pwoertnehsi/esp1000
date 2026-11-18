@@ -20,7 +20,7 @@ unsigned sctrlHENFindFunction(const char *mod,const char *lib,unsigned nid)
 {
     assert(!strcmp(mod,"sceNetApctl_Library"));if(!api_present)return 0;
     for(unsigned i=0;i<sizeof(entries)/sizeof(*entries);++i)if(entries[i].nid==nid){assert(!strcmp(lib,entries[i].library));return api.text_addr+entries[i].api_offset;}
-    for(unsigned g=0;g<3;++g)for(unsigned i=0;i<browser_import_guards[g]->entry_count;++i) {
+    for(unsigned g=0;g<WIFI_NATIVE_CONSUMERS;++g)for(unsigned i=0;i<browser_import_guards[g]->entry_count;++i) {
         const browser_import_entry_t *e=&browser_import_guards[g]->entries[i];
         if(e->nid==nid){assert(!strcmp(lib,e->library));return api.text_addr+e->api_offset;}
     }
@@ -50,7 +50,7 @@ int main(void)
     bridge=(SceModule){.modid=1,.text_addr=0x09000000,.text_size=0x1000,.nsegment=2,.segmentaddr={0x09000000,0x09001000},.segmentsize={0x1000,0x3000}};
     netconf=(SceModule){.modid=2,.version={1,1},.text_addr=0x09010000,.text_size=157640};strcpy(netconf.modname,"sceVshNetconf_Module");
     api=(SceModule){.version={3,1},.text_addr=0x09080000,.text_size=0x11e9c};
-    wifi_native_hooks_t *request=(void *)0x09001000;request->magic=WIFI_NATIVE_HOOK_MAGIC;request->abi=2;
+    wifi_native_hooks_t *request=(void *)0x09001000;request->magic=WIFI_NATIVE_HOOK_MAGIC;request->abi=3;
     for(unsigned i=0;i<WIFI_NATIVE_CALLBACKS;++i)request->callbacks[i]=bridge.text_addr+16*i;
     unsigned saved=request->callbacks[0];request->callbacks[0]=0x88000000;
     assert(wifiNativeRegister((unsigned)(uintptr_t)request,sizeof(*request))<0 && !hooks);request->callbacks[0]=saved;
@@ -85,7 +85,7 @@ int main(void)
     assert(wifiNativeRefresh()<0 && hooks->status==-14 && !memcmp(before,(void *)(uintptr_t)netconf.text_addr,sizeof(before)));
     /* Browser consumers: refuse any foreign stub before making a write;
      * accept loader placeholders, retain live ownership, then rebind on APCTL. */
-    for(unsigned g=0;g<3;++g) {
+    for(unsigned g=0;g<WIFI_NATIVE_CONSUMERS;++g) {
         const browser_import_guard_t *b=browser_import_guards[g];
         browser=(SceModule){.modid=20+(int)g,.version={b->minor,b->major},.text_addr=0x09100000,.text_size=b->size};
         strcpy(browser.modname,b->name);browser_present=1;api_present=0;
@@ -105,7 +105,7 @@ int main(void)
         *last_stub=0x08012345;
         assert(patch_browser_imports(&browser)<0 && *first==(b->entry_count==1?0x08012345u:0x54cu) && hooks->browser_owners[g]==-1);
         *last_stub=0x54c;
-        assert(!patch_browser_imports(&browser) && hooks->browser_owners[g]==browser.modid);
+        assert(!patch_browser_imports(&browser) && hooks->browser_owners[g]==browser.modid && (hooks->consumer_mask&(1u<<g)));
         assert(*first==jump(hooks->callbacks[b->entries[0].callback]));
         assert(wifi_native_stop()==-2);
         api_present=1;

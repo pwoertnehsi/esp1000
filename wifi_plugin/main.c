@@ -16,7 +16,7 @@
 #include "menu_control.h"
 #include "browser_runtime.h"
 
-PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,15);
+PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,16);
 #define CHORD (PSP_CTRL_LTRIGGER|PSP_CTRL_RTRIGGER|PSP_CTRL_SQUARE)
 #define ROWS 64u
 static SceUID worker=-1;
@@ -139,10 +139,12 @@ static int monitor(SceSize size,void *args)
             previous_native_status=native_status;
         }
         static int previous_browser_paths=-999,previous_browser_backend=-999;
+        static unsigned previous_consumers=~0u;
         int browser_paths=wifi_browser_status(),browser_backend=wifi_native_browser_status();
-        if(browser_paths!=previous_browser_paths || browser_backend!=previous_browser_backend) {
-            diagnostic("NATIVE_BROWSER paths=%d backend=%d\n",browser_paths,browser_backend);
-            previous_browser_paths=browser_paths;previous_browser_backend=browser_backend;
+        unsigned consumers=wifi_native_browser_consumers();
+        if(browser_paths!=previous_browser_paths || browser_backend!=previous_browser_backend || consumers!=previous_consumers) {
+            diagnostic("NATIVE_BROWSER paths=%d backend=%d consumers=%x\n",browser_paths,browser_backend,consumers);
+            previous_browser_paths=browser_paths;previous_browser_backend=browser_backend;previous_consumers=consumers;
         }
         int menu_status=wifi_menu_status();
         if(menu_status!=previous_menu_status){diagnostic("XMB_MENU status=%d\n",menu_status);previous_menu_status=menu_status;}
@@ -185,7 +187,7 @@ int module_start(SceSize size,void *args)
 {
     (void)size;(void)args;
     unsigned devkit=sceKernelDevkitVersion();int model=sceKernelGetModel(),context=sceKernelInitKeyConfig();
-    diagnostic("BEGIN ESP WiFi VSH Entry0.15 devkit=%08x model=%d context=%08x\n",devkit,model,context);
+    diagnostic("BEGIN ESP WiFi VSH Entry0.16 devkit=%08x model=%d context=%08x\n",devkit,model,context);
     /* ARK VSH reports 6.60 on this 6.61 installation. This plugin changes no
      * global model values; native menu changes have separate exact ABI guards. */
     if((devkit!=0x06060110 && devkit!=0x06060010) || model!=10 || context!=PSP_INIT_KEYCONFIG_VSH) {
