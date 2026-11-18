@@ -49,6 +49,17 @@ def prepare(source,output):
     replace(exports,'PSP_END_EXPORTS',text+'\nPSP_END_EXPORTS')
     # Hook only user imports in this opt-in GAME plugin; never a VSH provider.
     hook='''
+static void esp_boot_log(unsigned stage,int result)
+{
+    char line[48];const char prefix[]="ADHOC_PLUGIN ";unsigned used=sizeof(prefix)-1;
+    memcpy(line,prefix,used);static const char hex[]="0123456789abcdef";
+    for(unsigned j=0;j<8;++j)line[used++]=hex[(stage>>(28-4*j))&15];
+    line[used++]=' ';
+    for(unsigned j=0;j<8;++j)line[used++]=hex[((unsigned)result>>(28-4*j))&15];
+    line[used++]='\\n';
+    int fd=sceIoOpen("ms0:/esp-adhoc-plugin.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
+    if(fd>=0){sceIoWrite(fd,line,used);sceIoClose(fd);}
+}
 static SceModule2 *esp_game_module;
 int esp_game_switch(void){return 1;}
 static void esp_patch_imports(SceModule2 *module)
@@ -62,7 +73,12 @@ static void esp_patch_imports(SceModule2 *module)
         {"sceWlanDrv",0xd7763699,0x17}
     };
     hook_import_bynid((SceModule *)module,"sceWlanDrv",0xd7763699,esp_game_switch);
-    if(module->text_addr>=0x08800000 && module->text_addr<0x08900000 && strcmp(module->modname,"opnssmp") && strcmp(module->modname,"pspnet_shims") && strncmp(module->modname,"sceNet",6))esp_game_module=module;
+    int utility_hook=hook_import_bynid((SceModule *)module,"sceUtility",0x1579a159,utility_load_netmodule);
+    if(!utility_hook)esp_boot_log(10,utility_hook);
+    hook_import_bynid((SceModule *)module,"sceUtility",0x64d50c56,utility_unload_netmodule);
+    hook_import_bynid((SceModule *)module,"sceUtility",0x2a2b3de0,utility_load_module);
+    hook_import_bynid((SceModule *)module,"sceUtility",0xe49bfe92,utility_unload_module);
+    if(((module->text_addr>=0x08800000 && module->text_addr<0x08900000) || !strcmp(module->modname,"ESP1000 Ad Hoc Peer Test")) && strcmp(module->modname,"opnssmp") && strcmp(module->modname,"pspnet_shims") && strncmp(module->modname,"sceNet",6))esp_game_module=module;
     /* The loader may resolve weak imports again when APCTL arrives. Rebind
      * existing clients, including the game which started before the shim. */
     if(!strcmp(module->modname,"pspnet_shims") || !strcmp(module->modname,"sceNetApctl_Library")) {
@@ -85,6 +101,9 @@ static void esp_patch_imports(SceModule2 *module)
     replace(atpro,'// Online Module Start Patcher',hook+'\n// Online Module Start Patcher')
     replace(atpro,'int sysctrl_patcher_result = sysctrl_patcher(module);','int sysctrl_patcher_result = sysctrl_patcher(module);\n    esp_patch_imports(module);')
     replace(atpro,'onlinemode = sceWlanGetSwitchState();','onlinemode = sceKernelGetModel()==10 ? 1 : sceWlanGetSwitchState();')
+    replace(atpro,'// Initialize Logfile','esp_boot_log(1,sceKernelInitKeyConfig());\n    // Initialize Logfile')
+    replace(atpro,'printk("Kernel Loader Hook: %d\\n", result);','esp_boot_log(2,result);\n    printk("Kernel Loader Hook: %d\\n", result);')
+    replace(atpro,'printk("User Loader Hook: %d\\n", result);','esp_boot_log(3,result);\n    printk("User Loader Hook: %d\\n", result);')
     replace(atpro,'sctrlHENPatchSyscall((void*)sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x4AC57943), cbdeny);','if(sceKernelGetModel()!=10)sctrlHENPatchSyscall((void*)sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x4AC57943), cbdeny);')
     replace(atpro,'scePowerLock(0);','if(sceKernelGetModel()!=10)scePowerLock(0);')
     replace(tree/'atpro/exports.exp','PSP_END_EXPORTS','PSP_EXPORT_START(esp1000_kernel, 0, 0x4001)\nPSP_EXPORT_FUNC_HASH(esp_game_switch)\nPSP_EXPORT_END\nPSP_END_EXPORTS')

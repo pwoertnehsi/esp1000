@@ -26,7 +26,7 @@ static int step(const char *name,int result)
 }
 int main(void)
 {
-    pspDebugScreenInit();step("BEGIN peer test v0.2",0);sceCtrlSetSamplingCycle(0);sceCtrlSetSamplingMode(PSP_CTRL_MODE_DIGITAL);
+    pspDebugScreenInit();step("BEGIN peer test v0.3",0);step("APP text address",(int)(unsigned)main);sceCtrlSetSamplingCycle(0);sceCtrlSetSamplingMode(PSP_CTRL_MODE_DIGITAL);
     int cb=sceKernelCreateThread("callbacks",callbacks,0x10,4096,PSP_THREAD_ATTR_USER,NULL);if(cb>=0)sceKernelStartThread(cb,0,NULL);
     pspDebugScreenPrintf("ESP1000 / PPSSPP Ad Hoc peer test\n\nRun this same EBOOT on both devices.\nServer: set in esp-adhoc/server.txt\nPPSSPP: WLAN + built-in server ON,\nserver = PC LAN IP, offset = 10000,\nrelay / ENet / UPnP OFF for this LAN test.\n\nCROSS starts; HOME exits.\n");
     while(!quit){SceCtrlData pad;sceCtrlReadBufferPositive(&pad,1);if(pad.Buttons&PSP_CTRL_CROSS)break;sceKernelDelayThread(20000);}
