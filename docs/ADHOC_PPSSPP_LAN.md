@@ -2,8 +2,8 @@
 
 This candidate adapts [Kethen/aemu](https://github.com/Kethen/aemu), pinned at
 `f6bc457eca56c4f08cad39aeac80fcc6dce6db6a`, to the ESP-backed E1000.
-It is a GAME plugin, separate from the VSH/browser plugin. It has not yet passed
-hardware peer exchange or a Gran Turismo race. Ordinary PSP radio Ad Hoc, Game
+It is a GAME plugin, separate from the VSH/browser plugin. Hardware peer exchange and clean test shutdown passed on2026-11-18 (15
+UDP datagrams traced in each direction). A Gran Turismo race is not yet tested. Ordinary PSP radio Ad Hoc, Game
 Sharing and public relay servers are not implemented by this candidate.
 
 The existing aemu modules supply Ad Hoc control, discovery, matching, PDP, PTP
