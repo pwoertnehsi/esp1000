@@ -112,18 +112,36 @@ static int handshake(void *ssl)
 }
 static int io(void *ssl,void *data,int length,int sending)
 {
+    unsigned began=sceKernelGetSystemTimeLow(),epoch,limit=30000000u;
     enter();int i=find_ssl(ssl),fd=i>=0?slots[i].fd:-1;
     if(i<0 || fd<0 || slots[i].closing || length<0 || (!data && length)) {if(i>=0)slots[i].error=1;leave();return -1;}
-    /* Hold only across one nonblocking NET call, so close cannot reuse its fd. */
-    int n=sending?sceNetInetSend(fd,data,length,MSG_DONTWAIT):sceNetInetRecv(fd,data,length,MSG_DONTWAIT);
-    int error=n>0?0:n==0 && !sending?6:would_block()?(sending?3:2):1;
-    /* Bound diagnostics per connection. Record lengths/results only, never
-     * plaintext, and do Memory Stick I/O after releasing the socket lock. */
-    int trace=slots[i].io_events<12;
-    if(trace)++slots[i].io_events;
-    slots[i].error=error;leave();
-    if(trace){log_result(sending?"WRITE_REQUEST":"READ_REQUEST",length);log_result(sending?"WRITE_RESULT":"READ_RESULT",n);log_result("IO_SSL_ERROR",error);}
-    return n;
+    epoch=slots[i].generation;
+    /* Sony clears SO_NONBLOCK after connect. Its HTTP worker expects SSL I/O
+     * to wait; a transient WANT_READ is otherwise treated as request failure.
+     * PSP socket timeouts are four-byte microsecond values (owned 11018).
+     * Keep each NET call nonblocking so close/free can cancel between attempts. */
+    int nonblocking=0;unsigned configured=0;socklen_t size=sizeof(nonblocking);
+    sceNetInetGetsockopt(fd,SOL_SOCKET,SO_NONBLOCK,&nonblocking,&size);
+    size=sizeof(configured);
+    if(!sceNetInetGetsockopt(fd,SOL_SOCKET,sending?SO_SNDTIMEO:SO_RCVTIMEO,&configured,&size) && size==sizeof(configured) && configured)
+        limit=configured<60000000u?configured:60000000u;
+    leave();
+    int n,error;
+    for(;;) {
+        enter();
+        if(slots[i].generation!=epoch || slots[i].ssl!=ssl || slots[i].fd!=fd || slots[i].closing){leave();return -1;}
+        n=sending?sceNetInetSend(fd,data,length,MSG_DONTWAIT):sceNetInetRecv(fd,data,length,MSG_DONTWAIT);
+        error=n>0?0:n==0 && !sending?6:n<0 && would_block()?(sending?3:2):1;
+        int retry=length>0 && n<0 && (error==2 || error==3) && !nonblocking && sceKernelGetSystemTimeLow()-began<limit;
+        if(!retry) {
+            int trace=slots[i].io_events<12;
+            if(trace)++slots[i].io_events;
+            slots[i].error=error;leave();
+            if(trace){log_result(sending?"WRITE_REQUEST":"READ_REQUEST",length);log_result(sending?"WRITE_RESULT":"READ_RESULT",n);log_result("IO_SSL_ERROR",error);}
+            return n;
+        }
+        leave();sceKernelDelayThread(1000);
+    }
 }
 static int read_ssl(void *ssl,void *data,int length){return io(ssl,data,length,0);}
 static int write_ssl(void *ssl,const void *data,int length){return io(ssl,(void *)data,length,1);}

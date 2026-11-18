@@ -6,13 +6,16 @@
 static unsigned ticks,lock_depth,original_calls,closes,frees;
 static int response_status,io_errno=11,blocked,app_mode,cancel_during_wait,recycle_bio;
 static unsigned response_flags;
+static int socket_nonblocking=1,delayed_data,cancel_io_fd;
+int sceNetInetGetsockopt(int fd,int level,int opt,void *out,socklen_t *size)
+{assert(lock_depth && fd>=0 && level==SOL_SOCKET && *size==4);*(unsigned *)out=opt==SO_NONBLOCK?(unsigned)socket_nonblocking:5000u;return 0;}
 static unsigned response_at,sent_bytes;
 static unsigned char sent[512];
 int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;assert(!lock_depth);lock_depth=1;return 0;}
 int sceKernelSignalSema(int a,int b){(void)a;(void)b;assert(lock_depth);lock_depth=0;return 0;}
 int sceKernelCreateSema(const char *n,int a,int b,int c,void *d){(void)n;(void)a;(void)b;(void)c;(void)d;return 1;}
 unsigned sceKernelGetSystemTimeLow(void){return ticks;}
-int sceKernelDelayThread(unsigned n){ticks+=n;if(cancel_during_wait){cancel_during_wait=0;assert(!close_socket(5));}return 0;}
+int sceKernelDelayThread(unsigned n){ticks+=n;if(delayed_data){delayed_data=0;app_mode=2;}if(cancel_io_fd){int fd=cancel_io_fd;cancel_io_fd=0;assert(!close_socket(fd));}if(cancel_during_wait){cancel_during_wait=0;assert(!close_socket(5));}return 0;}
 int sceIoOpen(const char *n,int a,int b){(void)n;(void)a;(void)b;assert(!lock_depth);return -1;}
 int sceIoWrite(int a,const void *b,unsigned c){(void)a;(void)b;return c;}int sceIoClose(int a){(void)a;return 0;}
 int sceNetInetGetErrno(void){return io_errno;}
@@ -53,7 +56,14 @@ int main(void)
     app_mode=2;
     assert(read_ssl(ssl,data,8)==3 && !memcmp(data,"abc",3) && get_error(ssl,3)==0);
     assert(write_ssl(ssl,data,8)==3 && get_error(ssl,3)==0);
-    assert(!close_socket(4) && ready(ssl)==0 && handshake(ssl)<0 && tls.active==1);
+    socket_nonblocking=0;app_mode=1;io_errno=11;delayed_data=1;
+    unsigned read_began=ticks;
+    assert(read_ssl(ssl,data,8)==3 && ticks>read_began && get_error(ssl,3)==0);
+    app_mode=1;delayed_data=1;assert(write_ssl(ssl,data,8)==3 && get_error(ssl,3)==0);
+    app_mode=1;read_began=ticks;
+    assert(read_ssl(ssl,data,8)<0 && ticks-read_began==5000 && get_error(ssl,-1)==2);
+    cancel_io_fd=4;read_began=ticks;assert(read_ssl(ssl,data,8)<0 && ticks-read_began==1000);
+    assert(ready(ssl)==0 && handshake(ssl)<0 && tls.active==1);
     free_ssl(ssl);assert(!tls.active && closes==1 && frees==1);
     app_mode=0;io_errno=11;response_at=sent_bytes=0;
     assert(!wifiTlsConnect(4,&destination,0,&error,&syserror,NULL,conn));bio=bio_new(4,0);set_bio(ssl,bio,bio);

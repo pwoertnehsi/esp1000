@@ -101,3 +101,28 @@ If it fails, mount PSP and preserve `ssl-offload.log`, `wifi-vsh.log`,
 `native-wifi.log` and `psp-vnet.log`. `TLS_OFFLOAD_HOOKS status=1` confirms hook
 installation; VERIFIED / SSL_BOUND / HANDSHAKE_READY records distinguish stages.
 The earlier passive-capture marker remains disabled.
+
+## Post-handshake read correction (bridge 0.20)
+
+The first UART-free hardware capture showed verified handshakes, complete HTTP
+request writes (226 or 271 bytes), then a single read returning WANT_READ and
+immediate SSL free. One attempt received 568 bytes before a subsequent request
+failed. Owned libhttp clears SO_NONBLOCK after socket connect and its HTTP read
+worker treats negative reads as request failure, rather than retrying WANT_READ.
+The original offload shim forced nonblocking reads without implementing that
+blocking contract; 80431066 can be a later request-state failure.
+
+Bridge 0.20 retries transient reads/writes for blocking sockets. Each NET call
+remains nonblocking and holds the registry lock only for that call. Between
+attempts it yields and validates the original slot generation, SSL identity and
+descriptor, allowing socket close or SSL free to cancel the wait without fd
+reuse. Explicit nonblocking sockets keep WANT_READ/WANT_WRITE behavior. The
+PSP's four-byte socket timeout is used when set (capped at 60 seconds); unset
+timeouts use a bounded 30 seconds. EOF and hard errors return immediately.
+No ESP update or certificate-policy change is required.
+
+The three TLS sanitizer tests pass, including delayed successful read/write,
+native timeout expiry, explicit nonblocking behavior and close during a pending
+read. The PSP bridge builds with warnings as errors. Hardware confirmation of
+HTTPS pages and RSS/Browser exit is still pending. Previous logs/binary are
+archived locally in artifacts/tls-offload-v03.

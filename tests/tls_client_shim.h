@@ -10,6 +10,12 @@ typedef struct {int modid;} SceModule;
 #define PSP_O_CREAT 2
 #define PSP_O_APPEND 4
 #define AF_INET 2
+#define SOL_SOCKET 0xffff
+#define SO_NONBLOCK 0x1009
+#define SO_SNDTIMEO 0x1005
+#define SO_RCVTIMEO 0x1006
+typedef unsigned socklen_t;
+int sceNetInetGetsockopt(int,int,int,void *,socklen_t *);
 #define MSG_DONTWAIT 128
 struct sockaddr_in {unsigned char sin_len,sin_family;unsigned short sin_port;uint32_t sin_addr;char rest[8];};
 int sceKernelWaitSema(int,int,void *);int sceKernelSignalSema(int,int);
