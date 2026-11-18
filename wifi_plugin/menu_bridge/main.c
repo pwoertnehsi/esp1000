@@ -1,7 +1,7 @@
 #include <pspkernel.h>
 #include "../menu_control.h"
 #include "native_adapter.h"
-PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,21);
+PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,22);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
 extern int wifi_tls_init(void);
 extern int wifi_tls_can_stop(void);

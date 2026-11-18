@@ -150,3 +150,23 @@ Launch behavior is unchanged. Further inspection identifies launcher interface
 slot 0x24 as the URL-launch function at launcher text+0xdfc (interface starts at
 its data+0x10). RSS invokes it through content_browser with its completion
 context; substituting the RSS action into Browser would only open the RSS menu.
+
+### Socket timeout units: bridge 0.22
+
+Bridge 0.21 hardware logs showed read limit 0x2ee0 (12000 us), followed by
+WANT_READ after approximately 31–45 ms. The underlying socket was blocking;
+the nonblocking exception was not the observed cause. The wait budget was wrong.
+
+Owned 6.61 sceNetInet code confirms a non-round-tripping API: setsockopt at
+text+0x49f4/0x4a10 divides the supplied microseconds by 10000, storing internal
+10 ms ticks. Getsockopt at 0x4c88/0x4cb4 returns those stored counts unchanged.
+The earlier documentation's assumption that queried values were microseconds
+was incorrect. Values 6000/12000 therefore represent 60/120 seconds, not 6/12 ms.
+
+Bridge 0.22 converts queried ticks to microseconds with saturation before
+multiplication. The existing 60-second cap and unset-timeout 30-second default
+remain. Regression tests cover a one-tick deadline, delayed successful reads,
+12000 ticks, unsigned overflow protection, unset timeout and cancellation. The
+PSP build and three TLS sanitizer programs pass; HTTPS hardware confirmation
+is still required. Evidence and previous/new binaries are archived locally in
+artifacts/tls-offload-v05. RSS and standalone launch behavior is unchanged.

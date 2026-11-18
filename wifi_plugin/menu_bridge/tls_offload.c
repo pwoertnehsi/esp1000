@@ -110,6 +110,11 @@ static int handshake(void *ssl)
     log_result("HANDSHAKE_READY",result?0:-1);
     return result?1:-1; /* No legacy TLS fallback on an unbound/reused socket. */
 }
+/* Owned 6.61 sceNetInet setsockopt divides microseconds by 10000 at
+ * text+49f4/4a10, but getsockopt returns that stored tick count unchanged at
+ * 4c88/4cb4. Do not assume the two APIs round-trip the same units. */
+static unsigned wait_budget(unsigned socket_ticks)
+{return !socket_ticks?30000000u:socket_ticks>=6000u?60000000u:socket_ticks*10000u;}
 static int io(void *ssl,void *data,int length,int sending)
 {
     unsigned began=sceKernelGetSystemTimeLow(),epoch,limit=30000000u;
@@ -119,13 +124,13 @@ static int io(void *ssl,void *data,int length,int sending)
     /* Sony clears SO_NONBLOCK after connect. Its HTTP worker expects SSL I/O
      * to wait; a transient WANT_READ is otherwise treated as request failure.
      * The TCP descriptor mode does not define the HTTP SSL callback contract.
-     * PSP socket timeouts are four-byte microsecond values (owned 11018).
+     * Queried PSP socket timeouts are four-byte counts of 10 ms ticks.
      * Keep each NET call nonblocking so close/free can cancel between attempts. */
     int nonblocking=0;unsigned configured=0;socklen_t size=sizeof(nonblocking);
     sceNetInetGetsockopt(fd,SOL_SOCKET,SO_NONBLOCK,&nonblocking,&size);
     size=sizeof(configured);
     if(!sceNetInetGetsockopt(fd,SOL_SOCKET,sending?SO_SNDTIMEO:SO_RCVTIMEO,&configured,&size) && size==sizeof(configured) && configured)
-        limit=configured<60000000u?configured:60000000u;
+        limit=wait_budget(configured);
     leave();
     int n,error;
     for(;;) {

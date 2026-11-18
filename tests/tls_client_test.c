@@ -8,7 +8,7 @@ static int response_status,io_errno=11,blocked,app_mode,cancel_during_wait,recyc
 static unsigned response_flags;
 static int socket_nonblocking=1,delayed_data,cancel_io_fd;
 int sceNetInetGetsockopt(int fd,int level,int opt,void *out,socklen_t *size)
-{assert(lock_depth && fd>=0 && level==SOL_SOCKET && *size==4);*(unsigned *)out=opt==SO_NONBLOCK?(unsigned)socket_nonblocking:5000u;return 0;}
+{assert(lock_depth && fd>=0 && level==SOL_SOCKET && *size==4);*(unsigned *)out=opt==SO_NONBLOCK?(unsigned)socket_nonblocking:1u;return 0;}
 static unsigned response_at,sent_bytes;
 static unsigned char sent[512];
 int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;assert(!lock_depth);lock_depth=1;return 0;}
@@ -35,6 +35,7 @@ static void original_free(void *ssl){assert(ssl);++frees;}
 static int original_close(int fd){assert(fd>=0);++closes;return 0;}
 int main(void)
 {
+    assert(wait_budget(1)==10000 && wait_budget(12000)==60000000u && wait_budget(0xffffffffu)==60000000u && wait_budget(0)==30000000u);
     uint8_t *conn=mmap((void *)0x09000000,8192,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED,-1,0);assert(conn!=(void *)-1);
     char *name=(void *)(conn+4096);strcpy(name,"en.touhouwiki.net");*(char **)(conn+0x38)=name;*(unsigned *)(conn+4)=1;
     struct sockaddr_in destination={.sin_port=__builtin_bswap16(443)};int error=0,syserror=0;
@@ -50,7 +51,7 @@ int main(void)
     assert(!wifiTlsConnect(4,&destination,0,&error,&syserror,NULL,conn) && tls.active==1);
     assert(tls_offload_request_valid(sent) && !memcmp(sent+8,name,strlen(name)));
     void *bio=bio_new(4,0),*ssl=(void *)0x20000;set_bio(ssl,bio,bio);assert(handshake(ssl)==1 && ready(ssl)==1);
-    app_mode=1;char data[8];unsigned timeout_began=ticks;assert(read_ssl(ssl,data,8)<0 && get_error(ssl,-1)==2 && ticks-timeout_began==5000);
+    app_mode=1;char data[8];unsigned timeout_began=ticks;assert(read_ssl(ssl,data,8)<0 && get_error(ssl,-1)==2 && ticks-timeout_began==10000);
     assert(write_ssl(ssl,data,8)<0 && get_error(ssl,-1)==3);
     io_errno=54;assert(read_ssl(ssl,data,8)<0 && get_error(ssl,-1)==1);
     app_mode=2;
@@ -61,7 +62,7 @@ int main(void)
     assert(read_ssl(ssl,data,8)==3 && ticks>read_began && get_error(ssl,3)==0);
     socket_nonblocking=0;app_mode=1;delayed_data=1;assert(write_ssl(ssl,data,8)==3 && get_error(ssl,3)==0);
     app_mode=1;read_began=ticks;
-    assert(read_ssl(ssl,data,8)<0 && ticks-read_began==5000 && get_error(ssl,-1)==2);
+    assert(read_ssl(ssl,data,8)<0 && ticks-read_began==10000 && get_error(ssl,-1)==2);
     cancel_io_fd=4;read_began=ticks;assert(read_ssl(ssl,data,8)<0 && ticks-read_began==1000);
     assert(ready(ssl)==0 && handshake(ssl)<0 && tls.active==1);
     free_ssl(ssl);assert(!tls.active && closes==1 && frees==1);
