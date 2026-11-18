@@ -2,9 +2,12 @@ PSP_BEGIN_EXPORTS
 PSP_EXPORT_START(syslib, 0, 0x8000)
 PSP_EXPORT_FUNC(module_start)
 PSP_EXPORT_FUNC(module_stop)
+PSP_EXPORT_FUNC(module_reboot_before)
 PSP_EXPORT_VAR(module_info)
 PSP_EXPORT_END
 PSP_EXPORT_START(ESPWifiMenu, 0, 0x4001)
+PSP_EXPORT_FUNC(wifiNativePowerAcquire)
+PSP_EXPORT_FUNC(wifiNativePowerRelease)
 PSP_EXPORT_FUNC(wifiNativeRegister)
 PSP_EXPORT_FUNC(wifiNativeRefresh)
 PSP_EXPORT_FUNC(wifiMenuRegister)

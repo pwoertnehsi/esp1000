@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include "../wifi_plugin/main.c"
+static int power_stop_allowed=1;
+int wifi_power_can_stop(void){return power_stop_allowed;}
 void wifi_menu_snapshot(wifi_menu_snapshot_t *out){memset(out,0,sizeof(*out));}
 int wifi_menu_init(void){return 0;}
 int wifi_menu_can_stop(void){return 1;}
@@ -67,7 +69,7 @@ int main(void)
  create_result=-8;assert(module_start(0,NULL)==-8);create_result=3;
  start_result=-7;assert(module_start(0,NULL)==-7 && worker<0 && !running);start_result=0;
  devkit=0x06060010;assert(!module_start(0,NULL));assert(!module_stop(0,NULL));devkit=0x06060110;
- assert(!module_start(0,NULL));wait_result=-1;assert(module_stop(0,NULL)<0 && worker>=0);
+ assert(!module_start(0,NULL));power_stop_allowed=0;assert(module_stop(0,NULL)==-2 && worker>=0 && running);power_stop_allowed=1;wait_result=-1;assert(module_stop(0,NULL)<0 && worker>=0);
  wait_result=0;assert(!module_stop(0,NULL) && worker<0);
  run(CHORD,0x200,0,30);run(CHORD,0,1,30);run(PSP_CTRL_SQUARE,0,0,30);assert(!launches);
  run(CHORD,0,0,60);assert(launches==1); /* Holding never repeatedly launches. */

@@ -231,6 +231,18 @@ static void emit(int next,int event,int error)
     }
     trace_event(24,(unsigned)next,event);
 }
+extern int wifiNativePowerAcquire(void);
+extern int wifiNativePowerRelease(void);
+static int power_owned;
+static int stop_power(void)
+{
+    if(!power_owned)return 0;
+    /* A failed USB/session stop must retain its power owner and kernel code. */
+    if(service>=0 || service_started || network>=0 || network_started)return -1;
+    int result=wifiNativePowerRelease();
+    if(!result)power_owned=0;
+    return result;
+}
 static int stop_service(void)
 {
     if(service_started){int status;int r=sceKernelStopModule(service,0,NULL,&status,NULL);if(r<0 || status<0){service_failed=1;return -1;}service_started=0;}
@@ -241,6 +253,12 @@ static int start_service(void)
 {
     if(service_failed)return -2;
     if(service>=0)return service_started?0:-1;
+    if(!power_owned) {
+        session.stage=100;
+        int result=wifiNativePowerAcquire();session.detail=result;
+        if(result<0)return result;
+        power_owned=1;
+    }
     if(!acc_owned) {
         session.stage=101;
         int r=sceUtilityLoadUsbModule(PSP_USB_MODULE_ACC);session.detail=r;
@@ -346,7 +364,7 @@ static int worker(SceSize size,void *args)
 {
     (void)size;(void)args;
     while(running) {
-        if(!pending){sceKernelDelayThread(10000);continue;}
+        if(!pending){stop_power();sceKernelDelayThread(10000);continue;}
         unsigned command=operation;
         emit(command==WIFI_NATIVE_SCAN_COMMAND?1:2,command==WIFI_NATIVE_SCAN_COMMAND?1:0,0);
         native_wifi_profile_t profile;memset(&profile,0,sizeof(profile));
@@ -391,12 +409,13 @@ static int worker(SceSize size,void *args)
             if(stop_network()<0)result=-1;
             trace_event(31,0,result);
         }
+        if(stop_power()<0 && !result)result=-2;
         log_result(command,result,count);
         enter();pending=0;leave();trace_event(40,command,result);
         if(!disconnected)emit(0,result && !cancel?6:command==WIFI_NATIVE_SCAN_COMMAND?2:5,
             result && !cancel?(int)0x80410a0du:0);
     }
-    stop_service();return 0;
+    stop_service();stop_power();return 0;
 }
 int wifi_native_adapter_start(void)
 {
@@ -417,8 +436,9 @@ int wifi_native_adapter_start(void)
 int wifi_native_adapter_stop(void)
 {
     running=0;cancel=1;
-    if(thread>=0){unsigned timeout=3000000;if(sceKernelWaitThreadEnd(thread,&timeout)<0)return -2;}
+    if(thread>=0){unsigned timeout=5000000;if(sceKernelWaitThreadEnd(thread,&timeout)<0)return -2;}
     if(stop_service()<0 || stop_network()<0)return -2;
+    if(stop_power()<0)return -2;
     if(thread>=0){sceKernelDeleteThread(thread);thread=-1;}
     if(acc_owned){if(sceUtilityUnloadUsbModule(PSP_USB_MODULE_ACC)<0)return -2;acc_owned=0;}
     if(lock>=0){sceKernelDeleteSema(lock);lock=-1;}return 0;

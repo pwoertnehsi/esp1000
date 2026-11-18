@@ -1,3 +1,16 @@
+Current candidate: VSH entry0.21 + XMB bridge0.17 + ESP22.
+Install wifi_vsh.prx and wifi_menu.prx together, then restart VSH.
+ESP side-rail power is acquired only for native Scan or connection requests,
+with a two-second boot wait. It stays on during Browser/network use and USB
+handoff/recovery, and is released after scan or connection teardown. Idle XMB
+and local/offline browser pages do not request power. Logs: wifi-power.log.
+Use the proven 3.3 V side-rail wiring with external ESP power removed or isolated.
+The existing Ad Hoc game plugin is retained. Hardware VSH power validation is
+pending; see docs/VSH_ACCESSORY_POWER.md in the source tree.
+
+Historical implementation notes follow; their versions and external-power-only
+instructions describe earlier candidates.
+
 Link recovery candidate v0.20 + ESP19. The PSP retains its network resources
 for up to30 seconds during temporary USB loss, reports reconnecting, and resumes
 only after USB/uplink/metadata return. A persistent loss ends the session normally;

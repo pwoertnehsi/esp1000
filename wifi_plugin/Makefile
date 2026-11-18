@@ -1,5 +1,5 @@
 TARGET = wifi_vsh
-OBJS = main.o menu_runtime.o native_runtime.o browser_runtime.o browser_paths.o browser_assets.o exports.o
+OBJS = accessory_power.o accessory_syscon.o main.o menu_runtime.o native_runtime.o browser_runtime.o browser_paths.o browser_assets.o exports.o
 USE_KERNEL_LIBS = 1
 CFLAGS = -O2 -G0 -Wall -Wextra -Werror -fno-pic
 LIBS = -lpspsystemctrl_kernel -lpspsysmem_kernel_660 -lpspinit_kernel_660 -lpspctrl_driver -lpspusb_driver -lpspge_driver -lpspsdk
@@ -30,3 +30,7 @@ browser_assets.o: ../browser_local/driver/asset_device.c
 	$(CC) $(CFLAGS) -c $< -o $@
 browser_runtime.o: browser_runtime.h ../browser_local/driver/browser_guards.h
 native_runtime.o: browser_import_guards.h browser_import_hooks.h
+
+accessory_power.o: accessory_power.c ../adhoc/aemu/esp_power.c ../adhoc/aemu/esp_power_policy.h
+accessory_syscon.o: ../adhoc/aemu/esp_syscon.S
+	$(CC) $(ASFLAGS) $(CFLAGS) $(INCDIR:%=-I%) -c $< -o $@

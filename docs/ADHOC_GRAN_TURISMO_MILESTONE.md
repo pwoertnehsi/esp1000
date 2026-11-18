@@ -15,3 +15,10 @@ Before accessory-power changes, logs were copied to the ignored local directory
 configuration were preserved with SHA256 hashes in
 `artifacts/adhoc-granturismo-pass`. These archives contain private configuration
 and are not release artifacts. The browser exit problem remains unresolved.
+
+After ESP22 corrected overlapping USB host FIFO storage, the user reported a
+complete playable multiplayer race with no issues. This extends the milestone
+from car transfer to gameplay. The passing setup retained ESP21's mapping/TCP
+recovery and the existing Ad Hoc modules. Long-term stress and additional games
+remain untested. PSP logs available before the VSH power update are archived
+locally in `milestones/adhoc-race-pass-20261118`.

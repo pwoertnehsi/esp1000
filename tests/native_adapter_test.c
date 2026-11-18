@@ -3,6 +3,12 @@
 #include "native_adapter_shim.h"
 #include "../wifi_plugin/menu_bridge/native_adapter.c"
 static int lock_depth;
+static int power_error,power_release_error,rail_on,power_acquires,power_releases,usb_loads;
+int wifiNativePowerAcquire(void)
+{assert(!lock_depth);++power_acquires;if(power_error)return power_error;rail_on=1;return 0;}
+int wifiNativePowerRelease(void)
+{assert(!lock_depth && service<0 && !service_started && network<0 && !network_started);++power_releases;if(power_release_error)return power_release_error;rail_on=0;return 0;}
+
 static char last_log[160];
 static unsigned facade_traces;
 int sceUsbGetState(void){return 0;}
@@ -22,6 +28,7 @@ void wifiNativeInvoke(unsigned gp,event_fn fn,int old,int next,int code,int erro
 static unsigned clock_us;
 static int utility_unloads;
 static int simulate_reconnect,reconnect_ticks,simulate_cleanup,network_stops;
+static int reply_success;
 static int loader_result=-55,start_result,start_status,reply_error,stop_error;
 static int events_seen[8],event_count;
 int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;assert(!lock_depth);++lock_depth;return 0;}
@@ -37,7 +44,7 @@ int sceKernelDelayThread(unsigned n){
         else {assert(state==4 && network_started);cancel=1;}
         return 0;
     }
-    if(reply_error && service_started && usb.request){usb.result=reply_error;usb.phase=7;usb.detail=-reply_error;usb.completed=usb.request;}
+    if((reply_error || reply_success) && service_started && usb.request){usb.result=reply_error;usb.phase=7;usb.detail=-reply_error;usb.completed=usb.request;}
     if(!pending)running=0;
     return 0;
 }
@@ -54,7 +61,7 @@ int sceKernelStartModule(int a,unsigned b,void *c,int *d,void *e){
 int sceKernelStopModule(int a,unsigned b,void *c,int *d,void *e){(void)a;(void)b;(void)c;(void)e;if(a==20){assert(session.finished);++network_stops;}*d=stop_error;return 0;}
 int sceKernelUnloadModule(int a){(void)a;return 0;}
 int sceKernelGetModuleIdByAddress(const void *p){(void)p;assert(0);return -1;}
-int sceUtilityLoadUsbModule(int a){(void)a;return 0;}int sceUtilityUnloadUsbModule(int a){(void)a;return 0;}
+int sceUtilityLoadUsbModule(int a){(void)a;assert(rail_on);++usb_loads;return 0;}int sceUtilityUnloadUsbModule(int a){(void)a;return 0;}
 int sceUtilityGetNetParam(int a,int b,netData *c){assert(!lock_depth);int value;assert(!get_state(&value));(void)a;if(b==2 && profile_security>=0){c->asUint=profile_security;return 0;}return -1;}
 int kuKernelLoadModule(const char *a,int b,void *c){(void)a;(void)b;(void)c;return loader_result;}
 int wifiNativeRefresh(void){return 0;}
@@ -109,6 +116,9 @@ int main(void)
     assert(!scan());worker(0,NULL);
     assert(session.stage==1007 && session.detail==4 && !complete && !count && strstr(last_log,"result=fffffffc"));
     reply_error=0;
+    running=1;reply_success=1;event_count=0;assert(!scan());worker(0,NULL);
+    assert(complete && !count && !power_owned && !rail_on && event_count==2 && events_seen[1]==2);
+    reply_success=0;
     running=1;assert(!connect(3) && selected_profile==3 && operation==WIFI_NATIVE_CONNECT_COMMAND);
     state=4;session.alive=1;
     assert(!connect(3) && connect(4)<0); /* Reuse the recovering saved profile. */
@@ -127,9 +137,10 @@ int main(void)
     assert(!stop_service() && service==-1 && !service_started && !service_failed);
     handler=add_handler(event,(void *)1);assert(handler>0);event_count=0;
     running=1;pending=1;cancel=0;state=4;network_started=1;session.alive=1;session.ready=1;
+    power_owned=rail_on=1;
     simulate_reconnect=1;assert(!monitor_network());simulate_reconnect=0;
     assert(event_count==3 && events_seen[0]==10 && events_seen[1]==3 && events_seen[2]==4);
-    assert(network_started && session.alive && state==4);
+    assert(network_started && session.alive && state==4 && power_owned && rail_on);
     network_started=0;session.alive=0;pending=0;assert(!del_handler(handler));
     handler=add_handler(event,(void *)1);assert(handler>0);
     unsigned before=callback_invocations;lookup_cancel_id=handler;
@@ -139,5 +150,16 @@ int main(void)
     lookup_result=0;
     assert(callback_invocations>=3 && facade_traces>0);
     assert(!wifi_native_adapter_stop());
+    assert(!rail_on && !power_owned && power_acquires && power_releases);
+    int loads_before=usb_loads;power_error=-33;acc_owned=0;
+    assert(start_service()==-33 && !power_owned && usb_loads==loads_before);power_error=0;
+    assert(!start_service() && rail_on && power_owned);
+    int releases_before=power_releases;assert(stop_power()<0 && power_releases==releases_before && rail_on);
+    assert(!stop_service());
+    network=20;network_started=1;
+    assert(stop_power()<0 && power_releases==releases_before && rail_on);
+    network=-1;network_started=0;
+    power_release_error=-34;assert(stop_power()==-34 && rail_on && power_owned);
+    power_release_error=0;assert(!stop_power() && !rail_on && !power_owned);
     puts("PASS: actual native list20 bound, exact field sizes, security mapping, queued commands, events and unavailable ESP cleanup");
 }

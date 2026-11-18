@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * E1000 GAME-only accessory power lease. No camera function driver is started.
+ * E1000 accessory power lease (GAME by default, VSH opt-in at build time). No camera function driver is started.
  * The guarded USB-local import hook retains power across USB deactivation;
  * other Syscon clients, commands and completion callbacks are untouched. */
 #include <pspkernel.h>
@@ -14,6 +14,18 @@
 #include <pspsysmem_kernel.h>
 #include <systemctrl.h>
 #include "esp_power_policy.h"
+#ifndef ESP_POWER_CONTEXT
+#define ESP_POWER_CONTEXT PSP_INIT_KEYCONFIG_GAME
+#endif
+#ifndef ESP_POWER_MODULE
+#define ESP_POWER_MODULE SceModule2
+#endif
+#ifndef ESP_POWER_TAG
+#define ESP_POWER_TAG "ADHOC_POWER"
+#endif
+#ifndef ESP_POWER_LOG
+#define ESP_POWER_LOG "ms0:/esp-adhoc-power.log"
+#endif
 extern int sceSysconCtrlUsbPower(signed char power);
 static volatile int owned, changing, calls;
 static unsigned *stub, saved[2], patched[2];
@@ -65,20 +77,20 @@ static void flush(void)
 static void log_power(const char *event, int result)
 {
     char line[80];
-    int n = snprintf(line, sizeof(line), "ADHOC_POWER %s=%08x\n", event, (unsigned)result);
-    int fd = sceIoOpen("ms0:/esp-adhoc-power.log", PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND, 0600);
+    int n = snprintf(line, sizeof(line), "%s %s=%08x\n", ESP_POWER_TAG, event, (unsigned)result);
+    int fd = sceIoOpen(ESP_POWER_LOG, PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND, 0600);
     if (fd >= 0) { sceIoWrite(fd, line, n); sceIoClose(fd); }
 }
 static int acquire(void)
 {
     if (owned) return 0;
-    if (sceKernelGetModel() != 10 || sceKernelInitKeyConfig() != PSP_INIT_KEYCONFIG_GAME)
+    if (sceKernelGetModel() != 10 || sceKernelInitKeyConfig() != ESP_POWER_CONTEXT)
         return -1;
     const char *foreign[] = {"USBCamDriver", "USBCamMicDriver", "USBStor_Driver", "USBGpsDriver", "USBHostFSDriver"};
     if (sceUsbGetState() & PSP_USB_ACTIVATED) return -1;
     for (unsigned i = 0; i < sizeof(foreign)/sizeof(foreign[0]); ++i)
         if (sceUsbGetDrvState(foreign[i]) == 1) return -1;
-    SceModule2 *module = (SceModule2 *)sceKernelFindModuleByName("sceUSB_Driver");
+    ESP_POWER_MODULE *module = (ESP_POWER_MODULE *)sceKernelFindModuleByName("sceUSB_Driver");
     /* Owned 6.61 USB module: version 1.10, text 0x97c8. Fail closed on a
      * different layout. Offset 0x9020 is its sceSysconCmdExecAsync import. */
     if (!module || module->text_size != 0x97c8 || module->version[0] != 10 || module->version[1] != 1)
