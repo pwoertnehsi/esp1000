@@ -31,8 +31,9 @@ def prepare(source,output):
         with makefile.open('a') as f:f.write('\nCFLAGS += -std=gnu99\n')
     for name in ['kd','seplugins','server']:(tree/'dist'/name).mkdir(parents=True,exist_ok=True)
     shutil.copy2(ROOT/'adhoc/aemu/esp_backend.c',tree/'pspnet_shims/esp_backend.c')
+    shutil.copy2(ROOT/'adhoc/aemu/esp_power_imports.S',tree/'pspnet_shims/esp_power_imports.S')
     make=tree/'pspnet_shims/Makefile'
-    replace(make,'OBJS = main.o','OBJS = main.o esp_backend.o native_config.o native_config_abi.o lab_gateway.o')
+    replace(make,'OBJS = main.o','OBJS = main.o esp_backend.o esp_power_imports.o native_config.o native_config_abi.o lab_gateway.o')
     with make.open('a') as f:
         f.write(f'\nINCDIR += {ROOT} {ROOT}/common\nCFLAGS += -DVNET_USB_LAB -DNATIVE_HTTP_LOCAL_ONLY\nLIBS += -lpspkubridge -lpspsystemctrl_user -lpspnet -lpsputility -lpspnet_inet\n')
         for obj,src in [('native_config','virtual_net/app/native_config.c'),('native_config_abi','virtual_net/app/native_config_abi.c'),('lab_gateway','common/lab_gateway.c')]:
@@ -107,6 +108,14 @@ static void esp_patch_imports(SceModule2 *module)
     replace(atpro,'sctrlHENPatchSyscall((void*)sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x4AC57943), cbdeny);','if(sceKernelGetModel()!=10)sctrlHENPatchSyscall((void*)sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x4AC57943), cbdeny);')
     replace(atpro,'scePowerLock(0);','if(sceKernelGetModel()!=10)scePowerLock(0);')
     replace(tree/'atpro/exports.exp','PSP_END_EXPORTS','PSP_EXPORT_START(esp1000_kernel, 0, 0x4001)\nPSP_EXPORT_FUNC_HASH(esp_game_switch)\nPSP_EXPORT_END\nPSP_END_EXPORTS')
+    replace(tree/'atpro/exports.exp','PSP_EXPORT_FUNC_HASH(module_stop)','PSP_EXPORT_FUNC_HASH(module_stop)\nPSP_EXPORT_FUNC_HASH(module_reboot_before)')
+    for name in ['esp_power.c','esp_power_policy.h','esp_syscon.S']:
+        shutil.copy2(ROOT/'adhoc/aemu'/name,tree/'atpro'/name)
+    replace(tree/'atpro/Makefile','OBJS = main.o','OBJS = main.o esp_power.o esp_syscon.o')
+    with (tree/'atpro/Makefile').open('a') as f:f.write('\nLIBS += -lpspusb\n')
+    replace(atpro,'// Module Stop Event','extern int espAdhocPowerRelease(void);\n// Module Stop Event')
+    replace(atpro,'// Shutdown GUI','if(espAdhocPowerRelease()<0)return -1;\n\t// Shutdown GUI')
+    replace(tree/'atpro/exports.exp','PSP_END_EXPORTS','PSP_EXPORT_START(esp1000_power, 0, 0x4001)\nPSP_EXPORT_FUNC_NID(espAdhocPowerAcquire, 0x1)\nPSP_EXPORT_FUNC_NID(espAdhocPowerRelease, 0x2)\nPSP_EXPORT_END\nPSP_END_EXPORTS')
     # Build/install only this fork under esp-wifi; no global aemu files replaced.
     # Runtime paths retain aemu's existing kd/seplugins layout in the test package.
     (output/'provenance.json').write_text(json.dumps({'upstream':'https://github.com/Kethen/aemu','commit':PIN,'license':'GPL-3.0-or-later'},indent=2)+'\n')

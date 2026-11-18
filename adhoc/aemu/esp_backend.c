@@ -22,6 +22,8 @@ static wifi_native_usb_control_t usb={.magic=WIFI_NATIVE_USB_MAGIC,.abi=WIFI_NAT
 static volatile vnet_start_result_t transport;
 static int driver=-1,driver_started,helper=-1,helper_started,configured,state,profile_index;
 static unsigned request,map_nonce;
+extern int espAdhocPowerAcquire(void);
+extern int espAdhocPowerRelease(void);
 
 static void log_result(const char *name,int value)
 {
@@ -73,6 +75,9 @@ int espApctlConnect(int index)
     native_wifi_profile_t profile;
     if(native_sony_profile_read(index,get_parameter,&profile))return -1;
     profile_index=index;state=2;
+    /* Acquire before either USB owner starts; retain across Disconnect/retry. */
+    int power=espAdhocPowerAcquire();log_result("POWER_ACQUIRE",power);
+    if(power<0){native_profile_clear(&profile,sizeof(profile));state=0;return power;}
     /* A loaded USB ACC module is acceptable; driver start checks ownership. */
     int r=sceUtilityLoadUsbModule(PSP_USB_MODULE_ACC);log_result("USB_ACC_LOAD",r);
     SceModule owner;
@@ -172,4 +177,4 @@ int espApctlDisconnect(void)
     return stop_helper();
 }
 int espApctlTerm(void)
-{int r=espApctlDisconnect();if(!r)configured=0;return r;}
+{int r=espApctlDisconnect();if(!r)r=espAdhocPowerRelease();if(!r)configured=0;return r;}
