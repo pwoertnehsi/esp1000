@@ -67,7 +67,8 @@ int adapter_get_info(int n,union SceNetApctlInfo *p){(void)n;(void)p;return 0;}
 int main(int argc,char **argv)
 {
     assert(argc==2);mode=atoi(argv[1]);wifi_native_session_control_t shared={.magic=WIFI_NATIVE_SESSION_MAGIC,.abi=WIFI_NATIVE_SESSION_ABI};control=&shared;
-    worker(0,NULL);assert(!shared.ready && !shared.info_callback);
+    assert(module_stop(0,NULL)==-2);shared.cancel=0;
+    worker(0,NULL);assert(shared.finished && !shared.ready && !shared.info_callback);
     if(mode==0 || mode==1 || mode==6 || mode==8 || mode==9 || mode==11)assert(!shared.result && paused==1);
     else assert(shared.result<0);
     if(mode==5)assert(now>=PSP_LINK_RECOVERY_US && shared.recoveries==1);

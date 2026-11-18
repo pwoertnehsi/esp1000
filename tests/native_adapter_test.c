@@ -20,7 +20,7 @@ void wifiNativeInvoke(unsigned gp,event_fn fn,int old,int next,int code,int erro
 {assert(gp==0x09123450);++callback_invocations;fn(old,next,code,error,arg);}
 static unsigned clock_us;
 static int utility_unloads;
-static int simulate_reconnect,reconnect_ticks;
+static int simulate_reconnect,reconnect_ticks,simulate_cleanup,network_stops;
 static int loader_result=-55,start_result,start_status,reply_error,stop_error;
 static int events_seen[8],event_count;
 int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;return 0;}
@@ -29,6 +29,7 @@ int sceKernelGetThreadId(void){return thread;}
 unsigned sceKernelGetSystemTimeLow(void){return clock_us;}
 int sceKernelDelayThread(unsigned n){
     clock_us+=n;
+    if(simulate_cleanup){assert(session.cancel && network_started && !network_stops);session.finished=1;return 0;}
     if(simulate_reconnect) {
         if(++reconnect_ticks==1){session.ready=0;session.recovering=1;}
         else if(reconnect_ticks==2){assert(state==2 && network_started);session.ready=1;session.recovering=0;}
@@ -49,7 +50,7 @@ int sceKernelStartModule(int a,unsigned b,void *c,int *d,void *e){
     wifi_native_usb_args_t *args=c;assert(args->owner==(unsigned)hooks.owner && args->address==(unsigned)(uintptr_t)&usb);
     *d=start_status;return start_result;
 }
-int sceKernelStopModule(int a,unsigned b,void *c,int *d,void *e){(void)a;(void)b;(void)c;(void)e;*d=stop_error;return 0;}
+int sceKernelStopModule(int a,unsigned b,void *c,int *d,void *e){(void)a;(void)b;(void)c;(void)e;if(a==20){assert(session.finished);++network_stops;}*d=stop_error;return 0;}
 int sceKernelUnloadModule(int a){(void)a;return 0;}
 int sceKernelGetModuleIdByAddress(const void *p){(void)p;assert(0);return -1;}
 int sceUtilityLoadUsbModule(int a){(void)a;return 0;}int sceUtilityUnloadUsbModule(int a){(void)a;return 0;}

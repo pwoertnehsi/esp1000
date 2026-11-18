@@ -291,6 +291,13 @@ static int stop_network(void)
 {
     enter();session.ready=0;session.cancel=1;leave();
     session.stage=300;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
+    if(network_started) {
+        unsigned began=sceKernelGetSystemTimeLow();
+        while(!session.finished && sceKernelGetSystemTimeLow()-began<10000000u)
+            sceKernelDelayThread(10000);
+        if(!session.finished)return -1; /* Keep live helper code resident. */
+        __sync_synchronize();
+    }
     if(network_started){int status;int r=sceKernelStopModule(network,0,NULL,&status,NULL);if(r<0 || status<0)return -1;network_started=0;}
     session.stage=301;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
     if(network>=0){if(sceKernelUnloadModule(network)<0)return -1;network=-1;}
@@ -304,7 +311,7 @@ static int start_network(void)
     network=kuKernelLoadModule("ms0:/seplugins/esp-wifi/wifi_native_session.prx",0,NULL);
     if(network<0)return -1;
     session.cancel=0;session.ready=0;session.result=-1;session.info_callback=0;
-    session.alive=session.recovering=0;session.recoveries=session.info_users=0;
+    session.alive=session.recovering=session.finished=0;session.recoveries=session.info_users=0;
     unsigned address=(unsigned)&session;int status;
     int r=sceKernelStartModule(network,sizeof(address),&address,&status,NULL);
     if(r<0 || status<0){sceKernelUnloadModule(network);network=-1;return -1;}

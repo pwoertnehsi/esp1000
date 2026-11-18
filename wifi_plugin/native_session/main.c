@@ -14,7 +14,7 @@
 #include "../../browser_local/app/adapter.h"
 #include "../../browser_local/app/dns.h"
 #include "../../browser_local/app/lookup.h"
-PSP_MODULE_INFO("ESP Native Net Session",0,0,2);
+PSP_MODULE_INFO("ESP Native Net Session",0,0,3);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
 static wifi_native_session_control_t *control;
 static volatile vnet_start_result_t transport;
@@ -97,7 +97,7 @@ static int cleanup(void)
 }
 static int worker(SceSize size,void *args)
 {
-    (void)size;(void)args;control->result=setup();
+    (void)size;(void)args;control->finished=0;control->result=setup();
     if(!control->result) {
         link_recovery_t recovery={0};
         control->stage=10;control->alive=1;
@@ -122,7 +122,8 @@ static int worker(SceSize size,void *args)
     if(cleanup()){unsafe=1;control->result=-2;}
     cleanup_mark(31,net_live);
     if(net_live){int r=sceNetFreeThreadinfo(sceKernelGetThreadId());cleanup_mark(32,r);}
-    cleanup_mark(33,control->result);return 0;
+    cleanup_mark(33,control->result);
+    __sync_synchronize();control->finished=1;return 0;
 }
 int module_start(SceSize size,void *args)
 {
@@ -137,7 +138,7 @@ int module_start(SceSize size,void *args)
     control=(void *)address;
     if(control->magic!=WIFI_NATIVE_SESSION_MAGIC || control->abi!=WIFI_NATIVE_SESSION_ABI)return -1;
     control->cancel=0;control->ready=0;control->result=-1;control->info_callback=0;
-    control->alive=control->recovering=0;control->recoveries=control->info_users=0;
+    control->alive=control->recovering=control->finished=0;control->recoveries=control->info_users=0;
     thread=sceKernelCreateThread("ESPNativeNetwork",worker,0x28,0x10000,PSP_THREAD_ATTR_USER,NULL);
     if(thread<0)return -1;
     int r=sceKernelStartThread(thread,0,NULL);
@@ -146,6 +147,10 @@ int module_start(SceSize size,void *args)
 int module_stop(SceSize size,void *args)
 {
     (void)size;(void)args;control->cancel=1;
+    /* ModuleMgr cannot wait for cleanup that itself calls ModuleMgr. The
+     * bridge requests cancellation and waits outside StopModule first. */
+    if(!control->finished)return -2;
+    __sync_synchronize();
     if(thread>=0){unsigned timeout=3000000;if(sceKernelWaitThreadEnd(thread,&timeout)<0)return -2;}
     if(unsafe)return -2;
     if(thread>=0){sceKernelDeleteThread(thread);thread=-1;}return 0;

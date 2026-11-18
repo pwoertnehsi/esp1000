@@ -260,3 +260,21 @@ suppresses them), including during accessory USB where earlier facade logging
 was suppressed. They contain only phase, slot/event values and thread ID.
 The purpose is to distinguish callback blocking, removal waiting, lock waiting
 and module-stop completion before another behavior change.
+
+The v0.14 trace records successful connect callbacks, handler removal without
+a busy callback, disconnect emit returning, and entry to network stop. During
+that stop the helper reaches driver-stop marker20. The facade then returns
+network-stop failure; helper driver-unload marker21 and remaining cleanup
+markers follow, through worker return33. This supports a ModuleMgr dependency
+cycle: helper module_stop waits for its worker while the worker needs ModuleMgr
+to unload its driver. The three-second stop timeout lets driver unload proceed,
+but leaves the helper resident and the session reported as failed.
+
+Bridge v0.15 now requests cancellation and waits for an explicit finished flag
+outside ModuleMgr before calling StopModule. The helper publishes finished only
+after all cleanup / thread-info operations; its stop handler immediately refuses
+while unfinished instead of waiting for a worker that can need ModuleMgr. A
+bounded ten-second facade wait retains the live module on timeout. Session ABI3
+requires deploying both bridge and session helper together. Tests assert no
+StopModule or unload while unfinished, eventual cleanup then successful stop,
+and helper refusal before cleanup completion. Hardware confirmation is pending.
