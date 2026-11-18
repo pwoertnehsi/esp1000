@@ -81,7 +81,13 @@ static int get_info(int field,union SceNetApctlInfo *out)
         if(parameter>=0) {
             netData data;memset(&data,0,sizeof(data));
             if(!sceUtilityGetNetParam(selected_profile,parameter,&data)) {
-                if(field==4){unsigned value=data.asUint<=2?(data.asUint?1:0):data.asUint==3?2:4;memcpy(out,&value,4);}
+                if(field==4) {
+                    /* Profile/scan AES=4; APCTL GetInfo AES=3. Sony's browser
+                     * indexes a four-entry security-label table with this. */
+                    static const unsigned types[]={0,1,1,2,3};
+                    if(data.asUint>=sizeof(types)/sizeof(types[0])){leave();return -1;}
+                    unsigned value=types[data.asUint];memcpy(out,&value,4);
+                }
                 else memcpy(out,&data,field==0?64:field==14?128:field==15?2:4);
                 r=0;
             }

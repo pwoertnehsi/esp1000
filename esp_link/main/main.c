@@ -24,6 +24,7 @@
 #include "packet_link.h"
 #include "lab_gateway.h"
 #include "host_wakeup.h"
+#include "usb_host_recovery.h"
 
 void local_tcp_start(void);
 
@@ -59,7 +60,9 @@ static unsigned auth_attempts;
 static int64_t auth_due;
 /* Diagnostic counters only: event hook may run in interrupt context. */
 static volatile uint32_t attach_events, remove_events, transfer_events;
-static uint32_t watchdog_resets;
+static uint32_t watchdog_resets,enumeration_resets;
+static bool psp_port_known;
+static usb_host_recovery_t enumeration_recovery;
 static int64_t last_rx_completed, last_tx_completed;
 static network_page_t page;
 static bool html_receiver, file_wanted = true, file_active, file_waiting;
@@ -112,7 +115,8 @@ static bool class_deinit(void) { return true; }
 void tuh_enum_descriptor_device_cb(uint8_t address, const tusb_desc_device_t *desc)
 {
     ESP_LOGI(TAG, "USB address=%u VID:PID=%04x:%04x", address, desc->idVendor, desc->idProduct);
-    if (desc->idVendor == LINK_VID && desc->idProduct == LINK_PID) candidate = address;
+    psp_port_known=desc->idVendor == LINK_VID && desc->idProduct == LINK_PID;
+    if (psp_port_known) candidate = address;
 }
 
 static uint16_t class_open(uint8_t rhport, uint8_t address,
@@ -322,6 +326,8 @@ static void print_status(void)
              ethernet_mode, ethernet_received, ethernet_replied, ethernet_bad);
     ESP_LOGI(TAG, "SERVICE event_wakeup=1 tick_ms=%u watchdog_resets=%" PRIu32,
              (unsigned)portTICK_PERIOD_MS, watchdog_resets);
+    ESP_LOGI(TAG,"RECOVERY known_psp=%d enum_wait=%d enum_attempts=%u enum_resets=%" PRIu32,
+             psp_port_known,enumeration_recovery.waiting,enumeration_recovery.attempts,enumeration_resets);
     usb_router_status();
     native_scan_status();
     network_page_status();
@@ -547,7 +553,7 @@ void app_main(void)
     native_profile_start();
     usb_router_start();
     local_tcp_start();
-    ESP_LOGI(TAG, "PSP link host v15 native scan diagnostics; runtime credentials. UART0 115200; type help. D+=20 D-=19");
+    ESP_LOGI(TAG, "PSP link host v16 bounded enumeration recovery; runtime credentials. UART0 115200; type help. D+=20 D-=19");
     ESP_LOGI(TAG, "Two-cable setup: connector VBUS is external; GPIO4 does not switch its 5V");
     int64_t next_ping = now_ms() + 2000;
     int64_t next_status = now_ms() + 10000;
@@ -584,6 +590,15 @@ void app_main(void)
         command_t command;
         if (xQueueReceive(commands, &command, 0) == pdTRUE) handle_command(command.text);
         int64_t now = now_ms();
+        bool port_connected=tuh_inited() && hcd_port_connect_status(0);
+        if(now>=enumeration_recovery.settle_until && !port_connected)psp_port_known=false;
+        if(usb_host_recovery_poll(&enumeration_recovery,now,port_connected,
+                                 psp_port_known,mounted,vbus_on)) {
+            ++enumeration_resets;
+            ESP_LOGW(TAG,"Known PSP failed to mount for15s; host recovery attempt=%u/%u",
+                     enumeration_recovery.attempts,USB_HOST_ENUM_RETRY_LIMIT);
+            reset_requested=true;
+        }
         if (reset_requested) {
             reset_requested = false;
             set_vbus(false);
@@ -592,6 +607,7 @@ void app_main(void)
             vTaskDelay(pdMS_TO_TICKS(300));
             host_start();
             set_vbus(true);
+            usb_host_recovery_restarted(&enumeration_recovery,now_ms());
             next_ping = now_ms() + 2000;
         }
         if (mounted) {

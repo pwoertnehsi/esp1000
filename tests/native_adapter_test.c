@@ -7,7 +7,7 @@ int sceUsbGetState(void){return 0;}
 int sceIoOpen(const char *p,int f,int m){(void)p;(void)f;(void)m;return 7;}
 int sceIoWrite(int f,const void *p,unsigned n){assert(f==7 && n<sizeof(last_log));memcpy(last_log,p,n);last_log[n]=0;return n;}
 int sceIoClose(int f){(void)f;return 0;}
-static int lookup_result,browser_available;
+static int lookup_result,browser_available,profile_security=-1;
 int kuKernelFindModuleByAddress(void *p,SceModule *m){if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;return 0;}
 int kuKernelFindModuleByName(char *p,SceModule *m){
     if(!strcmp(p,"htmlviewer_plugin_module")){if(!browser_available)return -1;m->modid=123;return 0;}
@@ -40,7 +40,7 @@ int sceKernelStopModule(int a,unsigned b,void *c,int *d,void *e){(void)a;(void)b
 int sceKernelUnloadModule(int a){(void)a;return 0;}
 int sceKernelGetModuleIdByAddress(const void *p){(void)p;assert(0);return -1;}
 int sceUtilityLoadUsbModule(int a){(void)a;return 0;}int sceUtilityUnloadUsbModule(int a){(void)a;return 0;}
-int sceUtilityGetNetParam(int a,int b,netData *c){(void)a;(void)b;(void)c;return -1;}
+int sceUtilityGetNetParam(int a,int b,netData *c){(void)a;if(b==2 && profile_security>=0){c->asUint=profile_security;return 0;}return -1;}
 int kuKernelLoadModule(const char *a,int b,void *c){(void)a;(void)b;(void)c;return loader_result;}
 int wifiNativeRefresh(void){return 0;}
 int sceUtilityLoadNetModule(int n){(void)n;return 0;}
@@ -48,10 +48,25 @@ int sceUtilityUnloadNetModule(int n){(void)n;return 0;}
 int wifiNativeRegister(unsigned a,unsigned b){assert(a && b==sizeof(hooks));for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i)hooks.browser_owners[i]=-1;return 0;}
 static void __attribute__((aligned(4))) event(int old,int next,int code,int error,void *arg)
 {(void)old;(void)next;(void)error;assert(arg==(void *)1);assert(event_count<8);events_seen[event_count++]=code;}
+static int projected_info(int field,union SceNetApctlInfo *out)
+{assert(field==4);unsigned value=2;memcpy(out,&value,4);return 0;}
 int main(void)
 {
     assert(!wifi_native_adapter_start() && running);
     int handler=add_handler(event,(void *)1);assert(handler>0);
+    state=4;network_started=1;session.ready=1;session.info_callback=(unsigned)(uintptr_t)projected_info;
+    static const unsigned expected_types[]={0,1,1,2,3};
+    static const char *const browser_labels[]={"none","WEP","WPA-TKIP","WPA-AES"};
+    for(unsigned i=0;i<5;++i) {
+        struct {unsigned before,value,after;} output={0x12345678,~0u,0xabcdef01};
+        profile_security=i;
+        assert(!get_info(4,(void *)&output.value));
+        assert(output.before==0x12345678 && output.after==0xabcdef01);
+        assert(output.value==expected_types[i] && output.value<4);
+        assert(browser_labels[output.value]!=NULL);
+    }
+    profile_security=5;unsigned invalid=0;assert(get_info(4,(void *)&invalid)<0);
+    profile_security=-1;state=0;network_started=0;session.ready=0;session.info_callback=0;
     assert(!callback_owner(123) && !browser_alive());
     hooks.browser_owners[0]=123;browser_available=1;
     assert(callback_owner(123) && browser_alive());

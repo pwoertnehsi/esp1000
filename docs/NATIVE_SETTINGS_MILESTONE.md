@@ -64,3 +64,29 @@ consumer correction. Native browser launch/exit and saved-profile Internet
 browsing are hardware-confirmed. The user attributes incidental connection
 errors to the temporary physical wiring; these alone do not establish a new
 software regression. Next priority is WPA2 validation, then Ad Hoc.
+
+## WPA2 confirmed; connection-status and recovery candidate v0.17
+
+The user confirmed WPA2-Personal operation by observing the ESP associated on
+their router. The ESP backend therefore needs no separate ARK WPA2 extension.
+No station MAC or other personal network identifiers are recorded here.
+
+Display Connection Status crashed. Inspection of owned 6.61 firmware established
+that Sony profile/scan security4 (AES) maps to APCTL GetInfo security3, while our
+native adapter incorrectly returned4. Sony browser UI at3d9fc queries field4;
+at3da24..3da2c it indexes the four-entry label table without a bounds check.
+V0.17 fixes the conversion (0,1,2,3,4 -> 0,1,1,2,3), rejects invalid profile values,
+and tests actual callback field boundaries and browser indexing with sanitizers.
+An independent owned-firmware test verifies the native mapping instructions.
+
+The user also reports that USB failures can require pressing ESP reset. Cause is
+not yet established. ESP16 covers a gap in recovery: an identified PSP can remain
+physically connected without finishing enumeration, outside the outgoing-transfer
+watchdog. After15 seconds it restarts the host, with up to three attempts. Retry
+state survives the short artificial disconnect during host restart; a real
+unplug or successful mount resets the budget. Unrecognized devices, healthy idle
+mounted sessions and disabled ports are excluded. This preserves the ESP's
+RAM-only Wi-Fi configuration, unlike restarting the entire chip. It does not
+cover failures before PSP identification or prove that all reset-button cases
+are resolved. Neither correction has hardware acceptance yet. Ad Hoc follows
+these stability checks.

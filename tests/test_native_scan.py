@@ -49,7 +49,7 @@ unsigned sctrlHENFindFunction(const char *,const char *,unsigned);
             for name in ['pspkernel.h','psploadcore.h','pspmodulemgr.h','psputility_usbmodules.h','psputility_netparam.h','psputility_netmodules.h','pspnet_apctl.h','kubridge.h','pspiofilemgr.h','pspusb.h']:
                 (tmp/name).write_text('#include "native_adapter_shim.h"\n')
             exe=tmp/'adapter'
-            subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast','-Wno-int-to-pointer-cast','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),str(ROOT/'tests/native_adapter_test.c'),'-o',str(exe)],check=True)
+            subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast','-Wno-int-to-pointer-cast','-fno-pie','-no-pie','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),str(ROOT/'tests/native_adapter_test.c'),'-o',str(exe)],check=True)
             subprocess.run([str(exe)],check=True,env={**os.environ,'ASAN_OPTIONS':'detect_leaks=0'})
 
     def test_native_session(self):

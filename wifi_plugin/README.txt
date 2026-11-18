@@ -1,4 +1,4 @@
-ESP WiFi native browser candidate v0.16 — E1000 / owned 6.61 / ARK-5 / ESP15
+ESP WiFi native browser candidate v0.17 — E1000 / owned 6.61 / ARK-5 / ESP16
 
 Browser and Online Manual now use Sony's original VSH actions. L+R+SQUARE queues
 that same native browser action. The plugin does not load an EBOOT, draw a GU
@@ -7,12 +7,21 @@ and its existing restriction/password flow; that flow is not bypassed or replace
 Native browser launch and exit passed on hardware with v0.15. The four-digit
 prompt remains untested. v0.16 also routes Sony HTTP GetInfo to the ESP session;
 this fixes the missed consumer implicated in instant 80410A05 on remote pages.
-Remote pages still require a hardware retry with v0.16.
+Remote browsing passed on hardware with v0.16. v0.17 corrects connection-status
+security info: AES is3 for APCTL GetInfo, distinct from AES4 in profiles/scan.
+This prevents the browser indexing past its four-entry security-label table.
+Display connection status still needs a hardware retry.
+Display Connection Status: v0.17 reports AES as APCTL value3 (profile/scan
+value4 is a different enum), preventing an out-of-range Sony label-table index.
+Hardware verification of this fix remains pending. WPA2-Personal is now user-
+confirmed on a real router without an ARK WPA2 extension.
 The standalone browser EBOOT is retained as a separate diagnostic fallback.
 
 Install wifi_vsh.prx and wifi_menu.prx together (shared control ABI changed).
 Keep the existing native helpers, virtual driver and private ms0:/b0 + b1 assets.
-No ESP firmware update is required. After leaving PC USB mode, restart VSH.
+The connection-status fix also works with ESP15. ESP16 adds bounded known-PSP
+enumeration recovery (15 seconds, up to three attempts); this does not establish
+the cause of every failure requiring a reset. After leaving PC USB mode, restart VSH.
 Test native XMB Browser, exit to the same XMB, reopen, then test the shortcut.
 Read wifi-vsh.log for NATIVE_BROWSER path/backend status if startup fails.
 Network Settings Scan, Test Connection and saved-profile browser use passed

@@ -35,8 +35,8 @@ format. The saved profile supplies the passphrase (8–63 characters) or raw PSK
 profile security value4 is Sony's AES format, not a requirement for WPA1.
 The ESP auth threshold is a minimum, not an exact protocol selection (see the
 [ESP-IDF guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-guides/wifi-driver/overview.html)).
-This path does not require ARK's native-radio WPA2 patches. A WPA2-only hardware
-test remains necessary before marking WPA2 validated.
+This path does not require ARK's native-radio WPA2 patches. On 2026-11-18 the
+user confirmed WPA2-Personal operation and verified ESP association on their router.
 
 A separate [Kethen/wpa2psp release](https://github.com/Kethen/wpa2psp/releases/tag/2025-06-25)
 exists, but its author targets 6.61 PRO. Its
