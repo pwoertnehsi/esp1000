@@ -31,6 +31,7 @@ static void sys_untimeout(void (*fn)(void *),void *arg)
 {assert(!arg);if(timer==fn)timer=NULL;}
 static int ip_napt_enable_netif(int *netif,int enabled)
 {assert(netif==&usb_netif);if(enabled && !napt)++generation;napt=enabled;return 1;}
+static void tls_offload_link(int enabled){assert(enabled==(int)linked);}
 static void adhoc_portmap_pause(void){paused=1;}
 static void adhoc_portmap_resume(void){assert(napt);paused=0;}
 static void adhoc_portmap_clear(void){++clears;}

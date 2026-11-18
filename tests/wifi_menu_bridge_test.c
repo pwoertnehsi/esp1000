@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "../wifi_plugin/menu_bridge/main.c"
+int wifi_tls_init(void){return 0;}
+int wifi_tls_can_stop(void){return 1;}
 int wifi_native_adapter_start(void){return 0;}
 int wifi_native_adapter_stop(void){return 0;}
 static int registrations,releases,original_calls,last_action,last_argument;

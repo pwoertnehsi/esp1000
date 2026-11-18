@@ -90,6 +90,7 @@ static int patch_netconf(SceModule *m,int refresh)
     owner=m->modid;owner_text=m->text_addr;hooks->owner=owner;hooks->detail=0;hooks->status=refresh?2:1;return 0;
 }
 #include "browser_import_hooks.h"
+#include "tls_hooks.h"
 static int observe(SceModule *m)
 {
     if(m && !strcmp(m->modname,"sceNetApctl_Library")) {
@@ -104,7 +105,7 @@ static int observe(SceModule *m)
     int b=patch_browser_imports(m);return r?r:b;
 }
 static int on_start(SceModule *m)
-{int r=previous?previous(m):0;int intr=sceKernelCpuSuspendIntr();observe(m);sceKernelCpuResumeIntr(intr);return r;}
+{int r=previous?previous(m):0;int intr=sceKernelCpuSuspendIntr();observe(m);patch_tls();sceKernelCpuResumeIntr(intr);return r;}
 int wifiNativeRefresh(void)
 {
     unsigned k1=pspSdkSetK1(0);int intr=sceKernelCpuSuspendIntr();
@@ -113,7 +114,7 @@ int wifiNativeRefresh(void)
         SceModule *m=sceKernelFindModuleByName(browser_import_guards[i]->name);
         if(m && patch_browser_imports(m)<0)result=-1;
     }
-    sceKernelCpuResumeIntr(intr);pspSdkSetK1(k1);return result;
+    patch_tls();sceKernelCpuResumeIntr(intr);pspSdkSetK1(k1);return result;
 }
 int wifiNativeRegister(unsigned address,unsigned size)
 {
@@ -132,10 +133,11 @@ int wifi_native_init(void)
 {if(installed)return -1;previous=sctrlHENSetStartModuleHandler(on_start);installed=1;return 0;}
 int wifi_native_stop(void)
 {
+    if(!tls_can_stop())return -2;
     if(owner>=0 && sceKernelFindModuleByUID(owner))return -2;
     if(hooks)for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i)if(hooks->browser_owners[i]>=0 && sceKernelFindModuleByUID(hooks->browser_owners[i]))return -2;
     if(installed){STMOD_HANDLER current=sctrlHENSetStartModuleHandler(previous);if(current!=on_start){sctrlHENSetStartModuleHandler(current);return -2;}installed=0;}
-    hooks=NULL;return 0;
+    hooks=NULL;tls_hooks=NULL;return 0;
 }
 
 int wifi_native_status(void){return hooks?hooks->status:-20;}

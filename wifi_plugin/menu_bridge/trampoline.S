@@ -33,3 +33,13 @@ wifiNativeInvoke:
     jr $ra
     addiu $sp,$sp,32
     .end wifiNativeInvoke
+
+    # Exact libhttp call site107fc: s2=request, s0=connection; five original args.
+    .align 4
+    .globl wifiTlsConnectThunk
+    .ent wifiTlsConnectThunk
+wifiTlsConnectThunk:
+    move $t1,$s2
+    j wifiTlsConnect
+    move $t2,$s0
+    .end wifiTlsConnectThunk

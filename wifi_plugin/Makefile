@@ -34,3 +34,5 @@ native_runtime.o: browser_import_guards.h browser_import_hooks.h
 accessory_power.o: accessory_power.c ../adhoc/aemu/esp_power.c ../adhoc/aemu/esp_power_policy.h
 accessory_syscon.o: ../adhoc/aemu/esp_syscon.S
 	$(CC) $(ASFLAGS) $(CFLAGS) $(INCDIR:%=-I%) -c $< -o $@
+
+native_runtime.o: tls_control.h tls_hooks.h tls_guards.h

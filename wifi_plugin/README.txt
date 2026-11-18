@@ -1,3 +1,13 @@
+Current candidate: VSH entry0.22 + XMB bridge0.18 + ESP23.
+Native HTTP HTTPS sockets use the ESP's verified TLS1.2 service, with the original
+hostname for SNI and certificate verification. Install both VSH modules together
+and ESP23, then restart VSH. Initial clock sync can add delay. Use ssl-offload.log
+and wifi-vsh.log for diagnostics without UART. First public-site hardware test
+is pending; see docs/TLS_OFFLOAD.md for scope, limits and rollback evidence.
+The existing on-demand side-rail power and Ad Hoc behavior are retained.
+
+Earlier candidate notes follow.
+
 Current candidate: VSH entry0.21 + XMB bridge0.17 + ESP22.
 Install wifi_vsh.prx and wifi_menu.prx together, then restart VSH.
 ESP side-rail power is acquired only for native Scan or connection requests,

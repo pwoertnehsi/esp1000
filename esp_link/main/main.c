@@ -136,6 +136,7 @@ static usb_phy_handle_t phy;
 static usb_host_recovery_t enumeration_recovery;
 static int64_t last_rx_completed, last_tx_completed;
 static network_page_t page;
+void tls_offload_start(void);
 static bool html_receiver, file_wanted = true, file_active, file_waiting;
 static uint32_t file_session, file_offset, file_expected_offset;
 static unsigned file_stage, file_retries;
@@ -641,7 +642,8 @@ void app_main(void)
     native_profile_start();
     usb_router_start();
     local_tcp_start();
-    ESP_LOGI(TAG, "PSP link host v22 non-overlapping USB host FIFOs; runtime credentials. UART0 115200; type help. D+=20 D-=19");
+    tls_offload_start();
+    ESP_LOGI(TAG, "PSP link host v23 verified TLS offload; runtime credentials. UART0 115200; type help. D+=20 D-=19");
     ESP_LOGI(TAG, "Two-cable setup: connector VBUS is external; GPIO4 does not switch its 5V");
     int64_t next_ping = now_ms() + 2000;
     int64_t next_status = now_ms() + 10000;

@@ -70,6 +70,8 @@ static void wifi_event(void *arg, esp_event_base_t base, int32_t id, void *data)
                 xEventGroupSetBits(events,FAILED);return;
             }
         }
+        static bool ntp_started;
+        if(!ntp_started){esp_netif_sntp_start();ntp_started=true;}
         retries = 0;
         ESP_LOGI(TAG, "Wi-Fi connected; IP=" IPSTR, IP2STR(&event->ip_info.ip));
         xEventGroupSetBits(events, GOT_IP);
@@ -206,12 +208,9 @@ static void download_task(void *arg)
         retries = 0;
         if(configured && radio_running)esp_wifi_connect();
     }
-    esp_sntp_config_t time_config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
-    esp_err_t error = esp_netif_sntp_init(&time_config);
-    if (error != ESP_OK || esp_netif_sntp_sync_wait(pdMS_TO_TICKS(60000)) != ESP_OK) {
+    if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(60000)) != ESP_OK) {
         ESP_LOGE(TAG, "Time sync failed; refusing HTTPS with an unset certificate clock");
-        vTaskDelete(NULL);
-        return;
+        vTaskDelete(NULL);return;
     }
     time_t now;
     time(&now);
@@ -246,6 +245,7 @@ static void radio_start_task(void *unused)
 
 void network_page_start(void)
 {
+
     events = xEventGroupCreate();
     completed = xQueueCreate(1, sizeof(network_page_t));
     configASSERT(events && completed);
@@ -257,6 +257,8 @@ void network_page_start(void)
     ESP_ERROR_CHECK(error);
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+    esp_sntp_config_t time_config=ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+    time_config.start=false;ESP_ERROR_CHECK(esp_netif_sntp_init(&time_config));
     station = esp_netif_create_default_wifi_sta();
     configASSERT(station);
     wifi_init_config_t init = WIFI_INIT_CONFIG_DEFAULT();

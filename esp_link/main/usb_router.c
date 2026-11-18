@@ -14,6 +14,7 @@
 #include "usb_router.h"
 #include "router_filter.h"
 #include "host_wakeup.h"
+void tls_offload_link(int linked);
 void adhoc_portmap_start(void);
 void adhoc_portmap_clear(void);
 void adhoc_portmap_pause(void);
@@ -72,6 +73,7 @@ static void link_change(void *enabled)
 {
     bool was_linked=linked;
     linked=enabled!=NULL;
+    tls_offload_link(linked);
     if(linked) {
         sys_untimeout(expire_napt,NULL);
         configASSERT(ip_napt_enable_netif(&usb_netif,1));

@@ -1,5 +1,6 @@
 #ifndef WIFI_NATIVE_RUNTIME_H
 #define WIFI_NATIVE_RUNTIME_H
+int wifi_native_tls_status(void);
 int wifi_native_init(void);
 int wifi_native_stop(void);
 int wifi_native_status(void);

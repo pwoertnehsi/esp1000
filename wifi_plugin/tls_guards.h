@@ -1,0 +1,15 @@
+/* Generated from owned decrypted 6.61 modules. No Sony code distributed. */
+static const struct {unsigned slot,nid,stub,api;} tls_entries[]={
+    {1,0x28B4DE33u,0x00017B68u,0x122b8u},
+    {2,0xB9C8CCE6u,0x00017C90u,0x26898u},
+    {3,0xD53ACF30u,0x00017CB8u,0x274c8u},
+    {4,0xE7C29542u,0x00017CD0u,0x26970u},
+    {5,0xB7CA8717u,0x00017C80u,0x269b8u},
+    {6,0xB3B04C58u,0x00017C68u,0x27344u},
+    {7,0xA8F0AD39u,0x00017C50u,0x278ccu},
+    {8,0x3E3133D6u,0x00017B98u,0x26a10u},
+    {9,0x84833472u,0x00017C20u,0x266f0u},
+    {10,0x8D7284EAu,0x00017A38u,0x0u},
+};
+#define WIFI_TLS_HTTP_SIZE 0x18d1cu
+#define WIFI_TLS_SSL_SIZE 0x2ebc0u

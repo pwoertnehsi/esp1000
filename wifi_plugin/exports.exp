@@ -8,6 +8,7 @@ PSP_EXPORT_END
 PSP_EXPORT_START(ESPWifiMenu, 0, 0x4001)
 PSP_EXPORT_FUNC(wifiNativePowerAcquire)
 PSP_EXPORT_FUNC(wifiNativePowerRelease)
+PSP_EXPORT_FUNC(wifiTlsRegister)
 PSP_EXPORT_FUNC(wifiNativeRegister)
 PSP_EXPORT_FUNC(wifiNativeRefresh)
 PSP_EXPORT_FUNC(wifiMenuRegister)

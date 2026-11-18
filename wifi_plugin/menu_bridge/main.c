@@ -1,8 +1,10 @@
 #include <pspkernel.h>
 #include "../menu_control.h"
 #include "native_adapter.h"
-PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,17);
+PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,18);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
+extern int wifi_tls_init(void);
+extern int wifi_tls_can_stop(void);
 extern int wifiMenuRegister(unsigned,unsigned,unsigned,unsigned);
 extern int wifiMenuRelease(void);
 extern int wifiMenuOriginal(int,int);
@@ -38,11 +40,12 @@ int module_start(SceSize size,void *args)
  if(r)return r;
  /* Keep the registered menu callbacks resident even if backend startup fails. */
  wifi_native_adapter_start();
+ wifi_tls_init();
  worker=sceKernelCreateThread("ESPStockBrowser",browser_worker,0x30,0x10000,PSP_THREAD_ATTR_USER,NULL);
  if(worker<0)return 0;
  running=1;if(sceKernelStartThread(worker,0,NULL)<0){running=0;sceKernelDeleteThread(worker);worker=-1;}
  return 0;}
 int module_stop(SceSize size,void *args)
-{(void)size;(void)args;int r=wifiMenuRelease();if(r)return r;
+{(void)size;(void)args;if(!wifi_tls_can_stop())return -2;int r=wifiMenuRelease();if(r)return r;
  running=0;if(worker>=0){unsigned timeout=2000000;if(sceKernelWaitThreadEnd(worker,&timeout)<0)return -2;sceKernelDeleteThread(worker);worker=-1;}
  return wifi_native_adapter_stop();}
