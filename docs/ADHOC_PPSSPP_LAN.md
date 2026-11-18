@@ -97,3 +97,20 @@ A test executes the generated hook at a high user address and verifies routing
 to the replacement loader, excluding foreign models and kernel modules.
 `esp-adhoc-plugin.log` records startup/context and hook results independently of
 upstream release logging. This candidate still needs a hardware retry.
+
+## Retail-game launch compatibility
+
+The peer test passed, but the first Gran Turismo launch failed with the plugin
+enabled and succeeded with it disabled. That is not a gameplay pass. Inspection
+found forced-maximum high memory and active storage/ISO caches, contrary to
+[upstream aemu setup requirements](https://github.com/Kethen/aemu/blob/main/installation.md).
+The plugin also directly rewrites memory partitions at startup, so the memory
+policy conflict is a plausible launch blocker, not a confirmed exclusive cause.
+
+Use `tools/configure_adhoc_game.py --psp /path/to/PSP --game TITLEID` to append
+title-specific automatic high-memory mode and disable memory-stick / Inferno
+caches for that title only. It also enables the installed Ad Hoc plugin for that
+title, leaving broad disabled entries and unrelated settings in place. Files are
+backed up locally, written in place and read back. No flash0 changes or CFW
+reinstall are involved. The title ID can be read from the owned dump's PARAM.SFO.
+The first retry should verify reaching the title menu before entering multiplayer.
