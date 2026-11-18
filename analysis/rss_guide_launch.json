@@ -1,0 +1,26 @@
+{
+  "firmware": "owned decrypted PSP 6.61",
+  "modules": {
+    "rss_browser": "6722d037ae46bb8a9dcd66c95138a59ff218c6364d262dbbb91c203df7f08248",
+    "content_browser": "dce160c5b9216c13c58fb156de178dd02339deb99a1c222d7064faa5c038c1cf",
+    "launcher_plugin": "4037dc449f4e113db9a9654eb70924fa98d5280efb82fdfffcf28d0e9e1e2239",
+    "htmlviewer_plugin": "09b8bed627dc0f7967b1fe03b62cf3a7d91fdbc6edfee5983584a30e539fba26"
+  },
+  "rss_guide": {
+    "url": "http://www.playstation.com/manual/psp/rss/",
+    "rss_url_offset": "0x15164",
+    "rss_callsite": "0x1c14",
+    "library": "content_browser",
+    "nid": "0x0B1F04E6",
+    "export_offset": "0x153cc",
+    "arguments": [
+      "guide_url",
+      "strlen(guide_url)",
+      12,
+      "callback_context"
+    ],
+    "launcher_interface_offset": "0x24",
+    "launcher_htmlviewer_path_offset": "0x4da8"
+  },
+  "caution": "Different launch context is established; its causal role in browser exit is not established. No executable bytes included."
+}

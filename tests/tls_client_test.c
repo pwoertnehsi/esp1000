@@ -17,9 +17,9 @@ int sceIoOpen(const char *n,int a,int b){(void)n;(void)a;(void)b;assert(!lock_de
 int sceIoWrite(int a,const void *b,unsigned c){(void)a;(void)b;return c;}int sceIoClose(int a){(void)a;return 0;}
 int sceNetInetGetErrno(void){return io_errno;}
 int sceNetInetSend(int fd,const void *p,unsigned n,int flags)
-{(void)fd;assert(lock_depth==1 && flags==MSG_DONTWAIT);if(app_mode)return -1;if(n>2)n=2;assert(sent_bytes+n<=sizeof(sent));memcpy(sent+sent_bytes,p,n);sent_bytes+=n;return n;}
+{(void)fd;assert(lock_depth==1 && flags==MSG_DONTWAIT);if(app_mode==2)return n>3?3:(int)n;if(app_mode)return -1;if(n>2)n=2;assert(sent_bytes+n<=sizeof(sent));memcpy(sent+sent_bytes,p,n);sent_bytes+=n;return n;}
 int sceNetInetRecv(int fd,void *p,unsigned n,int flags)
-{(void)fd;assert(lock_depth==1 && flags==MSG_DONTWAIT);if(blocked || app_mode)return -1;uint8_t reply[TLS_OFFLOAD_REPLY];tls_offload_reply_details(reply,response_status,0,response_flags);if(n>2)n=2;assert(response_at+n<=TLS_OFFLOAD_REPLY);memcpy(p,reply+response_at,n);response_at+=n;return n;}
+{(void)fd;assert(lock_depth==1 && flags==MSG_DONTWAIT);if(app_mode==2){if(n>3)n=3;memcpy(p,"abc",n);return n;}if(blocked || app_mode)return -1;uint8_t reply[TLS_OFFLOAD_REPLY];tls_offload_reply_details(reply,response_status,0,response_flags);if(n>2)n=2;assert(response_at+n<=TLS_OFFLOAD_REPLY);memcpy(p,reply+response_at,n);response_at+=n;return n;}
 int sceNetInetShutdown(int fd,int how){assert(lock_depth && fd>=0 && (how==1 || how==2));return 0;}
 int kuKernelFindModuleByName(char *n,SceModule *m){(void)n;(void)m;return -1;}
 int wifiTlsRegister(unsigned address,unsigned size){assert(address==(unsigned)(uintptr_t)&tls && size==sizeof(tls));return 0;}
@@ -50,6 +50,9 @@ int main(void)
     app_mode=1;char data[8];assert(read_ssl(ssl,data,8)<0 && get_error(ssl,-1)==2);
     assert(write_ssl(ssl,data,8)<0 && get_error(ssl,-1)==3);
     io_errno=54;assert(read_ssl(ssl,data,8)<0 && get_error(ssl,-1)==1);
+    app_mode=2;
+    assert(read_ssl(ssl,data,8)==3 && !memcmp(data,"abc",3) && get_error(ssl,3)==0);
+    assert(write_ssl(ssl,data,8)==3 && get_error(ssl,3)==0);
     assert(!close_socket(4) && ready(ssl)==0 && handshake(ssl)<0 && tls.active==1);
     free_ssl(ssl);assert(!tls.active && closes==1 && frees==1);
     app_mode=0;io_errno=11;response_at=sent_bytes=0;

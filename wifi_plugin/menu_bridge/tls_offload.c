@@ -10,7 +10,7 @@
 #include "../tls_control.h"
 #include "../../common/tls_offload.h"
 static wifi_tls_control_t tls={.magic=WIFI_TLS_MAGIC,.abi=WIFI_TLS_ABI,.owner=-1};
-static struct {int fd,verified,error,connecting,closing;unsigned generation;void *bio,*ssl;} slots[TLS_OFFLOAD_SLOTS];
+static struct {int fd,verified,error,connecting,closing;unsigned generation,io_events;void *bio,*ssl;} slots[TLS_OFFLOAD_SLOTS];
 static unsigned generation;
 static SceUID mutex=-1;
 extern int wifiTlsRegister(unsigned,unsigned);
@@ -117,7 +117,13 @@ static int io(void *ssl,void *data,int length,int sending)
     /* Hold only across one nonblocking NET call, so close cannot reuse its fd. */
     int n=sending?sceNetInetSend(fd,data,length,MSG_DONTWAIT):sceNetInetRecv(fd,data,length,MSG_DONTWAIT);
     int error=n>0?0:n==0 && !sending?6:would_block()?(sending?3:2):1;
-    slots[i].error=error;leave();return n;
+    /* Bound diagnostics per connection. Record lengths/results only, never
+     * plaintext, and do Memory Stick I/O after releasing the socket lock. */
+    int trace=slots[i].io_events<12;
+    if(trace)++slots[i].io_events;
+    slots[i].error=error;leave();
+    if(trace){log_result(sending?"WRITE_REQUEST":"READ_REQUEST",length);log_result(sending?"WRITE_RESULT":"READ_RESULT",n);log_result("IO_SSL_ERROR",error);}
+    return n;
 }
 static int read_ssl(void *ssl,void *data,int length){return io(ssl,data,length,0);}
 static int write_ssl(void *ssl,const void *data,int length){return io(ssl,(void *)data,length,1);}
@@ -137,6 +143,7 @@ static int shutdown_ssl(void *ssl)
 static void free_ssl(void *ssl)
 {
     enter();int i=find_ssl(ssl);if(i>=0){slots[i].ssl=NULL;slots[i].bio=NULL;if(slots[i].fd<0)clear(i);}leave();
+    log_result("SSL_FREE",i);
     void (*original)(void *)=(void *)tls.originals[WT_FREE];original(ssl);
 }
 static int close_socket(int fd)
