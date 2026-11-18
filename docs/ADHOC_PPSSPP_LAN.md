@@ -86,3 +86,14 @@ failures before the ESP backend starts. PSP transport diagnostics go to
 The ESP logs mapping results as `adhoc-map`. Keep build manifests and raw hardware
 logs locally; they can contain user-specific identifiers. To disable this
 candidate, turn off only its GAME plugin entry. Preserve the browser entries.
+
+## First hardware startup failure
+
+The peer-test log showed COMMON load succeeded but Ad Hoc module load returned
+80010802, before NET initialization or ESP backend use. The adaptation now hooks
+utility load/unload imports explicitly for E1000 user modules, including
+high-address homebrew, rather than relying only on upstream's address heuristic.
+A test executes the generated hook at a high user address and verifies routing
+to the replacement loader, excluding foreign models and kernel modules.
+`esp-adhoc-plugin.log` records startup/context and hook results independently of
+upstream release logging. This candidate still needs a hardware retry.
