@@ -140,3 +140,46 @@ software and test sequence unchanged. If the same failure persists, the next
 controller investigation needs global port/frame/interrupt state and retry/error
 counts, rather than another header-only diagnostic. Raw evidence is retained
 locally under milestones/buffer-fifo-v19-capture.
+
+## Recovery requirement and candidate — PSP v0.20 / ESP19
+
+The user clarified that temporary physical interruptions must be recoverable
+without restarting VSH or resetting the entire ESP. Securing the connection is
+an experimental control, not a prerequisite for normal recovery. In the secured
+warm-state retry, USB enumeration/HELLO and profile application succeeded, but
+metadata transfer stalled and triggered the watchdog before a usable connection.
+No malformed frames were recorded. This reproduces warm reconnect failure;
+it does not by itself compare cold-connection dropout rates.
+
+The implementation now distinguishes a live session from a ready link. A session
+retains the virtual driver, network libraries, route/DNS configuration and callback
+ownership for up to30 seconds while readiness is missing. APCTL reports joining /
+reconnecting during that interval and GOT_IP only after all real link flags return.
+Repeated Connect for the same active profile reuses that session. Cancellation
+and browser exit still clean up promptly; persistent loss expires normally.
+Info callbacks hold a reference until they return so cleanup cannot dispose their
+backend while a Sony caller is executing it.
+
+ESP recovery stops the TinyUSB controller before deleting/recreating its owned
+USB PHY, then initializes the host again. Wi-Fi and its RAM configuration stay
+running. A previously identified PSP may be retried before its next descriptor
+completes; a positively identified foreign device remains excluded. Failed
+controller shutdown retains buffers and stops USB work instead of rebooting the
+chip or reusing DMA-owned memory. PHY deletion/allocation errors are returned,
+retain correct handle ownership, and do not restart Wi-Fi or the chip.
+
+Host tests cover actual session preservation/repeated recovery, timeout,
+cancellation, reference-safe cleanup, idempotent Connect and facade reconnect
+events. The PHY helper is tested for live-controller refusal, delete failure,
+allocation failure and subsequent retry. This is a recovery candidate, not proof
+that the initiating stall is prevented. Existing page requests may time out;
+Reload after reconnection is acceptable. Native session control ABI2 requires
+installing its helper and user bridge together. Hardware acceptance must verify
+both automatic recovery and another connection attempt without further VSH /
+ESP restarts. A VSH restart and flash reset are needed once to load this update.
+
+ESP19's USB-only rebuild was also exercised on hardware while the PSP stayed
+mounted on the PC: status uptime continued15551 ->16101 ->20591ms and the PHY
+rebuild succeeded without a new boot banner. The radio was unconfigured following
+the firmware update, so this verifies USB rebuild without a chip reboot, not yet
+preservation of a live AP association. Active browser reconnect remains pending.

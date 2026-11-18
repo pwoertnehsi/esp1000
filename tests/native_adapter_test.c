@@ -14,6 +14,7 @@ int kuKernelFindModuleByName(char *p,SceModule *m){
     m->modid=hooks.owner;return 0;
 }
 static unsigned clock_us;
+static int simulate_reconnect,reconnect_ticks;
 static int loader_result=-55,start_result,start_status,reply_error,stop_error;
 static int events_seen[8],event_count;
 int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;return 0;}
@@ -22,6 +23,12 @@ int sceKernelGetThreadId(void){return thread;}
 unsigned sceKernelGetSystemTimeLow(void){return clock_us;}
 int sceKernelDelayThread(unsigned n){
     clock_us+=n;
+    if(simulate_reconnect) {
+        if(++reconnect_ticks==1){session.ready=0;session.recovering=1;}
+        else if(reconnect_ticks==2){assert(state==2 && network_started);session.ready=1;session.recovering=0;}
+        else {assert(state==4 && network_started);cancel=1;}
+        return 0;
+    }
     if(reply_error && service_started && usb.request){usb.result=reply_error;usb.phase=7;usb.detail=-reply_error;usb.completed=usb.request;}
     if(!pending)running=0;
     return 0;
@@ -49,7 +56,7 @@ int wifiNativeRegister(unsigned a,unsigned b){assert(a && b==sizeof(hooks));for(
 static void __attribute__((aligned(4))) event(int old,int next,int code,int error,void *arg)
 {(void)old;(void)next;(void)error;assert(arg==(void *)1);assert(event_count<8);events_seen[event_count++]=code;}
 static int projected_info(int field,union SceNetApctlInfo *out)
-{assert(field==4);unsigned value=2;memcpy(out,&value,4);return 0;}
+{assert(field==4 && session.info_users==1);unsigned value=2;memcpy(out,&value,4);return 0;}
 int main(void)
 {
     assert(!wifi_native_adapter_start() && running);
@@ -62,7 +69,7 @@ int main(void)
         profile_security=i;
         assert(!get_info(4,(void *)&output.value));
         assert(output.before==0x12345678 && output.after==0xabcdef01);
-        assert(output.value==expected_types[i] && output.value<4);
+        assert(output.value==expected_types[i] && output.value<4 && !session.info_users);
         assert(browser_labels[output.value]!=NULL);
     }
     profile_security=5;unsigned invalid=0;assert(get_info(4,(void *)&invalid)<0);
@@ -93,6 +100,9 @@ int main(void)
     assert(session.stage==1007 && session.detail==4 && !complete && !count && strstr(last_log,"result=fffffffc"));
     reply_error=0;
     running=1;assert(!connect(3) && selected_profile==3 && operation==WIFI_NATIVE_CONNECT_COMMAND);
+    state=4;session.alive=1;
+    assert(!connect(3) && connect(4)<0); /* Reuse the recovering saved profile. */
+    state=0;session.alive=0;
     assert(!disconnect() && cancel && session.cancel);pending=0;
     assert(!del_handler(handler));assert(del_handler(handler)<0);
     loader_result=10;start_result=-9;
@@ -105,6 +115,12 @@ int main(void)
     stop_error=-2;assert(stop_service()<0 && service_failed && service_started && service==10);
     assert(start_service()==-2);stop_error=0;
     assert(!stop_service() && service==-1 && !service_started && !service_failed);
+    handler=add_handler(event,(void *)1);assert(handler>0);event_count=0;
+    running=1;pending=1;cancel=0;state=4;network_started=1;session.alive=1;session.ready=1;
+    simulate_reconnect=1;assert(!monitor_network());simulate_reconnect=0;
+    assert(event_count==3 && events_seen[0]==10 && events_seen[1]==3 && events_seen[2]==4);
+    assert(network_started && session.alive && state==4);
+    network_started=0;session.alive=0;pending=0;assert(!del_handler(handler));
     assert(!wifi_native_adapter_stop());
     puts("PASS: actual native list20 bound, exact field sizes, security mapping, queued commands, events and unavailable ESP cleanup");
 }

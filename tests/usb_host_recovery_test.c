@@ -3,6 +3,10 @@
 #include "../common/usb_host_recovery.h"
 int main(void)
 {
+    assert(!usb_host_recovery_eligible(0,0,0));
+    assert(usb_host_recovery_eligible(0,1,0));
+    assert(usb_host_recovery_eligible(1,1,0));
+    assert(!usb_host_recovery_eligible(0,1,1));
     usb_host_recovery_t s={0};
     /* Unknown devices, disabled power, disconnection and live sessions are inert. */
     assert(!usb_host_recovery_poll(&s,0,1,0,0,1));

@@ -26,6 +26,7 @@
 #include "packet_link.h"
 #include "lab_gateway.h"
 #include "host_wakeup.h"
+#include "phy_recovery.h"
 #include "usb_host_recovery.h"
 
 void local_tcp_start(void);
@@ -50,7 +51,7 @@ static QueueHandle_t commands, outgoing;
 /* USB state belongs exclusively to app_main/tuh_task and its callbacks. */
 static uint8_t device, candidate, ep_in, ep_out, itf_number;
 static bool mounted, rx_busy, tx_busy, automatic = true, vbus_on;
-static bool reset_requested;
+static bool reset_requested,host_fault;
 static uint32_t seq, tx_count, rx_count, bad_count, dropped;
 static int64_t tx_started,rx_started,ping_sent;
 static unsigned last_rx_header_errors;
@@ -123,7 +124,8 @@ static int64_t auth_due;
 /* Diagnostic counters only: event hook may run in interrupt context. */
 static volatile uint32_t attach_events, remove_events, transfer_events;
 static uint32_t watchdog_resets,enumeration_resets;
-static bool psp_port_known;
+static bool psp_port_known,psp_port_seen,foreign_port;
+static usb_phy_handle_t phy;
 static usb_host_recovery_t enumeration_recovery;
 static int64_t last_rx_completed, last_tx_completed;
 static network_page_t page;
@@ -178,7 +180,8 @@ void tuh_enum_descriptor_device_cb(uint8_t address, const tusb_desc_device_t *de
 {
     ESP_LOGI(TAG, "USB address=%u VID:PID=%04x:%04x", address, desc->idVendor, desc->idProduct);
     psp_port_known=desc->idVendor == LINK_VID && desc->idProduct == LINK_PID;
-    if (psp_port_known) candidate = address;
+    foreign_port=!psp_port_known;
+    if (psp_port_known){psp_port_seen=true;candidate=address;}
 }
 
 static uint16_t class_open(uint8_t rhport, uint8_t address,
@@ -518,11 +521,12 @@ static void ethernet_pump(void)
              ethernet_received,n,(unsigned)reply,ethernet_bad);
 }
 
-static void host_stop(void)
+static bool host_stop(void)
 {
     if (!tuh_deinit(0)) {
-        ESP_LOGE(TAG, "Host deinit failed; restarting rather than reusing live buffers");
-        abort();
+        host_fault=true;
+        ESP_LOGE(TAG,"Host deinit failed; retaining live buffers and stopping USB, no chip restart");
+        return false;
     }
     native_wifi=false;++native_epoch;native_profile_clear(&profile_receiver,sizeof(profile_receiver));
     ethernet_mode = ethernet_pending = ethernet_network = ethernet_metadata = false;
@@ -534,6 +538,7 @@ static void host_stop(void)
     device = candidate = ep_in = ep_out = 0;
     ping_seq = 0;
     xQueueReset(outgoing);
+    host_fault=false;return true;
 }
 
 static void handle_command(const char *line)
@@ -587,13 +592,15 @@ static void uart_console(void *arg)
     }
 }
 
-static void host_start(void)
+static bool host_start(void)
 {
     const tusb_rhport_init_t init = {.role = TUSB_ROLE_HOST, .speed = TUSB_SPEED_FULL};
     if (!tusb_rhport_init(0, &init)) {
-        ESP_LOGE(TAG, "Host init failed");
-        abort();
+        host_fault=true;
+        ESP_LOGE(TAG, "Host init failed; USB stays stopped, no chip restart");
+        return false;
     }
+    return true;
 }
 
 void app_main(void)
@@ -615,7 +622,6 @@ void app_main(void)
     outgoing = xQueueCreate(8, sizeof(link_frame_t));
     configASSERT(commands && outgoing);
     configASSERT(xTaskCreate(uart_console, "link_uart", 4096, NULL, 4, NULL) == pdPASS);
-    usb_phy_handle_t phy;
     const usb_phy_config_t phy_config = {
         .controller = USB_PHY_CTRL_OTG, .target = USB_PHY_TARGET_INT,
         .otg_mode = USB_OTG_MODE_HOST, .otg_speed = USB_PHY_SPEED_FULL,
@@ -628,12 +634,12 @@ void app_main(void)
     native_profile_start();
     usb_router_start();
     local_tcp_start();
-    ESP_LOGI(TAG, "PSP link host v18 sender/FIFO boundary diagnostics; runtime credentials. UART0 115200; type help. D+=20 D-=19");
+    ESP_LOGI(TAG, "PSP link host v19 USB PHY/session recovery; runtime credentials. UART0 115200; type help. D+=20 D-=19");
     ESP_LOGI(TAG, "Two-cable setup: connector VBUS is external; GPIO4 does not switch its 5V");
     int64_t next_ping = now_ms() + 2000;
     int64_t next_status = now_ms() + 10000;
     for (;;) {
-        tuh_task_ext(0, false);
+        if(!host_fault && tuh_inited())tuh_task_ext(0, false);
         if (router_link_pending) {
             router_link_pending=false;
             usb_router_link(false);
@@ -666,9 +672,9 @@ void app_main(void)
         if (xQueueReceive(commands, &command, 0) == pdTRUE) handle_command(command.text);
         int64_t now = now_ms();
         bool port_connected=tuh_inited() && hcd_port_connect_status(0);
-        if(now>=enumeration_recovery.settle_until && !port_connected)psp_port_known=false;
+        if(now>=enumeration_recovery.settle_until && !port_connected){psp_port_known=false;foreign_port=false;}
         if(usb_host_recovery_poll(&enumeration_recovery,now,port_connected,
-                                 psp_port_known,mounted,vbus_on)) {
+                                 usb_host_recovery_eligible(psp_port_known,psp_port_seen,foreign_port),mounted,vbus_on)) {
             ++enumeration_resets;
             ESP_LOGW(TAG,"Known PSP failed to mount for15s; host recovery attempt=%u/%u",
                      enumeration_recovery.attempts,USB_HOST_ENUM_RETRY_LIMIT);
@@ -677,15 +683,20 @@ void app_main(void)
         if (reset_requested) {
             reset_requested = false;
             set_vbus(false);
-            /* Deinit aborts transfers before static buffers are reused. */
-            host_stop();
-            vTaskDelay(pdMS_TO_TICKS(300));
-            host_start();
-            set_vbus(true);
+            /* Never replace a PHY until its controller releases DMA ownership. */
+            if(host_stop()) {
+                vTaskDelay(pdMS_TO_TICKS(300));
+                esp_err_t rebuilt=psp_usb_rebuild_phy(&phy);
+                if(rebuilt==ESP_OK) {
+                    ESP_LOGI(TAG,"USB PHY rebuilt; Wi-Fi state retained");
+                    host_start();
+                } else ESP_LOGE(TAG,"USB PHY rebuild failed code=%d; chip and Wi-Fi remain running",(int)rebuilt);
+                set_vbus(true);
+            }
             usb_host_recovery_restarted(&enumeration_recovery,now_ms());
             next_ping = now_ms() + 2000;
         }
-        if (mounted) {
+        if (mounted && !host_fault) {
             if (ethernet_network && now>=next_net_status) {
                 link_frame_t info; uint8_t ip[4]; unsigned state=network_page_uplink(ip);
                 link_init(&info,LINK_NET_STATUS,++seq,0,NULL);

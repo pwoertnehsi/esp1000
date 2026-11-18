@@ -1,4 +1,17 @@
-Buffer/FIFO diagnostic candidate v0.19 + ESP18. USB_TX_HEADER records sender
+Link recovery candidate v0.20 + ESP19. The PSP retains its network resources
+for up to30 seconds during temporary USB loss, reports reconnecting, and resumes
+only after USB/uplink/metadata return. A persistent loss ends the session normally;
+you can retry the saved profile without restarting VSH. Existing page requests
+may fail and need Reload. Same-profile Connect reuses an active/recovering session.
+ESP host recovery now stops the controller and rebuilds its USB PHY while leaving
+Wi-Fi running. Previously seen PSP ports can retry before descriptor completion;
+identified foreign devices remain excluded. Buffers are retained if shutdown
+fails, rather than rebooting the ESP or reusing live DMA buffers.
+Install the user bridge and native_session helper together (session ABI2).
+Hardware acceptance is pending. This targets recovery, not prevention of the
+initial controller stall. Keep the externally powered setup for testing.
+
+Buffer/FIFO diagnostic candidate v0.20 + ESP18. USB_TX_HEADER records sender
 header checks before submission and after completion, changed-byte masks and
 read-only uncached header checks. FIFO_DIAG checks the ESP header immediately
 after the FIFO copy. CHANNEL_DIAG snapshots active controller channels on invalid
@@ -19,7 +32,7 @@ transport and must be installed with this package. Test connected browser idle
 for60 seconds, then one HTTP page; capture UART and copy logs after exit.
 This is diagnostic work, not a demonstrated dropout fix.
 
-ESP WiFi native browser candidate v0.18 — E1000 / owned 6.61 / ARK-5 / ESP18
+ESP WiFi native browser candidate v0.18 — E1000 / owned 6.61 / ARK-5 / ESP19
 
 Browser and Online Manual now use Sony's original VSH actions. L+R+SQUARE queues
 that same native browser action. The plugin does not load an EBOOT, draw a GU

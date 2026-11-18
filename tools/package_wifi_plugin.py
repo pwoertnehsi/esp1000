@@ -24,8 +24,8 @@ shutil.copy2(ROOT / 'wifi_plugin/README.txt', stage / 'README.txt')
 (plugin / 'plugins-entry.txt').write_text('vsh, ms0:/seplugins/esp-wifi/wifi_vsh.prx, on\nvsh, ms0:/seplugins/esp-wifi/wifi_menu.prx, on\n')
 files = sorted(p for p in stage.rglob('*') if p.is_file())
 manifest = {str(p.relative_to(stage)): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
-with zipfile.ZipFile(ROOT / 'artifacts/wifi-plugin-v19-buffer-fifo-diagnostics.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile(ROOT / 'artifacts/wifi-plugin-v20-link-recovery.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
     for p in files:
         archive.write(p, str(p.relative_to(stage)))
-(ROOT / 'artifacts/wifi-plugin-v19-buffer-fifo-diagnostics-build.json').write_text(json.dumps(manifest, indent=2) + '\n')
-print('Code-only native XMB candidate:', ROOT / 'artifacts/wifi-plugin-v19-buffer-fifo-diagnostics.zip')
+(ROOT / 'artifacts/wifi-plugin-v20-link-recovery-build.json').write_text(json.dumps(manifest, indent=2) + '\n')
+print('Code-only native XMB candidate:', ROOT / 'artifacts/wifi-plugin-v20-link-recovery.zip')

@@ -59,7 +59,7 @@ unsigned sctrlHENFindFunction(const char *,const char *,unsigned);
                 (tmp/name).write_text('#include "native_session_shim.h"\n')
             exe=tmp/'session'
             subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast','-Wno-int-to-pointer-cast','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),str(ROOT/'tests/native_session_test.c'),'-o',str(exe)],check=True)
-            for mode in [0,1,2,3,4,5,7]:
+            for mode in [0,1,2,3,4,5,6,7,8,9,11]:
                 subprocess.run([str(exe),str(mode)],check=True,env={**os.environ,'ASAN_OPTIONS':'detect_leaks=0'})
 
     def test_native_usb_owner(self):

@@ -7,12 +7,13 @@
 #include <kubridge.h>
 #include <string.h>
 #include "../native_control.h"
+#include "../../common/link_recovery.h"
 #include "../../virtual_net/control.h"
 #include "../../virtual_net/app/native_http.h"
 #include "../../browser_local/app/adapter.h"
 #include "../../browser_local/app/dns.h"
 #include "../../browser_local/app/lookup.h"
-PSP_MODULE_INFO("ESP Native Net Session",0,0,1);
+PSP_MODULE_INFO("ESP Native Net Session",0,0,2);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
 static wifi_native_session_control_t *control;
 static volatile vnet_start_result_t transport;
@@ -77,16 +78,26 @@ static int worker(SceSize size,void *args)
 {
     (void)size;(void)args;control->result=setup();
     if(!control->result) {
-        control->stage=10;
+        link_recovery_t recovery={0};
+        control->stage=10;control->alive=1;
         control->info_callback=(unsigned)adapter_get_info;
         __sync_synchronize();control->ready=1;
         while(!cancelled()) {
             unsigned required=VNET_USB_READY|VNET_UPLINK_READY|VNET_WIFI_INFO_READY;
-            if((transport.flags&required)!=required){control->result=-1;break;}
+            int ready=(transport.flags&required)==required;
+            int action=link_recovery_poll(&recovery,sceKernelGetSystemTimeLow(),ready);
+            if(action<0){control->result=-1;break;}
+            if(!ready && !control->recovering)++control->recoveries;
+            control->stage=ready?10:11;control->detail=ready?0:(int)transport.flags;
+            control->recovering=!ready;
+            __sync_synchronize();control->ready=ready;
             sceKernelDelayThread(20000);
         }
     }
-    control->ready=0;__sync_synchronize();control->info_callback=0;
+    control->ready=0;control->alive=0;control->recovering=0;
+    __sync_synchronize();
+    while(control->info_users)sceKernelDelayThread(1000);
+    control->info_callback=0;
     if(cleanup()){unsafe=1;control->result=-2;}
     if(net_live)sceNetFreeThreadinfo(sceKernelGetThreadId());
     return 0;
@@ -102,8 +113,9 @@ int module_start(SceSize size,void *args)
         if(sizeof(*control)<=bridge.segmentsize[i] && address>=bridge.segmentaddr[i] && address-bridge.segmentaddr[i]<=bridge.segmentsize[i]-sizeof(*control))found=1;
     if(!found)return -1;
     control=(void *)address;
-    if(control->magic!=WIFI_NATIVE_SESSION_MAGIC || control->abi!=1)return -1;
+    if(control->magic!=WIFI_NATIVE_SESSION_MAGIC || control->abi!=WIFI_NATIVE_SESSION_ABI)return -1;
     control->cancel=0;control->ready=0;control->result=-1;control->info_callback=0;
+    control->alive=control->recovering=0;control->recoveries=control->info_users=0;
     thread=sceKernelCreateThread("ESPNativeNetwork",worker,0x28,0x10000,PSP_THREAD_ATTR_USER,NULL);
     if(thread<0)return -1;
     int r=sceKernelStartThread(thread,0,NULL);

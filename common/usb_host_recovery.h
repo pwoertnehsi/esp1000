@@ -8,7 +8,11 @@ typedef struct {
     unsigned attempts;
     int64_t since,settle_until;
 } usb_host_recovery_t;
-/* Only a positively identified PSP on a connected, enabled port is retried.
+/* A previous PSP identity may authorize probing the same dedicated port before
+ * its next descriptor completes. A positively identified foreign device never does. */
+static inline int usb_host_recovery_eligible(int known,int seen,int foreign)
+{return !foreign && (known || seen);}
+/* Only an eligible PSP session on a connected, enabled port is retried.
  * No idle bulk-IN timeout: an established session may legitimately be silent.
  * A successful mount or physical disconnect starts a fresh recovery budget. */
 static inline int usb_host_recovery_poll(usb_host_recovery_t *s,int64_t now,

@@ -24,7 +24,7 @@ static int service_started,acc_owned,service_failed;
 static SceUID network=-1;
 static int network_started,selected_profile;
 static unsigned operation=WIFI_NATIVE_SCAN_COMMAND;
-static wifi_native_session_control_t session={.magic=WIFI_NATIVE_SESSION_MAGIC,.abi=1};
+static wifi_native_session_control_t session={.magic=WIFI_NATIVE_SESSION_MAGIC,.abi=WIFI_NATIVE_SESSION_ABI};
 static volatile int running,pending,cancel;
 static int state,complete;
 static unsigned serial,count,request;
@@ -65,7 +65,9 @@ static int read_parameter(int profile,int parameter,void *out)
 static int connect(int profile)
 {
     if(profile<0 || profile>32)return -1;
-    enter();if(pending || state){leave();return (int)0x80410a0bu;}
+    enter();
+    if(pending && operation==WIFI_NATIVE_CONNECT_COMMAND && selected_profile==profile && session.alive && !cancel){leave();return 0;}
+    if(pending || state){leave();return (int)0x80410a0bu;}
     selected_profile=profile;operation=WIFI_NATIVE_CONNECT_COMMAND;cancel=0;pending=1;
     leave();return 0;
 }
@@ -76,6 +78,9 @@ static int get_info(int field,union SceNetApctlInfo *out)
     if(!out)return -1;
     enter();int r=-1;
     if(state==4 && network_started && session.ready && session.info_callback) {
+        __sync_add_and_fetch(&session.info_users,1);
+        __sync_synchronize();
+        if(!session.ready || !session.info_callback){__sync_sub_and_fetch(&session.info_users,1);leave();return -1;}
         int (*fn)(int,union SceNetApctlInfo *)=(void *)session.info_callback;r=fn(field,out);
         int parameter=field==0?0:field==4?2:field==13?13:field==14?14:field==15?15:field==17?23:-1;
         if(parameter>=0) {
@@ -85,13 +90,14 @@ static int get_info(int field,union SceNetApctlInfo *out)
                     /* Profile/scan AES=4; APCTL GetInfo AES=3. Sony's browser
                      * indexes a four-entry security-label table with this. */
                     static const unsigned types[]={0,1,1,2,3};
-                    if(data.asUint>=sizeof(types)/sizeof(types[0])){leave();return -1;}
+                    if(data.asUint>=sizeof(types)/sizeof(types[0])){__sync_sub_and_fetch(&session.info_users,1);leave();return -1;}
                     unsigned value=types[data.asUint];memcpy(out,&value,4);
                 }
                 else memcpy(out,&data,field==0?64:field==14?128:field==15?2:4);
                 r=0;
             }
         }
+        __sync_sub_and_fetch(&session.info_users,1);
     }
     leave();return r;
 }
@@ -264,6 +270,7 @@ static int start_network(void)
     network=kuKernelLoadModule("ms0:/seplugins/esp-wifi/wifi_native_session.prx",0,NULL);
     if(network<0)return -1;
     session.cancel=0;session.ready=0;session.result=-1;session.info_callback=0;
+    session.alive=session.recovering=0;session.recoveries=session.info_users=0;
     unsigned address=(unsigned)&session;int status;
     int r=sceKernelStartModule(network,sizeof(address),&address,&status,NULL);
     if(r<0 || status<0){sceKernelUnloadModule(network);network=-1;return -1;}
@@ -271,6 +278,18 @@ static int start_network(void)
     unsigned began=sceKernelGetSystemTimeLow();
     while(running && !cancel && !session.ready && sceKernelGetSystemTimeLow()-began<35000000u)sceKernelDelayThread(10000);
     return session.ready && !cancel?0:-1;
+}
+static int monitor_network(void)
+{
+    while(running && !cancel && session.alive) {
+        if(!session.ready && state==4)emit(2,10,0);
+        else if(session.ready && state!=4){emit(3,3,0);emit(4,4,0);}
+        SceModule m;
+        int netconf=kuKernelFindModuleByName("sceVshNetconf_Module",&m)>=0 && m.modid==hooks.owner;
+        if(!netconf && !browser_alive()){cancel=1;session.cancel=1;break;}
+        sceKernelDelayThread(20000);
+    }
+    return !cancel && !session.alive?-1:0;
 }
 static int worker(SceSize size,void *args)
 {
@@ -309,13 +328,7 @@ static int worker(SceSize size,void *args)
             result=start_network();
             if(!result) {
                 emit(3,3,0);emit(4,4,0);
-                while(running && !cancel && session.ready) {
-                    SceModule m;
-                    int netconf=kuKernelFindModuleByName("sceVshNetconf_Module",&m)>=0 && m.modid==hooks.owner;
-                    if(!netconf && !browser_alive()){cancel=1;session.cancel=1;break;}
-                    sceKernelDelayThread(20000);
-                }
-                if(!cancel && !session.ready)result=-1;
+                result=monitor_network();
             }
             if(stop_network()<0)result=-1;
         }
