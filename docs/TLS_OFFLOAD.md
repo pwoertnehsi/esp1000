@@ -126,3 +126,27 @@ native timeout expiry, explicit nonblocking behavior and close during a pending
 read. The PSP bridge builds with warnings as errors. Hardware confirmation of
 HTTPS pages and RSS/Browser exit is still pending. Previous logs/binary are
 archived locally in artifacts/tls-offload-v03.
+
+### Follow-up: bridge 0.21
+
+The user reproduced 80431066 with bridge 0.20 through both launch contexts; RSS
+Guide still exits cleanly and standalone Browser still hangs. The new capture
+again shows successful request writes followed by WANT_READ and immediate SSL
+free. Transport ends the tunnel with a PSP-originated FIN before response data
+arrives, with no USB faults in that session. The previous change did not resolve
+the hardware failure and its nonblocking-mode exception was insufficiently
+justified for an HTTP SSL callback.
+
+Bridge 0.21 applies the bounded wait regardless of the underlying TCP mode.
+The owned HTTP SSL read call has no per-call nonblocking argument; exposing the
+tunnel descriptor's mode is not a substitute for that callback's contract. The
+first twelve calls also log socket mode, wait budget and elapsed microseconds,
+so a remaining timeout can be distinguished from a bypass without UART. Tests
+now require delayed-data success even with a nonblocking descriptor and verify
+the deadline on that descriptor. The same timeout, cancellation, certificate
+verification and bounded diagnostics remain. Hardware confirmation is pending.
+
+Launch behavior is unchanged. Further inspection identifies launcher interface
+slot 0x24 as the URL-launch function at launcher text+0xdfc (interface starts at
+its data+0x10). RSS invokes it through content_browser with its completion
+context; substituting the RSS action into Browser would only open the RSS menu.

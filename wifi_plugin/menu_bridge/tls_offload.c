@@ -118,6 +118,7 @@ static int io(void *ssl,void *data,int length,int sending)
     epoch=slots[i].generation;
     /* Sony clears SO_NONBLOCK after connect. Its HTTP worker expects SSL I/O
      * to wait; a transient WANT_READ is otherwise treated as request failure.
+     * The TCP descriptor mode does not define the HTTP SSL callback contract.
      * PSP socket timeouts are four-byte microsecond values (owned 11018).
      * Keep each NET call nonblocking so close/free can cancel between attempts. */
     int nonblocking=0;unsigned configured=0;socklen_t size=sizeof(nonblocking);
@@ -132,12 +133,12 @@ static int io(void *ssl,void *data,int length,int sending)
         if(slots[i].generation!=epoch || slots[i].ssl!=ssl || slots[i].fd!=fd || slots[i].closing){leave();return -1;}
         n=sending?sceNetInetSend(fd,data,length,MSG_DONTWAIT):sceNetInetRecv(fd,data,length,MSG_DONTWAIT);
         error=n>0?0:n==0 && !sending?6:n<0 && would_block()?(sending?3:2):1;
-        int retry=length>0 && n<0 && (error==2 || error==3) && !nonblocking && sceKernelGetSystemTimeLow()-began<limit;
+        int retry=length>0 && n<0 && (error==2 || error==3) && sceKernelGetSystemTimeLow()-began<limit;
         if(!retry) {
             int trace=slots[i].io_events<12;
             if(trace)++slots[i].io_events;
             slots[i].error=error;leave();
-            if(trace){log_result(sending?"WRITE_REQUEST":"READ_REQUEST",length);log_result(sending?"WRITE_RESULT":"READ_RESULT",n);log_result("IO_SSL_ERROR",error);}
+            if(trace){log_result("IO_SOCKET_NONBLOCK",nonblocking);log_result("IO_LIMIT_US",limit);log_result("IO_WAIT_US",sceKernelGetSystemTimeLow()-began);log_result(sending?"WRITE_REQUEST":"READ_REQUEST",length);log_result(sending?"WRITE_RESULT":"READ_RESULT",n);log_result("IO_SSL_ERROR",error);}
             return n;
         }
         leave();sceKernelDelayThread(1000);
