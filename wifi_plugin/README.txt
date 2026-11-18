@@ -1,4 +1,19 @@
-ESP WiFi native Settings candidate v0.14 — E1000 / owned6.61 / ARK-5 / ESP15 diagnostics
+ESP WiFi native browser candidate v0.15 — E1000 / owned 6.61 / ARK-5 / ESP15
+
+Browser and Online Manual now use Sony's original VSH actions. L+R+SQUARE queues
+that same native browser action. The plugin does not load an EBOOT, draw a GU
+screen, or call ExitGame for these entries. Sony owns browser rendering, exit
+and its existing restriction/password flow; that flow is not bypassed or replaced.
+Native browser launch/exit and the four-digit prompt still need hardware testing.
+The standalone browser EBOOT is retained as a separate diagnostic fallback.
+
+Install wifi_vsh.prx and wifi_menu.prx together (shared control ABI changed).
+Keep the existing native helpers, virtual driver and private ms0:/b0 + b1 assets.
+No ESP firmware update is required. After leaving PC USB mode, restart VSH.
+Test native XMB Browser, exit to the same XMB, reopen, then test the shortcut.
+Read wifi-vsh.log for NATIVE_BROWSER path/backend status if startup fails.
+Network Settings Scan, Test Connection and saved-profile browser use passed
+with v0.14 / ESP15; repeat these checks with this new candidate.
 
 Native Infrastructure scan and connection requests now have an ESP backend.
 Native Scan showed real access points and Test Connection passed on hardware

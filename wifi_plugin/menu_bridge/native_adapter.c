@@ -17,7 +17,7 @@ extern int wifiNativeRegister(unsigned,unsigned);
 extern int wifiNativeRefresh(void);
 static unsigned owned_net_modules;
 typedef void (*event_fn)(int,int,int,int,void *);
-static wifi_native_hooks_t hooks={.magic=WIFI_NATIVE_HOOK_MAGIC,.abi=1};
+static wifi_native_hooks_t hooks={.magic=WIFI_NATIVE_HOOK_MAGIC,.abi=2};
 static wifi_native_usb_control_t usb={.magic=WIFI_NATIVE_USB_MAGIC,.abi=WIFI_NATIVE_USB_ABI};
 static SceUID lock=-1,thread=-1,service=-1;
 static int service_started,acc_owned,service_failed;
@@ -131,11 +131,22 @@ static int get_entry(unsigned id,unsigned field,void *out)
     }
     leave();return 0;
 }
+static int browser_alive(void)
+{
+    SceModule m;
+    return hooks.browser_owners[0]>=0 && kuKernelFindModuleByName("htmlviewer_plugin_module",&m)>=0 && m.modid==hooks.browser_owners[0];
+}
+static int callback_owner(int id)
+{
+    if(id==hooks.owner)return 1;
+    for(unsigned i=0;i<3;++i)if(id==hooks.browser_owners[i] && id>=0)return 1;
+    return 0;
+}
 static int add_handler(event_fn fn,void *arg)
 {
     if(!fn)return (int)0x80410a03u;
     SceModule m;unsigned address=(unsigned)fn;
-    if(kuKernelFindModuleByAddress((void *)fn,&m)<0 || m.modid!=hooks.owner ||
+    if(kuKernelFindModuleByAddress((void *)fn,&m)<0 || !callback_owner(m.modid) ||
         address<m.text_addr || address-m.text_addr>=m.text_size || (address&3))return -1;
     enter();int id=-1;
     for(unsigned i=0;i<16;++i)if(!handlers[i].active && !handlers[i].busy) {
@@ -152,7 +163,7 @@ static int del_handler(int id)
     handlers[i].active=0;
     while(handlers[i].busy && sceKernelGetThreadId()!=thread){leave();sceKernelDelayThread(1000);enter();}
     int any=0;for(unsigned j=0;j<16;++j)any|=handlers[j].active;
-    if(!any)cancel=1;
+    if(!any && !browser_alive())cancel=1;
     leave();return 0;
 }
 static int log_pointer(void **out)
@@ -294,7 +305,8 @@ static int worker(SceSize size,void *args)
                 emit(3,3,0);emit(4,4,0);
                 while(running && !cancel && session.ready) {
                     SceModule m;
-                    if(kuKernelFindModuleByName("sceVshNetconf_Module",&m)<0 || m.modid!=hooks.owner){cancel=1;session.cancel=1;break;}
+                    int netconf=kuKernelFindModuleByName("sceVshNetconf_Module",&m)>=0 && m.modid==hooks.owner;
+                    if(!netconf && !browser_alive()){cancel=1;session.cancel=1;break;}
                     sceKernelDelayThread(20000);
                 }
                 if(!cancel && !session.ready)result=-1;

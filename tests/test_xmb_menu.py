@@ -138,6 +138,15 @@ int apply(uint32_t *text,unsigned char *data) {
 #define PSP_MAIN_THREAD_ATTR(...)
 #define PSP_THREAD_ATTR_USER 0x80000000
 typedef unsigned SceSize;
+typedef int SceUID;
+#ifndef NULL
+#define NULL ((void *)0)
+#endif
+int sceKernelCreateThread(const char *,int (*)(SceSize,void *),int,int,int,void *);
+int sceKernelStartThread(int,unsigned,void *);
+int sceKernelDeleteThread(int);
+int sceKernelWaitThreadEnd(int,unsigned *);
+int sceKernelDelayThread(unsigned);
 ''')
             exe=tmp/'bridge'
             subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast',

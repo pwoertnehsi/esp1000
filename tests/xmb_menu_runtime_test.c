@@ -176,6 +176,11 @@ int main(void)
  assert(wifi_menu_verify()==-14 && (text[WIFI_MENU_TABLE_OFFSET/4]&1) && caches==2);
  text[WIFI_MENU_TABLE_OFFSET/4]^=1;assert(wifi_menu_verify()==2);
 
+ request->native_request=0;
+ assert(!wifi_menu_launch(WIFI_MENU_BROWSER) && request->native_request==WIFI_MENU_BROWSER);
+ assert(wifi_menu_launch(WIFI_MENU_MANUAL)==-2 && request->native_request==WIFI_MENU_BROWSER);
+ assert(wifi_menu_launch(WIFI_MENU_SETTINGS)==-1);
+ request->native_request=0;
  request->pending=WIFI_MENU_SETTINGS;assert(wifi_menu_poll()==WIFI_MENU_SETTINGS && !request->pending);
  request->pending=999;assert(!wifi_menu_poll());
  assert(wifiMenuRelease()<0 && wifi_menu_stop()<0 && control && handler==on_start);

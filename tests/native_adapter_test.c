@@ -7,9 +7,12 @@ int sceUsbGetState(void){return 0;}
 int sceIoOpen(const char *p,int f,int m){(void)p;(void)f;(void)m;return 7;}
 int sceIoWrite(int f,const void *p,unsigned n){assert(f==7 && n<sizeof(last_log));memcpy(last_log,p,n);last_log[n]=0;return n;}
 int sceIoClose(int f){(void)f;return 0;}
-static int lookup_result;
+static int lookup_result,browser_available;
 int kuKernelFindModuleByAddress(void *p,SceModule *m){if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;return 0;}
-int kuKernelFindModuleByName(char *p,SceModule *m){(void)p;m->modid=hooks.owner;return 0;}
+int kuKernelFindModuleByName(char *p,SceModule *m){
+    if(!strcmp(p,"htmlviewer_plugin_module")){if(!browser_available)return -1;m->modid=123;return 0;}
+    m->modid=hooks.owner;return 0;
+}
 static unsigned clock_us;
 static int loader_result=-55,start_result,start_status,reply_error,stop_error;
 static int events_seen[8],event_count;
@@ -42,13 +45,21 @@ int kuKernelLoadModule(const char *a,int b,void *c){(void)a;(void)b;(void)c;retu
 int wifiNativeRefresh(void){return 0;}
 int sceUtilityLoadNetModule(int n){(void)n;return 0;}
 int sceUtilityUnloadNetModule(int n){(void)n;return 0;}
-int wifiNativeRegister(unsigned a,unsigned b){assert(a && b==sizeof(hooks));return 0;}
+int wifiNativeRegister(unsigned a,unsigned b){assert(a && b==sizeof(hooks));for(unsigned i=0;i<3;++i)hooks.browser_owners[i]=-1;return 0;}
 static void __attribute__((aligned(4))) event(int old,int next,int code,int error,void *arg)
 {(void)old;(void)next;(void)error;assert(arg==(void *)1);assert(event_count<8);events_seen[event_count++]=code;}
 int main(void)
 {
     assert(!wifi_native_adapter_start() && running);
     int handler=add_handler(event,(void *)1);assert(handler>0);
+    assert(!callback_owner(123) && !browser_alive());
+    hooks.browser_owners[0]=123;browser_available=1;
+    assert(callback_owner(123) && browser_alive());
+    cancel=0;assert(!del_handler(handler) && !cancel); /* Native browser retains the link. */
+    browser_available=0;assert(!browser_alive());
+    handler=add_handler(event,(void *)1);assert(handler>0);
+    assert(!del_handler(handler) && cancel); /* Last settings owner still releases it. */
+    cancel=0;handler=add_handler(event,(void *)1);assert(handler>0);
     complete=1;count=32;
     for(unsigned i=0;i<count;++i)rows[i]=(native_scan_row_t){.ssid={'a','p'},.ssid_length=2,.rssi=-47,.channel=6,.auth=NATIVE_AUTH_WPA2,.cipher=NATIVE_CIPHER_AES};
     unsigned size=0;assert(!get_list(&size,NULL) && size==160);

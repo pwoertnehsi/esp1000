@@ -151,6 +151,12 @@ int wifi_menu_init(void)
     previous=sctrlHENSetStartModuleHandler(on_start);installed=1;
     sceKernelCpuResumeIntr(intr);return 0;
 }
+int wifi_menu_launch(unsigned command)
+{
+    if(!control || !control->active || !wifi_menu_uses_launcher(command))return -1;
+    if(sceKernelFindModuleByName("htmlviewer_plugin_module"))return -2;
+    return __sync_bool_compare_and_swap(&control->native_request,0,command)?0:-2;
+}
 unsigned wifi_menu_poll(void)
 {
     if(!control || !control->active)return 0;

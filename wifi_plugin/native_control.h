@@ -29,6 +29,8 @@ typedef struct {
     unsigned magic,abi,callbacks[WIFI_NATIVE_CALLBACKS];
     volatile int status,owner;
     volatile unsigned detail;
+    volatile int browser_owners[3];
+    volatile int browser_status;
 } wifi_native_hooks_t;
 #define WIFI_NATIVE_SESSION_MAGIC 0x574e5301u
 typedef struct {

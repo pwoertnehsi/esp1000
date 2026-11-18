@@ -2,7 +2,7 @@
 #define ESP_WIFI_MENU_CONTROL_H
 #include <stdint.h>
 #define WIFI_MENU_MAGIC 0x574d4e31u
-#define WIFI_MENU_ABI 2u
+#define WIFI_MENU_ABI 3u
 /* Commands are bounded integers, never user-supplied paths or strings. */
 enum {WIFI_MENU_NONE=0,WIFI_MENU_BROWSER=1,WIFI_MENU_SETTINGS=2,WIFI_MENU_RSS_SETTINGS=3,
       WIFI_MENU_GAME_SHARING=4,WIFI_MENU_MANUAL=5,WIFI_MENU_LOCATIONFREE=6,WIFI_MENU_SKYPE=7,
@@ -11,11 +11,12 @@ enum {WIFI_MENU_NONE=0,WIFI_MENU_BROWSER=1,WIFI_MENU_SETTINGS=2,WIFI_MENU_RSS_SE
 typedef struct {
     uint32_t magic,abi;
     volatile uint32_t active,pending;
+    volatile uint32_t native_request;
     uint32_t original[2];
     volatile uint32_t calls,last_action,last_argument;
 } wifi_menu_control_t;
-/* Native Settings, RSS and other services remain in Sony's own VSH pages.
- * Only the working browser session needs the standalone transport launcher. */
+/* Browser/manual commands identify native VSH actions. The standalone test
+ * application also uses this predicate for its explicit diagnostic entry. */
 static inline int wifi_menu_uses_launcher(unsigned command)
 {return command==WIFI_MENU_BROWSER || command==WIFI_MENU_MANUAL;}
 static inline unsigned wifi_menu_command(int action,int argument)

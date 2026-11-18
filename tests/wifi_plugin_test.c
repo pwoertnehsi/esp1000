@@ -12,10 +12,11 @@ int wifi_menu_activity(unsigned out[3]){(void)out;return 0;}
 void wifi_native_observed(unsigned out[4]){memset(out,0,16);}
 unsigned wifi_native_detail(void){return 0;}
 int wifi_native_status(void){return 0;}
+int wifi_native_browser_status(void){return 0;}
 int wifi_native_init(void){return 0;}
 int wifi_native_stop(void){return 0;}
 static unsigned clock_us,buttons,devkit=0x06060110;
-static int state,model=10,context=0x100,foreign,loops,launches,stat_ok=1,busy_after_stat;
+static int state,model=10,context=0x100,foreign,loops,launches;
 static int create_result=3,start_result,wait_result,deleted,vsh_present=1,syscon_present;
 static SceModule vsh,syscon;
 static unsigned code[4];static unsigned char cached;
@@ -36,16 +37,11 @@ int sceUsbGetDrvState(const char *name){(void)name;return foreign?1:2;}
 unsigned sceKernelGetSystemTimeLow(void){return clock_us;}
 int sceCtrlPeekBufferPositive(SceCtrlData *pad,int n){assert(n==1);pad->Buttons=buttons;return 1;}
 int sceKernelDelayThread(unsigned n){clock_us+=n;if(--loops<=0)running=0;return 0;}
-int sceIoGetstat(const char *path,SceIoStat *stat)
-{assert(!strcmp(path,APP));stat->st_size=100;if(busy_after_stat)state=0x200;return stat_ok?0:-1;}
-int sctrlKernelLoadExecVSHMs2(const char *path,struct SceKernelLoadExecVSHParam *p)
-{
- assert(!state && !foreign && !strcmp(path,APP));assert(p->size==sizeof(*p) && !strcmp(p->key,"game"));
- const char *a=p->argp;assert(!strcmp(a,APP));assert(!strncmp(a+sizeof(APP),"--wifi-entry\n",13));
- unsigned expected=sizeof(APP)+strlen(a+sizeof(APP))+1;
- if(menu_command){assert(!strcmp(a+expected,"--wifi-menu=1"));expected+=strlen(a+expected)+1;}
- assert(p->args==expected && p->args<sizeof(launch_args));++launches;return -9;
-}
+int wifi_browser_init(void){return 0;}
+int wifi_browser_stop(void){return 0;}
+static int browser_status=1;
+int wifi_browser_status(void){return browser_status;}
+int wifi_menu_launch(unsigned command){assert(command==WIFI_MENU_BROWSER && !state && !foreign);++launches;return 0;}
 unsigned sceKernelDevkitVersion(void){return devkit;}
 int sceKernelGetModel(void){return model;}
 int sceKernelInitKeyConfig(void){return context;}
@@ -74,8 +70,8 @@ int main(void)
  wait_result=0;assert(!module_stop(0,NULL) && worker<0);
  run(CHORD,0x200,0,30);run(CHORD,0,1,30);run(PSP_CTRL_SQUARE,0,0,30);assert(!launches);
  run(CHORD,0,0,60);assert(launches==1); /* Holding never repeatedly launches. */
- busy_after_stat=1;state=0;assert(launch()==-2 && launches==1);busy_after_stat=0;state=0;
- stat_ok=0;assert(launch()==-1);stat_ok=1;
+ state=0x200;assert(launch()==-2 && launches==1);state=0;
+ browser_status=-1;assert(launch()==-3 && launches==1);browser_status=1;
  /* Optional detector is guarded and cannot turn an unrecognized firmware
   * routine into a hardware write or a guessed accessory-ID decision. */
  syscon_present=1;strcpy(syscon.modname,"sceSYSCON_Driver");syscon.version[0]=11;syscon.version[1]=1;
@@ -88,7 +84,6 @@ int main(void)
  code[3]^=1;resolve_passive_flag();assert(!usb_flag);code[3]^=1;
  syscon.segmentaddr[0]=data+1;resolve_passive_flag();assert(!usb_flag);
  for(unsigned i=0;i<1000;++i)remember(i,(int)i,0,0);
- assert(make_arguments()<sizeof(launch_args));
  diagnostic("test=%d\n",17);state=0x222;unsigned before=log_opens;
  flush_diagnostics();assert(log_opens==before && diagnostic_pending);
  state=-1;flush_diagnostics();assert(log_opens==before);
@@ -96,5 +91,5 @@ int main(void)
  flush_diagnostics();assert(diagnostic_size==bytes-2 && diagnostic_pending);
  write_limit=4096;flush_diagnostics();assert(!diagnostic_pending && log_writes);
  before=log_opens;flush_diagnostics();assert(before==log_opens);
- puts("PASS: real VSH plugin guards/lifecycle, storage refusal, hold/release/wrap, loadexec args, passive detector guards");
+ puts("PASS: real VSH plugin guards/lifecycle, storage refusal, hold/release/wrap, resident browser request, passive detector guards");
 }

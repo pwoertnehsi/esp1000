@@ -1,10 +1,8 @@
-/* VSH entry and scoped native menu candidate. It never registers, starts or activates a USB driver.
- * The proven EBOOT owns networking and USB only during its own lifetime. */
+/* Resident native XMB browser and ESP network backend. */
 #include <pspkernel.h>
 #include <pspctrl.h>
 #include <pspinit.h>
 #include <psploadcore.h>
-#include <psploadexec_kernel.h>
 #include <pspsysmem_kernel.h>
 #include <pspusb.h>
 #include <systemctrl.h>
@@ -16,9 +14,9 @@
 #include "menu_runtime.h"
 #include "native_runtime.h"
 #include "menu_control.h"
+#include "browser_runtime.h"
 
-PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,14);
-#define APP "ms0:/PSP/GAME/psp-browser/EBOOT.PBP"
+PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,15);
 #define CHORD (PSP_CTRL_LTRIGGER|PSP_CTRL_RTRIGGER|PSP_CTRL_SQUARE)
 #define ROWS 64u
 static SceUID worker=-1;
@@ -99,45 +97,12 @@ static void remember(unsigned time,int state,int foreign,int flag)
     history[row].foreign=foreign;history[row].flag=flag;
 }
 static unsigned menu_command;
-static char launch_args[4096];
-static unsigned make_arguments(void)
-{
-    memcpy(launch_args,APP,sizeof(APP));
-    unsigned used=sizeof(APP);
-    int n=snprintf(launch_args+used,sizeof(launch_args)-used,
-        "--wifi-entry\nVSH shortcut0.14 passive_syscon=%d (bit meaning unverified)\n",usb_flag!=NULL);
-    used+=(unsigned)n;
-    unsigned count=written<16?written:16;
-    for(unsigned i=written-count;i<written;++i) {
-        unsigned row=i%ROWS;
-        n=snprintf(launch_args+used,sizeof(launch_args)-used,
-            "%u USB=%08x foreign=%d syscon_usb_flag=%d\n",
-            history[row].time,history[row].state,history[row].foreign,history[row].flag);
-        used+=(unsigned)n;
-    }
-    if(menu_command) {
-        n=snprintf(launch_args+used+1,sizeof(launch_args)-used-1,"--wifi-menu=%u",menu_command);
-        used+=1+(unsigned)n;
-    }
-    /* NUL-separated argv strings. The application logs the snapshot after
-     * loadexec, when VSH/mass-storage lifetime has ended. No VSH file writes. */
-    return used+1;
-}
 static int launch(void)
 {
-    SceIoStat stat;
-    int r=sceIoGetstat(APP,&stat);
-    diagnostic("APP_STAT result=%08x bytes=%u\n",r,r<0?0:(unsigned)stat.st_size);
-    if(r<0 || stat.st_size<40)return -1;
-    /* Recheck immediately before loadexec. We never steal an active bus. */
     int state=sceUsbGetState();
     if(state<0 || (state&PSP_USB_ACTIVATED) || foreign_usb())return -2;
-    struct SceKernelLoadExecVSHParam param;
-    memset(&param,0,sizeof(param));param.size=sizeof(param);
-    param.args=make_arguments();param.argp=launch_args;param.key="game";
-    diagnostic("LOADEXEC_BEGIN args=%u\n",param.args);
-    flush_diagnostics();
-    return sctrlKernelLoadExecVSHMs2(APP,&param);
+    if(wifi_browser_status()!=1)return -3;
+    return wifi_menu_launch(menu_command?menu_command:WIFI_MENU_BROWSER);
 }
 static int monitor(SceSize size,void *args)
 {
@@ -173,6 +138,12 @@ static int monitor(SceSize size,void *args)
             diagnostic("NATIVE_BACKEND status=%d detail=%08x stub=%08x/%08x function=%08x api=%08x\n",native_status,wifi_native_detail(),words[0],words[1],words[2],words[3]);
             previous_native_status=native_status;
         }
+        static int previous_browser_paths=-999,previous_browser_backend=-999;
+        int browser_paths=wifi_browser_status(),browser_backend=wifi_native_browser_status();
+        if(browser_paths!=previous_browser_paths || browser_backend!=previous_browser_backend) {
+            diagnostic("NATIVE_BROWSER paths=%d backend=%d\n",browser_paths,browser_backend);
+            previous_browser_paths=browser_paths;previous_browser_backend=browser_backend;
+        }
         int menu_status=wifi_menu_status();
         if(menu_status!=previous_menu_status){diagnostic("XMB_MENU status=%d\n",menu_status);previous_menu_status=menu_status;}
         if(menu_status==1 && !menu_check_started){menu_check_started=1;menu_check_time=now;}
@@ -203,7 +174,7 @@ static int monitor(SceSize size,void *args)
         int shortcut_launch=wifi_shortcut_update(&shortcut,now,chord,allowed);
         if(shortcut_launch)menu_command=WIFI_MENU_BROWSER;
         if(menu_command || shortcut_launch) {
-            int result=launch();diagnostic("LOADEXEC_RETURN %08x\n",result);
+            int result=launch();diagnostic("NATIVE_BROWSER_REQUEST result=%08x paths=%d\n",result,wifi_browser_status());
         }
         flush_diagnostics();
         sceKernelDelayThread(50000);
@@ -214,7 +185,7 @@ int module_start(SceSize size,void *args)
 {
     (void)size;(void)args;
     unsigned devkit=sceKernelDevkitVersion();int model=sceKernelGetModel(),context=sceKernelInitKeyConfig();
-    diagnostic("BEGIN ESP WiFi VSH Entry0.14 devkit=%08x model=%d context=%08x\n",devkit,model,context);
+    diagnostic("BEGIN ESP WiFi VSH Entry0.15 devkit=%08x model=%d context=%08x\n",devkit,model,context);
     /* ARK VSH reports 6.60 on this 6.61 installation. This plugin changes no
      * global model values; native menu changes have separate exact ABI guards. */
     if((devkit!=0x06060110 && devkit!=0x06060010) || model!=10 || context!=PSP_INIT_KEYCONFIG_VSH) {
@@ -222,17 +193,19 @@ int module_start(SceSize size,void *args)
     }
     wifi_menu_init();
     wifi_native_init();
+    int browser_result=wifi_browser_init();diagnostic("NATIVE_BROWSER_PATHS result=%08x status=%d\n",browser_result,wifi_browser_status());
     worker=sceKernelCreateThread("ESPWiFiVshEntry",monitor,0x32,0x4000,0,NULL);
-    if(worker<0){wifi_native_stop();wifi_menu_stop();diagnostic("THREAD_CREATE %08x\n",worker);flush_diagnostics();return worker;}
+    if(worker<0){wifi_browser_stop();wifi_native_stop();wifi_menu_stop();diagnostic("THREAD_CREATE %08x\n",worker);flush_diagnostics();return worker;}
     running=1;int r=sceKernelStartThread(worker,0,NULL);
     diagnostic("THREAD_START %08x\n",r);
-    if(r<0){wifi_native_stop();wifi_menu_stop();running=0;sceKernelDeleteThread(worker);worker=-1;flush_diagnostics();}
+    if(r<0){wifi_browser_stop();wifi_native_stop();wifi_menu_stop();running=0;sceKernelDeleteThread(worker);worker=-1;flush_diagnostics();}
     return r;
 }
 int module_stop(SceSize size,void *args)
 {
     (void)size;(void)args;
     if(!wifi_menu_can_stop())return -2;
+    if(wifi_browser_stop()<0)return -2;
     if(wifi_native_stop()<0)return -2;
     if(wifi_menu_stop()<0)return -2;
     running=0;
