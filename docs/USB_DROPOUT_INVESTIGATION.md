@@ -64,3 +64,24 @@ mount the PSP to collect psp-vnet.log, native-wifi.log and wifi-vsh.log. Record
 whether the fault first appeared while idle or when loading. A secured cable /
 stable external-power repeat is a separate comparison; change one variable per
 run. Do not reset the ESP after a failure until its diagnostic state is captured.
+
+## Diagnostic capture result — PSP v0.18 / ESP17
+
+The user connected and left Browser untouched. No error appeared on screen.
+The PSP log still contains initial/restored automatic HTTP requests, so this
+was a hands-off test rather than a traffic-free idle test. The planned manual
+page-load phase was skipped after the fault was already observed.
+
+At ESP uptime106961ms an invalid64-byte frame fails mask02: only magic is wrong;
+size, version, type and length pass their checks. At111981ms, after5008ms with
+no progress, the outgoing watchdog restarts the host. The PSP reports successful
+send completions and an outstanding receive whose age increases, with no logged
+header or endpoint error. Wi-Fi stays associated. USB readiness recovers after
+the restart, then the native session ends. The browser remaining visible is
+therefore not proof the network session is still active.
+
+Header corruption is now narrowed but not localized to sender, receiver or
+controller. The diagnostic does not establish a physical cause or exclude one.
+Next investigation should check sender-side header integrity around submission
+and completion, together with host FIFO/channel state. Private correlated logs
+are retained locally under milestones/usb-diag-v18-hands-off.
