@@ -49,17 +49,17 @@ unsigned sctrlHENFindFunction(const char *,const char *,unsigned);
             for name in ['pspkernel.h','psploadcore.h','pspmodulemgr.h','psputility_usbmodules.h','psputility_netparam.h','psputility_netmodules.h','pspnet_apctl.h','kubridge.h','pspiofilemgr.h','pspusb.h']:
                 (tmp/name).write_text('#include "native_adapter_shim.h"\n')
             exe=tmp/'adapter'
-            subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast','-Wno-int-to-pointer-cast','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),str(ROOT/'tests/native_adapter_test.c'),'-o',str(exe)],check=True)
+            subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast','-Wno-int-to-pointer-cast','-fno-pie','-no-pie','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),str(ROOT/'tests/native_adapter_test.c'),'-o',str(exe)],check=True)
             subprocess.run([str(exe)],check=True,env={**os.environ,'ASAN_OPTIONS':'detect_leaks=0'})
 
     def test_native_session(self):
         with tempfile.TemporaryDirectory() as d:
             tmp=Path(d)
-            for name in ['pspkernel.h','pspmodulemgr.h','pspnet.h','pspnet_inet.h','pspnet_resolver.h','pspnet_apctl.h','kubridge.h']:
+            for name in ['pspkernel.h','pspmodulemgr.h','pspnet.h','pspnet_inet.h','pspnet_resolver.h','pspnet_apctl.h','kubridge.h','pspiofilemgr.h']:
                 (tmp/name).write_text('#include "native_session_shim.h"\n')
             exe=tmp/'session'
             subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast','-Wno-int-to-pointer-cast','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),str(ROOT/'tests/native_session_test.c'),'-o',str(exe)],check=True)
-            for mode in [0,1,2,3,4,5,7]:
+            for mode in [0,1,2,3,4,5,6,7,8,9,11]:
                 subprocess.run([str(exe),str(mode)],check=True,env={**os.environ,'ASAN_OPTIONS':'detect_leaks=0'})
 
     def test_native_usb_owner(self):
@@ -69,7 +69,7 @@ unsigned sctrlHENFindFunction(const char *,const char *,unsigned);
                 (tmp/name).write_text('#include "native_usb_shim.h"\n')
             exe=tmp/'usb-owner'
             subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-int-to-pointer-cast','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),'-I',str(ROOT/'common'),str(ROOT/'tests/native_usb_test.c'),'-o',str(exe)],check=True)
-            for mode in range(8):
+            for mode in range(10):
                 subprocess.run([str(exe),str(mode)],check=True,env={**os.environ,'ASAN_OPTIONS':'detect_leaks=0'})
 
     def test_native_guard_catalog(self):

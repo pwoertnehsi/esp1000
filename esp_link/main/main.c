@@ -14,7 +14,9 @@
 #include "tusb.h"
 #include "host/usbh_pvt.h"
 #include "host/hcd.h"
+#include "portable/synopsys/dwc2/diagnostics.h"
 #include "link_protocol.h"
+#include "link_diagnostics.h"
 #include "link_usb.h"
 #include "network_page.h"
 #include "native_scan.h"
@@ -24,6 +26,8 @@
 #include "packet_link.h"
 #include "lab_gateway.h"
 #include "host_wakeup.h"
+#include "phy_recovery.h"
+#include "usb_host_recovery.h"
 
 void local_tcp_start(void);
 
@@ -47,11 +51,71 @@ static QueueHandle_t commands, outgoing;
 /* USB state belongs exclusively to app_main/tuh_task and its callbacks. */
 static uint8_t device, candidate, ep_in, ep_out, itf_number;
 static bool mounted, rx_busy, tx_busy, automatic = true, vbus_on;
-static bool reset_requested;
+static bool reset_requested,host_fault;
 static uint32_t seq, tx_count, rx_count, bad_count, dropped;
-static int64_t tx_started, ping_sent;
+static int64_t tx_started,rx_started,ping_sent;
+static unsigned last_rx_header_errors;
+static int last_in_result=-1,last_out_result=-1;
+static uint32_t last_in_bytes,last_out_bytes;
+#define ENUM_DIAG_ROWS 32u
+static struct {int64_t time;unsigned phase,address,stage,result,bytes;} enum_history[ENUM_DIAG_ROWS];
+static unsigned enum_written,enum_printed;
+void tuh_enum_diagnostic_cb(uint8_t phase,uint8_t address,uint32_t stage,uint8_t result,uint32_t bytes)
+{
+    unsigned i=enum_written++%ENUM_DIAG_ROWS;
+    enum_history[i].time=esp_timer_get_time()/1000;
+    enum_history[i].phase=phase;enum_history[i].address=address;enum_history[i].stage=stage;
+    enum_history[i].result=result;enum_history[i].bytes=bytes;
+}
+static void print_enumeration(void)
+{
+    unsigned first=enum_printed;
+    if(enum_written-first>ENUM_DIAG_ROWS) {
+        ESP_LOGW("psp-link","ENUM_DIAG lost=%u",enum_written-first-ENUM_DIAG_ROWS);
+        first=enum_written-ENUM_DIAG_ROWS;
+    }
+    for(unsigned n=first;n<enum_written;++n) {
+        unsigned i=n%ENUM_DIAG_ROWS;
+        ESP_LOGI("psp-link","ENUM_DIAG n=%u time_ms=%" PRId64 " phase=%u addr=%u stage=%u result=%u bytes=%u",
+                 n,enum_history[i].time,enum_history[i].phase,enum_history[i].address,
+                 enum_history[i].stage,enum_history[i].result,enum_history[i].bytes);
+    }
+    enum_printed=enum_written;
+}
 static uint32_t ping_seq;
 static link_frame_t tx, rx;
+/* USB ISR publishes an odd/even revision; task snapshots cannot mix records.
+ * Metadata only, and only the link's own static RX buffer is observed. */
+static volatile unsigned fifo_revision,fifo_copies,fifo_channel,fifo_bytes,fifo_offset,fifo_capacity,fifo_checks,fifo_overflow;
+void hcd_dwc2_diag_rx_cb(unsigned phase,unsigned channel,unsigned bytes,unsigned offset,unsigned capacity,const void *buffer)
+{
+    if(phase!=1 || buffer!=&rx)return;
+    ++fifo_revision;__sync_synchronize();
+    ++fifo_copies;fifo_channel=channel;fifo_bytes=bytes;fifo_offset=offset;fifo_capacity=capacity;
+    fifo_overflow=offset>capacity || bytes>capacity-offset;
+    fifo_checks=offset==0 && bytes==sizeof(rx) && capacity>=sizeof(rx)?link_frame_checks(&rx,sizeof(rx)):LINK_CHECK_SIZE;
+    __sync_synchronize();++fifo_revision;
+}
+static void print_fifo(void)
+{
+    unsigned revision=fifo_revision;
+    if(revision&1)return;
+    __sync_synchronize();
+    unsigned copies=fifo_copies,channel=fifo_channel,bytes=fifo_bytes,offset=fifo_offset;
+    unsigned capacity=fifo_capacity,checks=fifo_checks,overflow=fifo_overflow;
+    __sync_synchronize();if(revision!=fifo_revision)return;
+    ESP_LOGI("psp-link","FIFO_DIAG copies=%u channel=%u bytes=%u offset=%u capacity=%u checks=%02x overflow=%u",
+             copies,channel,bytes,offset,capacity,checks,overflow);
+}
+static void print_channels(void)
+{
+    psp_dwc2_channel_diag_t rows[PSP_DWC2_DIAG_CHANNELS];
+    unsigned count=hcd_dwc2_diag_channels(0,rows,PSP_DWC2_DIAG_CHANNELS);
+    for(unsigned i=0;i<count;++i)if(rows[i].allocated)
+        ESP_LOGI("psp-link","CHANNEL_DIAG channel=%u ep=%02x hcchar=%08" PRIx32 " hctsiz=%08" PRIx32
+                 " hcint=%08" PRIx32 " mask=%08" PRIx32 " transferred=%" PRIu32 " capacity=%" PRIu32,
+                 i,rows[i].endpoint,rows[i].hcchar,rows[i].hctsiz,rows[i].hcint,rows[i].hcintmsk,rows[i].transferred,rows[i].capacity);
+}
 static tusb_control_request_t auth_request;
 static uint8_t auth_data[64];
 static bool auth_busy, auth_pending;
@@ -59,7 +123,10 @@ static unsigned auth_attempts;
 static int64_t auth_due;
 /* Diagnostic counters only: event hook may run in interrupt context. */
 static volatile uint32_t attach_events, remove_events, transfer_events;
-static uint32_t watchdog_resets;
+static uint32_t watchdog_resets,enumeration_resets;
+static bool psp_port_known,psp_port_seen,foreign_port;
+static usb_phy_handle_t phy;
+static usb_host_recovery_t enumeration_recovery;
 static int64_t last_rx_completed, last_tx_completed;
 static network_page_t page;
 static bool html_receiver, file_wanted = true, file_active, file_waiting;
@@ -112,7 +179,9 @@ static bool class_deinit(void) { return true; }
 void tuh_enum_descriptor_device_cb(uint8_t address, const tusb_desc_device_t *desc)
 {
     ESP_LOGI(TAG, "USB address=%u VID:PID=%04x:%04x", address, desc->idVendor, desc->idProduct);
-    if (desc->idVendor == LINK_VID && desc->idProduct == LINK_PID) candidate = address;
+    psp_port_known=desc->idVendor == LINK_VID && desc->idProduct == LINK_PID;
+    foreign_port=!psp_port_known;
+    if (psp_port_known){psp_port_seen=true;candidate=address;}
 }
 
 static uint16_t class_open(uint8_t rhport, uint8_t address,
@@ -168,6 +237,7 @@ static bool class_transfer(uint8_t address, uint8_t endpoint,
 {
     if (address != device) return false;
     if (endpoint == ep_out) {
+        last_out_result=result;last_out_bytes=size;
         tx_busy = false;
         if (result == XFER_RESULT_SUCCESS && size == sizeof(tx)) {
             tx_count++;
@@ -184,13 +254,17 @@ static bool class_transfer(uint8_t address, uint8_t endpoint,
             reset_requested = true;
         }
     } else if (endpoint == ep_in) {
+        last_in_result=result;last_in_bytes=size;
         rx_busy = false;
         if (result != XFER_RESULT_SUCCESS) {
             ESP_LOGE(TAG, "RX result=%d bytes=%" PRIu32, result, size);
             reset_requested = true;
         } else if (!link_valid(&rx, size)) {
             bad_count++;
-            ESP_LOGW(TAG, "Invalid frame: %" PRIu32 " bytes", size);
+            last_rx_header_errors=link_frame_checks(&rx,size);
+            ESP_LOGW(TAG,"Invalid frame bytes=%" PRIu32 " checks=%02x (size1 magic2 version4 type8 length16)",size,last_rx_header_errors);
+            print_fifo();
+            print_channels();
         } else {
             rx_count++;
             last_rx_completed = now_ms();
@@ -322,6 +396,16 @@ static void print_status(void)
              ethernet_mode, ethernet_received, ethernet_replied, ethernet_bad);
     ESP_LOGI(TAG, "SERVICE event_wakeup=1 tick_ms=%u watchdog_resets=%" PRIu32,
              (unsigned)portTICK_PERIOD_MS, watchdog_resets);
+    ESP_LOGI(TAG,"RECOVERY known_psp=%d enum_wait=%d enum_attempts=%u enum_resets=%" PRIu32,
+             psp_port_known,enumeration_recovery.waiting,enumeration_recovery.attempts,enumeration_resets);
+    ESP_LOGI(TAG,"BULK_DIAG in_ep=%02x out_ep=%02x pending_ms(in/out)=%" PRId64 "/%" PRId64
+             " completed_age_ms(in/out)=%" PRId64 "/%" PRId64 " result(in/out)=%d/%d bytes=%" PRIu32 "/%" PRIu32 " header_checks=%02x",
+             ep_in,ep_out,rx_busy?now_ms()-rx_started:0,tx_busy?now_ms()-tx_started:0,
+             last_rx_completed?now_ms()-last_rx_completed:0,last_tx_completed?now_ms()-last_tx_completed:0,
+             last_in_result,last_out_result,last_in_bytes,last_out_bytes,last_rx_header_errors);
+    print_fifo();
+    if(tuh_inited() && !mounted && hcd_port_connect_status(0))print_channels();
+    print_enumeration();
     usb_router_status();
     native_scan_status();
     network_page_status();
@@ -437,11 +521,12 @@ static void ethernet_pump(void)
              ethernet_received,n,(unsigned)reply,ethernet_bad);
 }
 
-static void host_stop(void)
+static bool host_stop(void)
 {
     if (!tuh_deinit(0)) {
-        ESP_LOGE(TAG, "Host deinit failed; restarting rather than reusing live buffers");
-        abort();
+        host_fault=true;
+        ESP_LOGE(TAG,"Host deinit failed; retaining live buffers and stopping USB, no chip restart");
+        return false;
     }
     native_wifi=false;++native_epoch;native_profile_clear(&profile_receiver,sizeof(profile_receiver));
     ethernet_mode = ethernet_pending = ethernet_network = ethernet_metadata = false;
@@ -453,6 +538,7 @@ static void host_stop(void)
     device = candidate = ep_in = ep_out = 0;
     ping_seq = 0;
     xQueueReset(outgoing);
+    host_fault=false;return true;
 }
 
 static void handle_command(const char *line)
@@ -506,13 +592,15 @@ static void uart_console(void *arg)
     }
 }
 
-static void host_start(void)
+static bool host_start(void)
 {
     const tusb_rhport_init_t init = {.role = TUSB_ROLE_HOST, .speed = TUSB_SPEED_FULL};
     if (!tusb_rhport_init(0, &init)) {
-        ESP_LOGE(TAG, "Host init failed");
-        abort();
+        host_fault=true;
+        ESP_LOGE(TAG, "Host init failed; USB stays stopped, no chip restart");
+        return false;
     }
+    return true;
 }
 
 void app_main(void)
@@ -534,7 +622,6 @@ void app_main(void)
     outgoing = xQueueCreate(8, sizeof(link_frame_t));
     configASSERT(commands && outgoing);
     configASSERT(xTaskCreate(uart_console, "link_uart", 4096, NULL, 4, NULL) == pdPASS);
-    usb_phy_handle_t phy;
     const usb_phy_config_t phy_config = {
         .controller = USB_PHY_CTRL_OTG, .target = USB_PHY_TARGET_INT,
         .otg_mode = USB_OTG_MODE_HOST, .otg_speed = USB_PHY_SPEED_FULL,
@@ -547,12 +634,12 @@ void app_main(void)
     native_profile_start();
     usb_router_start();
     local_tcp_start();
-    ESP_LOGI(TAG, "PSP link host v15 native scan diagnostics; runtime credentials. UART0 115200; type help. D+=20 D-=19");
+    ESP_LOGI(TAG, "PSP link host v19 USB PHY/session recovery; runtime credentials. UART0 115200; type help. D+=20 D-=19");
     ESP_LOGI(TAG, "Two-cable setup: connector VBUS is external; GPIO4 does not switch its 5V");
     int64_t next_ping = now_ms() + 2000;
     int64_t next_status = now_ms() + 10000;
     for (;;) {
-        tuh_task_ext(0, false);
+        if(!host_fault && tuh_inited())tuh_task_ext(0, false);
         if (router_link_pending) {
             router_link_pending=false;
             usb_router_link(false);
@@ -584,17 +671,32 @@ void app_main(void)
         command_t command;
         if (xQueueReceive(commands, &command, 0) == pdTRUE) handle_command(command.text);
         int64_t now = now_ms();
+        bool port_connected=tuh_inited() && hcd_port_connect_status(0);
+        if(now>=enumeration_recovery.settle_until && !port_connected){psp_port_known=false;foreign_port=false;}
+        if(usb_host_recovery_poll(&enumeration_recovery,now,port_connected,
+                                 usb_host_recovery_eligible(psp_port_known,psp_port_seen,foreign_port),mounted,vbus_on)) {
+            ++enumeration_resets;
+            ESP_LOGW(TAG,"Known PSP failed to mount for15s; host recovery attempt=%u/%u",
+                     enumeration_recovery.attempts,USB_HOST_ENUM_RETRY_LIMIT);
+            reset_requested=true;
+        }
         if (reset_requested) {
             reset_requested = false;
             set_vbus(false);
-            /* Deinit aborts transfers before static buffers are reused. */
-            host_stop();
-            vTaskDelay(pdMS_TO_TICKS(300));
-            host_start();
-            set_vbus(true);
+            /* Never replace a PHY until its controller releases DMA ownership. */
+            if(host_stop()) {
+                vTaskDelay(pdMS_TO_TICKS(300));
+                esp_err_t rebuilt=psp_usb_rebuild_phy(&phy);
+                if(rebuilt==ESP_OK) {
+                    ESP_LOGI(TAG,"USB PHY rebuilt; Wi-Fi state retained");
+                    host_start();
+                } else ESP_LOGE(TAG,"USB PHY rebuild failed code=%d; chip and Wi-Fi remain running",(int)rebuilt);
+                set_vbus(true);
+            }
+            usb_host_recovery_restarted(&enumeration_recovery,now_ms());
             next_ping = now_ms() + 2000;
         }
-        if (mounted) {
+        if (mounted && !host_fault) {
             if (ethernet_network && now>=next_net_status) {
                 link_frame_t info; uint8_t ip[4]; unsigned state=network_page_uplink(ip);
                 link_init(&info,LINK_NET_STATUS,++seq,0,NULL);
@@ -620,6 +722,7 @@ void app_main(void)
                 }
             }
             if (!rx_busy) {
+                rx_started=now;
                 rx_busy = usbh_edpt_xfer(device, ep_in, (uint8_t *)&rx, sizeof(rx));
                 if (!rx_busy) reset_requested = true;
             }
@@ -644,6 +747,8 @@ void app_main(void)
                          " packet=%" PRIu32 " offset=%" PRIu32 "/%" PRIu32,
                          tx.type, tx.seq, now-tx_started, now-last_rx_completed,
                          now-last_tx_completed, ethernet_tx.id, ethernet_tx.offset, ethernet_tx.total);
+                print_status();
+                print_channels();
                 reset_requested = true;
             }
         }

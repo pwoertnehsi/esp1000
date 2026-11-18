@@ -35,9 +35,12 @@ typedef struct {
     volatile unsigned consumer_mask;
 } wifi_native_hooks_t;
 #define WIFI_NATIVE_SESSION_MAGIC 0x574e5301u
+#define WIFI_NATIVE_SESSION_ABI 3u
 typedef struct {
     unsigned magic,abi;
     volatile int cancel,ready,result;
+    volatile int alive,recovering,finished;
+    volatile unsigned recoveries,info_users;
     unsigned info_callback;
     volatile unsigned stage;
     volatile int detail;

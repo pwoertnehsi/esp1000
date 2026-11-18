@@ -13,3 +13,5 @@ native_config.o native_config_abi.o native_http.o: %.o: ../../virtual_net/app/%.
 lab_gateway.o: ../../common/lab_gateway.c
 	$(CC) $(CFLAGS) $(INCDIR:%=-I%) -c $< -o $@
 main.o: ../native_control.h
+
+main.o: ../../common/link_recovery.h
