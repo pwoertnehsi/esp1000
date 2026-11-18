@@ -183,3 +183,20 @@ mounted on the PC: status uptime continued15551 ->16101 ->20591ms and the PHY
 rebuild succeeded without a new boot banner. The radio was unconfigured following
 the firmware update, so this verifies USB rebuild without a chip reboot, not yet
 preservation of a live AP association. Active browser reconnect remains pending.
+
+
+The first ESP19 hardware attempt still failed during native profile setup. The
+ESP applied the profile and associated, then stalled sending metadata (type14).
+Its watchdog rebuilt the USB PHY while Wi-Fi remained associated. The following
+capture failed because the UART device disappeared; it does not establish what
+happened on the second attempt. PSP logs end in profile phase1008, not a recorded
+helper-unload error. The initiating stall remains unresolved.
+
+Inspection found two additional recovery defects in the USB-only helper. After
+readiness is lost, it must resubmit the scan/profile transaction once HELLO
+returns, within the original bounded request deadline. Also, a cancellation
+failure must retain its buffers but allow a later StopModule to retry transport
+cleanup after the worker exits; successful cleanup clears the unsafe marker.
+Tests exercise profile resubmission and delayed successful cleanup, as well as
+continued unload refusal while cancellation is still failing. These fixes are
+installed for hardware testing; they do not establish the cause of this stall.
