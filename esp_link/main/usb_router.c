@@ -13,6 +13,8 @@
 #include "usb_router.h"
 #include "router_filter.h"
 #include "host_wakeup.h"
+void adhoc_portmap_start(void);
+void adhoc_portmap_clear(void);
 static struct netif usb_netif;
 static QueueHandle_t outgoing;
 static volatile bool linked;
@@ -46,6 +48,7 @@ static void create(void *unused)
     configASSERT(netif_add(&usb_netif,&ip,&mask,&gw,NULL,init,tcpip_input));
     netif_set_up(&usb_netif);
     configASSERT(ip_napt_enable_netif(&usb_netif,1));
+    adhoc_portmap_start();
     /* Wi-Fi retains the default route. This LAN interface is never default. */
 }
 void usb_router_start(void)
@@ -58,7 +61,7 @@ static void link_change(void *enabled)
 {
     linked=enabled!=NULL;
     if (linked) { configASSERT(ip_napt_enable_netif(&usb_netif,1)); netif_set_link_up(&usb_netif); }
-    else { configASSERT(ip_napt_enable_netif(&usb_netif,0)); netif_set_link_down(&usb_netif); etharp_cleanup_netif(&usb_netif); xQueueReset(outgoing); }
+    else { adhoc_portmap_clear();configASSERT(ip_napt_enable_netif(&usb_netif,0)); netif_set_link_down(&usb_netif); etharp_cleanup_netif(&usb_netif); xQueueReset(outgoing); }
 }
 void usb_router_link(bool enabled)
 {

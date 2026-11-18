@@ -634,7 +634,7 @@ void app_main(void)
     native_profile_start();
     usb_router_start();
     local_tcp_start();
-    ESP_LOGI(TAG, "PSP link host v19 USB PHY/session recovery; runtime credentials. UART0 115200; type help. D+=20 D-=19");
+    ESP_LOGI(TAG, "PSP link host v20 Ad Hoc LAN port mapping; runtime credentials. UART0 115200; type help. D+=20 D-=19");
     ESP_LOGI(TAG, "Two-cable setup: connector VBUS is external; GPIO4 does not switch its 5V");
     int64_t next_ping = now_ms() + 2000;
     int64_t next_status = now_ms() + 10000;
