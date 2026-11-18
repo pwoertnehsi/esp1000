@@ -75,3 +75,26 @@ record-framing or endpoint handling as its cause. ESP status collected after
 its power cycle contains no previous-run controller history. A synchronized
 externally powered UART capture is the next diagnostic; no timeout increase or
 speculative controller change has been applied.
+
+## Synchronized external-power capture
+
+At the user's request, monitoring continued through another race attempt with
+external ESP power, until the user asked to stop. Four complete, untruncated
+20-second UART captures and a checksum summary are preserved locally in
+`milestones/adhoc-live-20261118T111234Z`. This attempt failed before race rendering.
+
+The capture contains eight bulk-OUT watchdog expirations at about five seconds,
+with recent successful bulk-IN traffic at each expiration. Watchdog counters
+increase from 3 to 11. Each watchdog snapshot still reports the physical USB
+port connected; the OUT channel remains enabled with one 64-byte packet pending
+and zero transferred bytes. Three invalid 64-byte incoming records are also
+observed, including after host recovery. Wi-Fi remains connected in every
+sample, with RSSI between -71 and -64 dBm. Restoring all three game mappings
+reports success after each reset.
+
+External power alone therefore does not eliminate the fault, and these host
+resets cannot all be attributed to physically unplugging the cable. The evidence
+narrows the next investigation to USB bulk-OUT progress / device receive arming
+and post-reset record handling. A watchdog snapshot cannot distinguish a host
+controller/FIFO problem from device-side NAK or endpoint readiness; no controller
+fix is established yet. No firmware or PSP binary was changed during monitoring.
