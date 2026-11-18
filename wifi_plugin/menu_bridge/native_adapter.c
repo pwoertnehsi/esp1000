@@ -47,6 +47,22 @@ static void log_result(unsigned command,int result,unsigned row_count)
     line[used++]='\n';int fd=sceIoOpen("ms0:/native-wifi.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0777);
     if(fd>=0){sceIoWrite(fd,line,used);sceIoClose(fd);}
 }
+/* Small bounded event records; never write while PC storage owns the stick. */
+static void trace_event(unsigned phase,unsigned slot,int value)
+{
+    if(sceUsbGetDrvState("USBStor_Driver")==1)return;
+    char line[112];unsigned used=0;
+    const char *names[]={"FACADE phase="," slot="," value="," thread="};
+    unsigned values[]={phase,slot,(unsigned)value,(unsigned)sceKernelGetThreadId()};
+    static const char hex[]="0123456789abcdef";
+    for(unsigned i=0;i<4;++i) {
+        unsigned n=strlen(names[i]);memcpy(line+used,names[i],n);used+=n;
+        for(unsigned j=0;j<8;++j)line[used++]=hex[(values[i]>>(28-4*j))&15];
+    }
+    line[used++]='\n';
+    int fd=sceIoOpen("ms0:/native-wifi.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
+    if(fd>=0){sceIoWrite(fd,line,used);sceIoClose(fd);}
+}
 static void enter(void){sceKernelWaitSema(lock,1,NULL);}
 static void leave(void){sceKernelSignalSema(lock,1);}
 static int gate(void){return running?0:1;}
@@ -171,20 +187,24 @@ static int add_handler(event_fn fn,void *arg)
 }
 static int del_handler(int id)
 {
-    unsigned i=(unsigned)id&15;enter();
+    unsigned i=(unsigned)id&15;trace_event(10,i,id);enter();
+    trace_event(11,i,handlers[i].busy);
     if(!handlers[i].active || handlers[i].id!=id){leave();return -1;}
     handlers[i].active=0;
+    if(handlers[i].busy)trace_event(12,i,handlers[i].owner);
     while(handlers[i].busy && sceKernelGetThreadId()!=thread){leave();sceKernelDelayThread(1000);enter();}
     int any=0;for(unsigned j=0;j<16;++j)any|=handlers[j].active;
     if(!any && !browser_alive())cancel=1;
-    leave();return 0;
+    leave();trace_event(13,i,id);return 0;
 }
 static int log_pointer(void **out)
 {if(!out)return -1;*out=diagnostic_buffer;return 0;}
 static int log_setting(const char *unused){(void)unused;return 0;}
 static void emit(int next,int event,int error)
 {
+    trace_event(20,(unsigned)next,event);
     enter();int old=state;state=next;leave();
+    trace_event(21,(unsigned)old,event);
     for(unsigned i=0;i<16;++i) {
         enter();event_fn fn=handlers[i].active?handlers[i].fn:NULL;void *arg=handlers[i].arg;
         if(fn) {
@@ -196,8 +216,10 @@ static void emit(int next,int event,int error)
         unsigned gp=handlers[i].gp;
         if(fn)handlers[i].busy=1;
         leave();
-        if(fn){wifiNativeInvoke(gp,fn,old,next,event,error,arg);enter();handlers[i].busy=0;leave();}
+        if(fn){trace_event(22,i,event);wifiNativeInvoke(gp,fn,old,next,event,error,arg);
+            trace_event(23,i,event);enter();handlers[i].busy=0;leave();}
     }
+    trace_event(24,(unsigned)next,event);
 }
 static int stop_service(void)
 {
@@ -348,10 +370,12 @@ static int worker(SceSize size,void *args)
              * resources to be released. */
             emit(0,result && !cancel?6:5,result && !cancel?(int)0x80410a0du:0);
             disconnected=1;
+            trace_event(30,0,result);
             if(stop_network()<0)result=-1;
+            trace_event(31,0,result);
         }
         log_result(command,result,count);
-        enter();pending=0;leave();
+        enter();pending=0;leave();trace_event(40,command,result);
         if(!disconnected)emit(0,result && !cancel?6:command==WIFI_NATIVE_SCAN_COMMAND?2:5,
             result && !cancel?(int)0x80410a0du:0);
     }

@@ -3,9 +3,11 @@
 #include "native_adapter_shim.h"
 #include "../wifi_plugin/menu_bridge/native_adapter.c"
 static char last_log[160];
+static unsigned facade_traces;
 int sceUsbGetState(void){return 0;}
+int sceUsbGetDrvState(const char *p){assert(!strcmp(p,"USBStor_Driver"));return 2;}
 int sceIoOpen(const char *p,int f,int m){(void)p;(void)f;(void)m;return 7;}
-int sceIoWrite(int f,const void *p,unsigned n){assert(f==7 && n<sizeof(last_log));memcpy(last_log,p,n);last_log[n]=0;return n;}
+int sceIoWrite(int f,const void *p,unsigned n){assert(f==7 && n<sizeof(last_log));if(n>=7 && !memcmp(p,"FACADE ",7)){++facade_traces;return n;}memcpy(last_log,p,n);last_log[n]=0;return n;}
 int sceIoClose(int f){(void)f;return 0;}
 static int lookup_result,browser_available,profile_security=-1;
 int kuKernelFindModuleByAddress(void *p,SceModule *m){if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;m->gp_value=0x09123450;return 0;}
@@ -127,7 +129,7 @@ int main(void)
     assert(event_count==3 && events_seen[0]==10 && events_seen[1]==3 && events_seen[2]==4);
     assert(network_started && session.alive && state==4);
     network_started=0;session.alive=0;pending=0;assert(!del_handler(handler));
-    assert(callback_invocations>=3);
+    assert(callback_invocations>=3 && facade_traces>0);
     assert(!wifi_native_adapter_stop());
     puts("PASS: actual native list20 bound, exact field sizes, security mapping, queued commands, events and unavailable ESP cleanup");
 }

@@ -247,3 +247,16 @@ uses the PSP extended argument registers expected by the trampoline. Host
 facade tests check that the callback module's GP reaches invocation; actual GP
 switching was inspected in PSP disassembly, not executed by host tests. Hardware
 verification is pending; this does not claim to prevent the USB stall.
+
+Bridge v0.13 hardware test still left Browser exit on the pulsing circle. The
+installed binary matched, USB and helper cleanup again completed through step33,
+and no facade completion appeared. GP handling is an ABI correction, not a
+verified solution to this hang. Bridge v0.14 adds FACADE records with thread ID:
+phases10/11 enter handler removal / acquire its lock,12 observes a busy callback,
+13 removal returns;20/21 enter emit / publish state,22/23 bracket each callback,
+24 emit returns;30/31 bracket network stop,40 marks request completion. These
+records are written outside active mass storage (USBStor_Driver started state1
+suppresses them), including during accessory USB where earlier facade logging
+was suppressed. They contain only phase, slot/event values and thread ID.
+The purpose is to distinguish callback blocking, removal waiting, lock waiting
+and module-stop completion before another behavior change.
