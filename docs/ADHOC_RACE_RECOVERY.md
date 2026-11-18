@@ -54,3 +54,24 @@ First try a race without deliberately disturbing USB. If it stalls, retain the
 exact PPSSPP message and mount the PSP for its richer mapping log. A separate
 brief-unplug test can then verify recovery; passing that alone does not prove a
 race works. Do not erase the known successful car-transfer baseline.
+
+## ESP21 race loaded, then stopped
+
+The next user test reached the rendered track and opponent car, but the user
+could not accelerate and the connection failed shortly afterward. Its PSP logs
+were preserved in the ignored `milestones/adhoc-race-loaded-drop-20261118`.
+They confirm successful mappings for UDP 10001, UDP 30125 and TCP 30000, and
+incoming traffic on both race ports. A control TCP connection also recovered
+from an early USB interruption, supporting the intended ESP21 recovery behavior.
+
+Later, PSP USB receive requests remain pending for approximately five seconds
+while PSP-to-ESP completions continue. Detach/reattach follows repeatedly, and
+one receive completes with 44 bytes instead of the fixed 64-byte record. The
+session ends with 432 transmitted / 133 received frames, zero packet rejection
+or driver fault, four detach events and clean driver teardown. Mapping removal
+then fails as transport readiness disappears. These observations identify a
+remaining USB transfer stall but do not distinguish cable, power, controller,
+record-framing or endpoint handling as its cause. ESP status collected after
+its power cycle contains no previous-run controller history. A synchronized
+externally powered UART capture is the next diagnostic; no timeout increase or
+speculative controller change has been applied.
