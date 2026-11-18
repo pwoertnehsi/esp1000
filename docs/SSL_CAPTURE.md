@@ -78,3 +78,47 @@ covers byte-fragmented and cross-record hellos, retransmission/overlap, extensio
 presence, legacy ClientHello framing, plaintext/encrypted alerts, TCP gaps and
 reset, bounded flow eviction, metadata budgets, prefix clearing and 10000
 checksum-valid malformed payloads. Real hardware capture remains to be tested.
+
+## First real capture: server rejects the legacy offer
+
+The first PSP capture completed without evictions or dropped log rows. Six TCP
+flows were observed. Every ClientHello offered TLS1.0, nine legacy ciphers and
+no extensions (including no SNI). Three other flows exchanged ServerHello,
+certificate messages, ChangeCipherSpec and encrypted application records in both
+directions. One flow received no captured TLS reply. The two failing attempts
+received a plaintext fatal TLS alert 40 (`handshake_failure`) immediately after
+the ClientHello, with no ServerHello or certificate. Both closed cleanly, with
+no stream decoder gaps. The latest network-driver run has no USB detach event,
+packet rejection or driver fault, and stops cleanly.
+
+This confirms that those failures occur in the server's response to the PSP's
+TLS offer, before PSP certificate validation. Alert 40 does not distinguish
+protocol version, cipher policy, missing SNI or another ClientHello policy; it
+would be incorrect to claim a uniquely identified rejection reason. Encrypted
+application records in other flows do not prove those pages rendered or that
+all certificate checks were enabled. The PSP clock was recorded, but it cannot
+explain these particular pre-certificate server rejections.
+
+Raw logs and the per-flow summary are preserved locally in the ignored
+`milestones/ssl-first-capture-20261118`. The enable marker was removed after
+preservation, avoiding continuing diagnostic overhead. No PSP/ESP binary was
+changed following this capture.
+
+### Consequence for the offloader
+
+A TLS packet-level redirect cannot supply the missing hostname: the captured
+ClientHello contains no SNI. The offloader must take the original hostname from
+the native HTTP/connection layer and associate it with the SSL object. Guessing
+from a shared CDN IP or reverse DNS would break virtual hosting and certificate
+identity verification. The ESP must use that original hostname both for SNI and
+certificate-name verification, and verify its certificate chain/date before
+reporting handshake success to the PSP.
+
+Owned-module inspection locates libhttp's SSL setup/handshake call sequence,
+its `SSL_do_handshake` import at 0x17cb8 and SSL-object slot at connection offset
+0x4c. It also confirms that `SSL_set_bio` and the shared BIO for read/write are
+used. These offsets are evidence for exact-module guards, not portable APIs.
+The read/write, handshake/error, connection-name binding, certificate display
+and cleanup contracts must be handled together; returning success from the old
+handshake or disabling verification is not a TLS implementation. Candidate
+imports are inventoried separately; no offloading hooks are installed yet.
