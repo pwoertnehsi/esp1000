@@ -289,3 +289,22 @@ verified original flash bundle. Source restored to ae4a2f6. Local before/after
 logs, manifests and flash result are under artifacts/restore-recent-after-baseline.
 This restores the newer recovery measures; Browser exit and dependable USB
 recovery remain unresolved and are not claimed stable.
+
+HOME-to-XMB menu transition produced a different latest trace: handler deletion
+returned with busy0, disconnect published state0 (emit phases20/21), but no
+callback-entry22, emit-return24 or network-stop30 followed. Older successful
+cleanup records in the appended file must not be attributed to this final run.
+This puts the last durable event inside facade dispatch, before session cleanup.
+
+Bridge0.16 removes ModuleMgr lookups, Sony GetNetParam calls, helper GetInfo
+calls and diagnostic file IO from the facade semaphore. GetInfo snapshots its
+callback/profile under lock, retains the existing helper reference across the
+external calls and releases that reference on all return paths. Emit reserves a
+handler slot as busy, validates module ownership/GP outside the lock, rechecks
+registration before dispatch, and clears busy after validation failure or return.
+Handler removal checks Browser module presence outside the lock and rechecks
+active registrations under lock before cancellation. This addresses a possible
+lock inversion, not a hardware-confirmed root cause. Host tests enforce no
+module lookup/file IO/profile call under that semaphore, exercise reentrant state
+queries from GetInfo/profile calls, and skip dispatch if lookup observes removal
+or an invalid owner. Build/full tests pass; hardware HOME/exit testing pending.

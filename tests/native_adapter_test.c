@@ -2,16 +2,17 @@
 #include <stdio.h>
 #include "native_adapter_shim.h"
 #include "../wifi_plugin/menu_bridge/native_adapter.c"
+static int lock_depth;
 static char last_log[160];
 static unsigned facade_traces;
 int sceUsbGetState(void){return 0;}
 int sceUsbGetDrvState(const char *p){assert(!strcmp(p,"USBStor_Driver"));return 2;}
-int sceIoOpen(const char *p,int f,int m){(void)p;(void)f;(void)m;return 7;}
+int sceIoOpen(const char *p,int f,int m){assert(!lock_depth);(void)p;(void)f;(void)m;return 7;}
 int sceIoWrite(int f,const void *p,unsigned n){assert(f==7 && n<sizeof(last_log));if(n>=7 && !memcmp(p,"FACADE ",7)){++facade_traces;return n;}memcpy(last_log,p,n);last_log[n]=0;return n;}
 int sceIoClose(int f){(void)f;return 0;}
-static int lookup_result,browser_available,profile_security=-1;
-int kuKernelFindModuleByAddress(void *p,SceModule *m){if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;m->gp_value=0x09123450;return 0;}
-int kuKernelFindModuleByName(char *p,SceModule *m){
+static int lookup_result,browser_available,profile_security=-1,lookup_cancel_id;
+int kuKernelFindModuleByAddress(void *p,SceModule *m){assert(!lock_depth);if(lookup_cancel_id){int id=lookup_cancel_id;lookup_cancel_id=0;assert(!del_handler(id));}if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;m->gp_value=0x09123450;return 0;}
+int kuKernelFindModuleByName(char *p,SceModule *m){assert(!lock_depth);
     if(!strcmp(p,"htmlviewer_plugin_module")){if(!browser_available)return -1;m->modid=123;return 0;}
     m->modid=hooks.owner;return 0;
 }
@@ -23,8 +24,8 @@ static int utility_unloads;
 static int simulate_reconnect,reconnect_ticks,simulate_cleanup,network_stops;
 static int loader_result=-55,start_result,start_status,reply_error,stop_error;
 static int events_seen[8],event_count;
-int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;return 0;}
-int sceKernelSignalSema(int a,int b){(void)a;(void)b;return 0;}
+int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;assert(!lock_depth);++lock_depth;return 0;}
+int sceKernelSignalSema(int a,int b){(void)a;(void)b;assert(lock_depth==1);--lock_depth;return 0;}
 int sceKernelGetThreadId(void){return thread;}
 unsigned sceKernelGetSystemTimeLow(void){return clock_us;}
 int sceKernelDelayThread(unsigned n){
@@ -54,7 +55,7 @@ int sceKernelStopModule(int a,unsigned b,void *c,int *d,void *e){(void)a;(void)b
 int sceKernelUnloadModule(int a){(void)a;return 0;}
 int sceKernelGetModuleIdByAddress(const void *p){(void)p;assert(0);return -1;}
 int sceUtilityLoadUsbModule(int a){(void)a;return 0;}int sceUtilityUnloadUsbModule(int a){(void)a;return 0;}
-int sceUtilityGetNetParam(int a,int b,netData *c){(void)a;if(b==2 && profile_security>=0){c->asUint=profile_security;return 0;}return -1;}
+int sceUtilityGetNetParam(int a,int b,netData *c){assert(!lock_depth);int value;assert(!get_state(&value));(void)a;if(b==2 && profile_security>=0){c->asUint=profile_security;return 0;}return -1;}
 int kuKernelLoadModule(const char *a,int b,void *c){(void)a;(void)b;(void)c;return loader_result;}
 int wifiNativeRefresh(void){return 0;}
 int sceUtilityLoadNetModule(int n){(void)n;return 0;}
@@ -63,7 +64,7 @@ int wifiNativeRegister(unsigned a,unsigned b){assert(a && b==sizeof(hooks));for(
 static void __attribute__((aligned(4))) event(int old,int next,int code,int error,void *arg)
 {(void)old;(void)next;(void)error;assert(arg==(void *)1);assert(event_count<8);events_seen[event_count++]=code;}
 static int projected_info(int field,union SceNetApctlInfo *out)
-{assert(field==4 && session.info_users==1);unsigned value=2;memcpy(out,&value,4);return 0;}
+{assert(!lock_depth && field==4 && session.info_users==1);int state_value;assert(!get_state(&state_value));unsigned value=2;memcpy(out,&value,4);return 0;}
 int main(void)
 {
     assert(!wifi_native_adapter_start() && running);
@@ -130,6 +131,12 @@ int main(void)
     assert(event_count==3 && events_seen[0]==10 && events_seen[1]==3 && events_seen[2]==4);
     assert(network_started && session.alive && state==4);
     network_started=0;session.alive=0;pending=0;assert(!del_handler(handler));
+    handler=add_handler(event,(void *)1);assert(handler>0);
+    unsigned before=callback_invocations;lookup_cancel_id=handler;
+    emit(0,5,0);assert(callback_invocations==before && !handlers[handler&15].busy);
+    handler=add_handler(event,(void *)1);assert(handler>0);lookup_result=-1;
+    emit(0,5,0);assert(callback_invocations==before && !handlers[handler&15].active && !handlers[handler&15].busy);
+    lookup_result=0;
     assert(callback_invocations>=3 && facade_traces>0);
     assert(!wifi_native_adapter_stop());
     puts("PASS: actual native list20 bound, exact field sizes, security mapping, queued commands, events and unavailable ESP cleanup");

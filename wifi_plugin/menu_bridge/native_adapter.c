@@ -93,30 +93,31 @@ static int disconnect(void)
 static int get_info(int field,union SceNetApctlInfo *out)
 {
     if(!out)return -1;
-    enter();int r=-1;
-    if(state==4 && network_started && session.ready && session.info_callback) {
-        __sync_add_and_fetch(&session.info_users,1);
-        __sync_synchronize();
-        if(!session.ready || !session.info_callback){__sync_sub_and_fetch(&session.info_users,1);leave();return -1;}
-        int (*fn)(int,union SceNetApctlInfo *)=(void *)session.info_callback;r=fn(field,out);
-        int parameter=field==0?0:field==4?2:field==13?13:field==14?14:field==15?15:field==17?23:-1;
-        if(parameter>=0) {
-            netData data;memset(&data,0,sizeof(data));
-            if(!sceUtilityGetNetParam(selected_profile,parameter,&data)) {
-                if(field==4) {
-                    /* Profile/scan AES=4; APCTL GetInfo AES=3. Sony's browser
-                     * indexes a four-entry security-label table with this. */
-                    static const unsigned types[]={0,1,1,2,3};
-                    if(data.asUint>=sizeof(types)/sizeof(types[0])){__sync_sub_and_fetch(&session.info_users,1);leave();return -1;}
-                    unsigned value=types[data.asUint];memcpy(out,&value,4);
-                }
-                else memcpy(out,&data,field==0?64:field==14?128:field==15?2:4);
-                r=0;
+    enter();
+    if(state!=4 || !network_started || !session.ready || !session.info_callback){leave();return -1;}
+    __sync_add_and_fetch(&session.info_users,1);
+    __sync_synchronize();
+    if(!session.ready || !session.info_callback){__sync_sub_and_fetch(&session.info_users,1);leave();return -1;}
+    int (*fn)(int,union SceNetApctlInfo *)=(void *)session.info_callback;
+    int profile=selected_profile;
+    leave();
+    /* Keep the helper reference, not the facade lock, across Sony calls. */
+    int r=fn(field,out);
+    int parameter=field==0?0:field==4?2:field==13?13:field==14?14:field==15?15:field==17?23:-1;
+    if(parameter>=0) {
+        netData data;memset(&data,0,sizeof(data));
+        if(!sceUtilityGetNetParam(profile,parameter,&data)) {
+            if(field==4) {
+                static const unsigned types[]={0,1,1,2,3};
+                if(data.asUint>=sizeof(types)/sizeof(types[0])){__sync_sub_and_fetch(&session.info_users,1);return -1;}
+                unsigned value=types[data.asUint];memcpy(out,&value,4);
             }
+            else memcpy(out,&data,field==0?64:field==14?128:field==15?2:4);
+            r=0;
         }
-        __sync_sub_and_fetch(&session.info_users,1);
     }
-    leave();return r;
+    __sync_sub_and_fetch(&session.info_users,1);
+    return r;
 }
 static int get_state(int *out)
 {if(!out)return (int)0x80410a03u;enter();*out=state;leave();return 0;}
@@ -187,14 +188,18 @@ static int add_handler(event_fn fn,void *arg)
 }
 static int del_handler(int id)
 {
-    unsigned i=(unsigned)id&15;trace_event(10,i,id);enter();
-    trace_event(11,i,handlers[i].busy);
+    unsigned i=(unsigned)id&15;int caller=sceKernelGetThreadId();
+    trace_event(10,i,id);enter();
     if(!handlers[i].active || handlers[i].id!=id){leave();return -1;}
-    handlers[i].active=0;
-    if(handlers[i].busy)trace_event(12,i,handlers[i].owner);
-    while(handlers[i].busy && sceKernelGetThreadId()!=thread){leave();sceKernelDelayThread(1000);enter();}
-    int any=0;for(unsigned j=0;j<16;++j)any|=handlers[j].active;
-    if(!any && !browser_alive())cancel=1;
+    handlers[i].active=0;int busy=handlers[i].busy;
+    leave();trace_event(11,i,busy);
+    if(busy)trace_event(12,i,id);
+    while(busy && caller!=thread) {
+        sceKernelDelayThread(1000);enter();busy=handlers[i].busy;leave();
+    }
+    int browser=browser_alive(); /* ModuleMgr lookup must not hold our lock. */
+    enter();int any=0;for(unsigned j=0;j<16;++j)any|=handlers[j].active;
+    if(!any && !browser)cancel=1;
     leave();trace_event(13,i,id);return 0;
 }
 static int log_pointer(void **out)
@@ -206,18 +211,23 @@ static void emit(int next,int event,int error)
     enter();int old=state;state=next;leave();
     trace_event(21,(unsigned)old,event);
     for(unsigned i=0;i<16;++i) {
-        enter();event_fn fn=handlers[i].active?handlers[i].fn:NULL;void *arg=handlers[i].arg;
-        if(fn) {
-            SceModule m;
-            if(kuKernelFindModuleByAddress((void *)fn,&m)<0 || m.modid!=handlers[i].owner || m.gp_value!=handlers[i].gp) {
-                handlers[i].active=0;fn=NULL;
-            }
-        }
-        unsigned gp=handlers[i].gp;
-        if(fn)handlers[i].busy=1;
+        enter();event_fn fn=handlers[i].active?handlers[i].fn:NULL;
+        void *arg=handlers[i].arg;unsigned gp=handlers[i].gp;
+        int owner=handlers[i].owner,id=handlers[i].id;
+        if(fn)handlers[i].busy=1; /* Reserve the slot across lookup/call. */
         leave();
-        if(fn){trace_event(22,i,event);wifiNativeInvoke(gp,fn,old,next,event,error,arg);
-            trace_event(23,i,event);enter();handlers[i].busy=0;leave();}
+        if(!fn)continue;
+        SceModule m;
+        int valid=kuKernelFindModuleByAddress((void *)fn,&m)>=0 &&
+            m.modid==owner && m.gp_value==gp;
+        enter();
+        valid=valid && handlers[i].active && handlers[i].id==id;
+        if(!valid){handlers[i].active=0;handlers[i].busy=0;}
+        leave();
+        if(valid) {
+            trace_event(22,i,event);wifiNativeInvoke(gp,fn,old,next,event,error,arg);
+            trace_event(23,i,event);enter();handlers[i].busy=0;leave();
+        }
     }
     trace_event(24,(unsigned)next,event);
 }
