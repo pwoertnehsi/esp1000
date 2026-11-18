@@ -141,7 +141,8 @@ int espLocalMac(void *out)
 int espWlanSwitch(void){return 1;}
 static int mapping(unsigned op,unsigned protocol,unsigned port)
 {
-    if(!required_ready())return -1;
+    log_result("MAP_OP",op);log_result("MAP_PROTOCOL",protocol);log_result("MAP_PORT",port);
+    if(!required_ready()){log_result("PORTMAP_NOT_READY",-1);return -1;}
     int socket=sceNetInetSocket(AF_INET,SOCK_DGRAM,0);if(socket<0)return -1;
     struct sockaddr_in address;memset(&address,0,sizeof(address));address.sin_len=sizeof(address);address.sin_family=AF_INET;
     address.sin_port=__builtin_bswap16(27313);memcpy(&address.sin_addr,vnet_lab_gateway_ip,4);
@@ -164,7 +165,7 @@ void espPortOpen(const char *protocol,unsigned short port)
 {mapping(ADHOC_PORTMAP_ADD,!strcmp(protocol,"TCP")?6:17,port);}
 void espPortClose(const char *protocol,unsigned short port)
 {mapping(ADHOC_PORTMAP_REMOVE,!strcmp(protocol,"TCP")?6:17,port);}
-void espMapsStart(void){}
+void espMapsStart(void){mapping(ADHOC_PORTMAP_CLEAR,0,0);}
 void espMapsStop(void){mapping(ADHOC_PORTMAP_CLEAR,0,0);}
 int espApctlDisconnect(void)
 {

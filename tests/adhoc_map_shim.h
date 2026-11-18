@@ -15,7 +15,8 @@ struct netif {ip4_addr_t ip;};extern struct netif *netif_default;
 #define ip4_addr_isany_val(p) (!(p).addr)
 #define ip4_addr_get_u32(p) ((p)->addr)
 #define configASSERT assert
-#define ESP_LOGI(...) ((void)0)
+static inline void mock_log(const char *tag,const char *format,...){(void)tag;(void)format;}
+#define ESP_LOGI mock_log
 #define PBUF_TRANSPORT 0
 #define PBUF_RAM 0
 #define ERR_OK 0
@@ -27,4 +28,6 @@ struct udp_pcb *udp_new(void);int udp_bind(struct udp_pcb *,const ip_addr_t *,un
 void udp_recv(struct udp_pcb *,void (*)(void *,struct udp_pcb *,struct pbuf *,const ip_addr_t *,u16_t),void *);
 int udp_sendto(struct udp_pcb *,struct pbuf *,const ip_addr_t *,unsigned);
 int ip_portmap_add(unsigned,uint32_t,unsigned,uint32_t,unsigned);int ip_portmap_remove(unsigned,unsigned);
+void sys_timeout(unsigned,void (*)(void *),void *);
+void sys_untimeout(void (*)(void *),void *);
 #endif

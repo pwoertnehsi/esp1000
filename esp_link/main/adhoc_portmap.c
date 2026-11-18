@@ -2,16 +2,58 @@
 #include "freertos/FreeRTOS.h"
 #include "adhoc_portmap.h"
 #include "lwip/udp.h"
+#include "lwip/timeouts.h"
 #include "lwip/lwip_napt.h"
 #include "lwip/netif.h"
 #include "lab_gateway.h"
 #include "esp_log.h"
-static struct {uint16_t port;uint8_t protocol;} mappings[16];
+static struct {uint16_t port;uint8_t protocol;uint32_t address;} mappings[16];
+static int paused=1;
 static struct udp_pcb *service;
+static void expire(void *unused);
+static void remove_installed(void)
+{
+    for(unsigned i=0;i<16;++i)if(mappings[i].port && mappings[i].address) {
+        ip_portmap_remove(mappings[i].protocol,mappings[i].port);
+        mappings[i].address=0;
+    }
+}
 void adhoc_portmap_clear(void)
 {
+    sys_untimeout(expire,NULL);
+    remove_installed();
+    for(unsigned i=0;i<16;++i)mappings[i].port=0;
+}
+static void expire(void *unused)
+{
+    (void)unused;
+    if(paused)adhoc_portmap_clear();
+}
+static int install(unsigned slot)
+{
+    if(paused || !netif_default || ip4_addr_isany_val(*netif_ip4_addr(netif_default)))return -1;
+    uint32_t address=ip4_addr_get_u32(netif_ip4_addr(netif_default));
+    if(mappings[slot].address==address)return 0;
+    if(mappings[slot].address)ip_portmap_remove(mappings[slot].protocol,mappings[slot].port);
+    mappings[slot].address=0;
+    ip4_addr_t target;IP4_ADDR(&target,192,168,77,2);
+    if(!ip_portmap_add(mappings[slot].protocol,address,mappings[slot].port,ip4_addr_get_u32(&target),mappings[slot].port))return -2;
+    mappings[slot].address=address;return 0;
+}
+/* Call before disabling NAPT: that frees lwIP's entire mapping table. Retain
+ * only intent, for a bounded cable-recovery window, never an active forward. */
+void adhoc_portmap_pause(void)
+{
+    remove_installed();
+    if(!paused){paused=1;sys_timeout(10000,expire,NULL);}
+}
+/* Call after NAPT has been re-enabled, before accepting new USB frames. */
+void adhoc_portmap_resume(void)
+{
+    sys_untimeout(expire,NULL);paused=0;
     for(unsigned i=0;i<16;++i)if(mappings[i].port) {
-        ip_portmap_remove(mappings[i].protocol,mappings[i].port);mappings[i].port=0;
+        int result=install(i);
+        ESP_LOGI("adhoc-map","restore proto=%u port=%u result=%d",mappings[i].protocol,mappings[i].port,result);
     }
 }
 static int change(const uint8_t *p)
@@ -20,13 +62,15 @@ static int change(const uint8_t *p)
     if(p[4]==ADHOC_PORTMAP_CLEAR){adhoc_portmap_clear();return 0;}
     for(unsigned i=0;i<16;++i)if(mappings[i].port==port && mappings[i].protocol==proto){slot=i;break;}
     if(p[4]==ADHOC_PORTMAP_REMOVE) {
-        if(slot>=0){ip_portmap_remove(proto,port);mappings[slot].port=0;}return 0;
+        if(slot>=0){if(mappings[slot].address)ip_portmap_remove(proto,port);mappings[slot].port=0;mappings[slot].address=0;}return 0;
     }
     if(slot<0)for(unsigned i=0;i<16;++i)if(!mappings[i].port){slot=i;break;}
-    if(slot<0 || !netif_default || ip4_addr_isany_val(*netif_ip4_addr(netif_default)))return -1;
-    ip4_addr_t target;IP4_ADDR(&target,192,168,77,2);
-    if(!ip_portmap_add(proto,ip4_addr_get_u32(netif_ip4_addr(netif_default)),port,ip4_addr_get_u32(&target),port))return -2;
-    mappings[slot].port=port;mappings[slot].protocol=proto;return 0;
+    if(slot<0)return -1;
+    int fresh=!mappings[slot].port;
+    mappings[slot].port=port;mappings[slot].protocol=proto;
+    int result=install(slot);
+    if(result && fresh)mappings[slot].port=0;
+    return result;
 }
 static void receive(void *arg,struct udp_pcb *pcb,struct pbuf *packet,const ip_addr_t *address,u16_t port)
 {

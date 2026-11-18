@@ -6,6 +6,7 @@
 #include "freertos/queue.h"
 #include "esp_log.h"
 #include "lwip/tcpip.h"
+#include "lwip/timeouts.h"
 #include "lwip/etharp.h"
 #include "lwip/lwip_napt.h"
 #include "netif/ethernet.h"
@@ -15,6 +16,8 @@
 #include "host_wakeup.h"
 void adhoc_portmap_start(void);
 void adhoc_portmap_clear(void);
+void adhoc_portmap_pause(void);
+void adhoc_portmap_resume(void);
 static struct netif usb_netif;
 static QueueHandle_t outgoing;
 static volatile bool linked;
@@ -57,11 +60,33 @@ void usb_router_start(void)
     ESP_ERROR_CHECK(tcpip_callback_wait(create,NULL)==ERR_OK ? ESP_OK : ESP_FAIL);
     ESP_LOGI("usb-router","Ethernet 192.168.77.1/24, bundled lwIP NAPT enabled");
 }
+static void expire_napt(void *unused)
+{
+    (void)unused;
+    if(!linked) {
+        adhoc_portmap_clear();
+        configASSERT(ip_napt_enable_netif(&usb_netif,0));
+    }
+}
 static void link_change(void *enabled)
 {
+    bool was_linked=linked;
     linked=enabled!=NULL;
-    if (linked) { configASSERT(ip_napt_enable_netif(&usb_netif,1)); netif_set_link_up(&usb_netif); }
-    else { adhoc_portmap_clear();configASSERT(ip_napt_enable_netif(&usb_netif,0)); netif_set_link_down(&usb_netif); etharp_cleanup_netif(&usb_netif); xQueueReset(outgoing); }
+    if(linked) {
+        sys_untimeout(expire_napt,NULL);
+        configASSERT(ip_napt_enable_netif(&usb_netif,1));
+        adhoc_portmap_resume();
+        netif_set_link_up(&usb_netif);
+    } else {
+        adhoc_portmap_pause();
+        netif_set_link_down(&usb_netif);
+        etharp_cleanup_netif(&usb_netif);
+        xQueueReset(outgoing);
+        /* Keep TCP/NAPT tuples through brief cable interruptions. Disabling
+         * NAPT here destroys them even if static UDP maps are later restored.
+         * Link-down output and receive guards continue to reject USB traffic. */
+        if(was_linked)sys_timeout(10000,expire_napt,NULL);
+    }
 }
 void usb_router_link(bool enabled)
 {

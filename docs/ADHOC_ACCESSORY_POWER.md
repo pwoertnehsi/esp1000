@@ -39,7 +39,9 @@ Host sanitizer checks exercise actual power code with mocked PSP services:
 foreign-context and layout refusal, hook/on/delay order, no one-second expiry,
 idempotent retry, packet filtering and Sony completion preservation, failed
 submission, failed power writes, pending-call retention, hook conflict and exit
-cleanup. Hardware validation remains pending.
+cleanup. The user subsequently confirmed that side-rail power works as expected and is
+enabled only when online functionality is requested. A separate race test
+revealed a USB/port-recovery failure; that does not establish a power fault.
 
 For the hardware test, keep the existing 3.3 V/GND side-rail wiring, remove the
 ESP's external PC power (or isolate its supply), then start Gran Turismo and
