@@ -338,6 +338,8 @@ static int packet_worker(SceSize size,void *args)
             record("USB_DIAG attached=%u epoch=%u attach/detach=%u/%u pending_us=%u/%u result=%08x/%08x bytes=%u/%u checks=%02x",
                    usb.attached,usb.epoch_reset,usb.attaches,usb.detaches,usb.tx_pending_us,usb.rx_pending_us,
                    usb.tx_result,usb.rx_result,usb.tx_bytes,usb.rx_bytes,usb.rx_checks);
+            record("USB_TX_HEADER checked=%u before=%02x after=%02x changed=%04x uncached=%08x/%08x bad=%u/%u/%u",
+                   usb.tx_checked,usb.tx_pre_checks,usb.tx_post_checks,usb.tx_changed,usb.tx_uncached_pre,usb.tx_uncached_post,usb.tx_bad_before,usb.tx_bad_after,usb.tx_bad_uncached);
         }
         sceKernelDelayThread(1000);
     }

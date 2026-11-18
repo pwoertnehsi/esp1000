@@ -32,6 +32,24 @@ static unsigned start_step;
 static unsigned seq;
 static unsigned sent_frames,received_frames,last_sent,last_received;
 static unsigned tx_submitted,rx_submitted,rx_checks;
+static unsigned tx_pre_checks,tx_post_checks,tx_changed,tx_uncached_pre,tx_uncached_post,tx_checked;
+static unsigned tx_bad_before,tx_bad_after,tx_bad_uncached;
+static unsigned char tx_header[16];
+/* Kernel KSEG0 has a physical KSEG1 uncached alias on this guarded PSP target.
+ * Only read the fixed header; do not invalidate or change the active DMA buffer. */
+static unsigned tx_uncached_checks(void)
+{
+    const volatile unsigned char *bytes=(const void *)&tx;
+#if defined(__mips__)
+    unsigned address=(unsigned)&tx;
+    if((address&0xe0000000u)!=0x80000000u)return 0x80000000u;
+    bytes=(const void *)((address&0x1fffffffu)|0xa0000000u);
+#endif
+    link_frame_t snapshot;memset(&snapshot,0,sizeof(snapshot));
+    for(unsigned i=0;i<16;++i)((unsigned char *)&snapshot)[i]=bytes[i];
+    return link_frame_checks(&snapshot,sizeof(snapshot));
+}
+
 static volatile unsigned attach_count,detach_count;
 
 static packet_link_t packet_tx, packet_rx;
@@ -226,6 +244,9 @@ void vnet_usb_progress(vnet_usb_progress_t *p)
     p->attached=attached;p->epoch_reset=epoch_reset;p->attaches=attach_count;p->detaches=detach_count;p->rx_checks=rx_checks;
     p->tx_result=tx_req.retcode;p->rx_result=rx_req.retcode;
     p->tx_bytes=tx_req.recvsize;p->rx_bytes=rx_req.recvsize;
+    p->tx_bad_before=tx_bad_before;p->tx_bad_after=tx_bad_after;p->tx_bad_uncached=tx_bad_uncached;
+    p->tx_pre_checks=tx_pre_checks;p->tx_post_checks=tx_post_checks;p->tx_changed=tx_changed;
+    p->tx_uncached_pre=tx_uncached_pre;p->tx_uncached_post=tx_uncached_post;p->tx_checked=tx_checked;
 }
 int vnet_usb_can_send(void) { return vnet_usb_ready() && !packet_tx.total; }
 int vnet_usb_send(const void *data,unsigned n)
@@ -246,6 +267,11 @@ int vnet_usb_poll(void *data,unsigned capacity)
         if(rx_busy) sceUsbbdReqCancelAll(&endpoints[2]);
     }
     if(tx_busy && tx_done) {
+        tx_post_checks=link_frame_checks(&tx,sizeof(tx));tx_uncached_post=tx_uncached_checks();
+        for(unsigned i=0;i<16;++i)if(tx_header[i]!=((unsigned char *)&tx)[i])tx_changed|=1u<<i;
+        if(tx_post_checks)++tx_bad_after;
+        if(tx_uncached_post && tx_uncached_post!=0x80000000u)++tx_bad_uncached;
+        ++tx_checked;
         tx_busy=tx_done=0;
         if(!tx_req.retcode && tx_req.recvsize==sizeof(tx)){++sent_frames;last_sent=sceKernelGetSystemTimeLow();}
         if(!epoch_reset && attached && (tx_req.retcode || tx_req.recvsize!=sizeof(tx))) { ready=0; usb_error(1,tx_req.retcode,tx_req.recvsize); }
@@ -295,7 +321,12 @@ int vnet_usb_poll(void *data,unsigned capacity)
             if(profile_index==profile_count){profile_count=0;native_profile_clear(&profile,sizeof(profile));}
         }
         else packet_link_next(&packet_tx,&tx,++seq);
+        tx_pre_checks=link_frame_checks(&tx,sizeof(tx));
+        if(tx_pre_checks)++tx_bad_before;
+        memcpy(tx_header,&tx,sizeof(tx_header));
         sceKernelDcacheWritebackRange(&tx,sizeof(tx));
+        tx_uncached_pre=tx_uncached_checks();
+        if(tx_uncached_pre && tx_uncached_pre!=0x80000000u)++tx_bad_uncached;
         memset(&tx_req,0,sizeof(tx_req)); tx_req.endp=&endpoints[1];
         tx_req.data=&tx; tx_req.size=sizeof(tx); tx_req.func=tx_complete;
         tx_done=0; tx_busy=1;

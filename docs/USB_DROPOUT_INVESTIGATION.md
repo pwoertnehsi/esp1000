@@ -85,3 +85,24 @@ controller. The diagnostic does not establish a physical cause or exclude one.
 Next investigation should check sender-side header integrity around submission
 and completion, together with host FIFO/channel state. Private correlated logs
 are retained locally under milestones/usb-diag-v18-hands-off.
+
+## Sender/FIFO boundary diagnostic build — PSP v0.19 / ESP18
+
+USB_TX_HEADER reports cached header checks before submit and after completion,
+a sticky byte-change mask over the16-byte header, and read-only KSEG1 uncached
+header checks after writeback and after completion. Unsupported address mappings
+report80000000 rather than dereferencing an unknown alias. Cumulative failure
+counts retain transient errors; no raw header or payload bytes are logged.
+Host tests inject sender-buffer mutation and verify detection without changing
+transfer acceptance. The actual uncached alias still needs hardware validation.
+
+The ESP's optional DWC2 receive observer only watches its own static link RX
+buffer. It stores bounded metadata in the ISR; logging happens in the owner
+task. FIFO_DIAG reports header checks immediately after the copy, along with
+channel, count, offset, capacity and overflow classification. CHANNEL_DIAG takes
+best-effort read-only register/software-state snapshots for allocated channels,
+on invalid frame/watchdog and connected pre-mount status. Snapshot fields may
+span interrupt progress; they are not an atomic hardware trace. No payload,
+raw header or buffer address is logged. FIFO copies, controller registers,
+packet acceptance and retry thresholds remain unchanged. Timing perturbation
+from instrumentation remains possible; the fault is not declared fixed.

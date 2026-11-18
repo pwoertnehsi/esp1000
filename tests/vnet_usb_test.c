@@ -56,11 +56,16 @@ int main(void) {
     fail_at=0;assert(!vnet_usb_start());
     on_attach(1,NULL,NULL);vnet_usb_poll(data,sizeof(data));vnet_usb_poll(data,sizeof(data));
     assert(tx_busy && tx.type==LINK_HELLO && rx_busy && !vnet_usb_ready());
+    assert(!tx_pre_checks && !tx_uncached_pre);
+    tx.magic[0]='X'; /* Simulate buffer mutation during an outstanding send. */
     tx_req.retcode=0;tx_req.recvsize=64;tx_complete(&tx_req,0,0);
     link_frame_t f;link_init(&f,LINK_HELLO,1,0,LINK_BROWSER_HELLO);host_frame(f);
     assert(!vnet_usb_poll(data,sizeof(data)) && vnet_usb_ready());
     vnet_usb_progress_t progress;vnet_usb_progress(&progress);
     assert(progress.tx_frames==1 && progress.rx_frames==1 && !progress.tx_busy && progress.rx_busy);
+    assert(progress.tx_checked==1 && progress.tx_post_checks==LINK_CHECK_MAGIC && progress.tx_changed==1);
+    assert(progress.tx_uncached_post==LINK_CHECK_MAGIC && progress.tx_bad_after==1 && progress.tx_bad_uncached==1 && !progress.tx_bad_before);
+    tx.magic[0]='P';
     clock_us+=2000000;vnet_usb_progress(&progress);
     assert(progress.attached && progress.attaches==1 && !progress.detaches);
     assert(progress.rx_pending_us==2000000 && !progress.tx_pending_us);

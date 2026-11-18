@@ -14,6 +14,7 @@
 #include "tusb.h"
 #include "host/usbh_pvt.h"
 #include "host/hcd.h"
+#include "portable/synopsys/dwc2/diagnostics.h"
 #include "link_protocol.h"
 #include "link_diagnostics.h"
 #include "link_usb.h"
@@ -82,6 +83,38 @@ static void print_enumeration(void)
 }
 static uint32_t ping_seq;
 static link_frame_t tx, rx;
+/* USB ISR publishes an odd/even revision; task snapshots cannot mix records.
+ * Metadata only, and only the link's own static RX buffer is observed. */
+static volatile unsigned fifo_revision,fifo_copies,fifo_channel,fifo_bytes,fifo_offset,fifo_capacity,fifo_checks,fifo_overflow;
+void hcd_dwc2_diag_rx_cb(unsigned phase,unsigned channel,unsigned bytes,unsigned offset,unsigned capacity,const void *buffer)
+{
+    if(phase!=1 || buffer!=&rx)return;
+    ++fifo_revision;__sync_synchronize();
+    ++fifo_copies;fifo_channel=channel;fifo_bytes=bytes;fifo_offset=offset;fifo_capacity=capacity;
+    fifo_overflow=offset>capacity || bytes>capacity-offset;
+    fifo_checks=offset==0 && bytes==sizeof(rx) && capacity>=sizeof(rx)?link_frame_checks(&rx,sizeof(rx)):LINK_CHECK_SIZE;
+    __sync_synchronize();++fifo_revision;
+}
+static void print_fifo(void)
+{
+    unsigned revision=fifo_revision;
+    if(revision&1)return;
+    __sync_synchronize();
+    unsigned copies=fifo_copies,channel=fifo_channel,bytes=fifo_bytes,offset=fifo_offset;
+    unsigned capacity=fifo_capacity,checks=fifo_checks,overflow=fifo_overflow;
+    __sync_synchronize();if(revision!=fifo_revision)return;
+    ESP_LOGI("psp-link","FIFO_DIAG copies=%u channel=%u bytes=%u offset=%u capacity=%u checks=%02x overflow=%u",
+             copies,channel,bytes,offset,capacity,checks,overflow);
+}
+static void print_channels(void)
+{
+    psp_dwc2_channel_diag_t rows[PSP_DWC2_DIAG_CHANNELS];
+    unsigned count=hcd_dwc2_diag_channels(0,rows,PSP_DWC2_DIAG_CHANNELS);
+    for(unsigned i=0;i<count;++i)if(rows[i].allocated)
+        ESP_LOGI("psp-link","CHANNEL_DIAG channel=%u ep=%02x hcchar=%08" PRIx32 " hctsiz=%08" PRIx32
+                 " hcint=%08" PRIx32 " mask=%08" PRIx32 " transferred=%" PRIu32 " capacity=%" PRIu32,
+                 i,rows[i].endpoint,rows[i].hcchar,rows[i].hctsiz,rows[i].hcint,rows[i].hcintmsk,rows[i].transferred,rows[i].capacity);
+}
 static tusb_control_request_t auth_request;
 static uint8_t auth_data[64];
 static bool auth_busy, auth_pending;
@@ -227,6 +260,8 @@ static bool class_transfer(uint8_t address, uint8_t endpoint,
             bad_count++;
             last_rx_header_errors=link_frame_checks(&rx,size);
             ESP_LOGW(TAG,"Invalid frame bytes=%" PRIu32 " checks=%02x (size1 magic2 version4 type8 length16)",size,last_rx_header_errors);
+            print_fifo();
+            print_channels();
         } else {
             rx_count++;
             last_rx_completed = now_ms();
@@ -365,6 +400,8 @@ static void print_status(void)
              ep_in,ep_out,rx_busy?now_ms()-rx_started:0,tx_busy?now_ms()-tx_started:0,
              last_rx_completed?now_ms()-last_rx_completed:0,last_tx_completed?now_ms()-last_tx_completed:0,
              last_in_result,last_out_result,last_in_bytes,last_out_bytes,last_rx_header_errors);
+    print_fifo();
+    if(tuh_inited() && !mounted && hcd_port_connect_status(0))print_channels();
     print_enumeration();
     usb_router_status();
     native_scan_status();
@@ -591,7 +628,7 @@ void app_main(void)
     native_profile_start();
     usb_router_start();
     local_tcp_start();
-    ESP_LOGI(TAG, "PSP link host v17 USB enumeration and frame diagnostics; runtime credentials. UART0 115200; type help. D+=20 D-=19");
+    ESP_LOGI(TAG, "PSP link host v18 sender/FIFO boundary diagnostics; runtime credentials. UART0 115200; type help. D+=20 D-=19");
     ESP_LOGI(TAG, "Two-cable setup: connector VBUS is external; GPIO4 does not switch its 5V");
     int64_t next_ping = now_ms() + 2000;
     int64_t next_status = now_ms() + 10000;
@@ -700,6 +737,7 @@ void app_main(void)
                          tx.type, tx.seq, now-tx_started, now-last_rx_completed,
                          now-last_tx_completed, ethernet_tx.id, ethernet_tx.offset, ethernet_tx.total);
                 print_status();
+                print_channels();
                 reset_requested = true;
             }
         }

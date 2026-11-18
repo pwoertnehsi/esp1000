@@ -1,4 +1,12 @@
-USB diagnostic candidate v0.18 / ESP17: logs enumeration stages, frame-header
+Buffer/FIFO diagnostic candidate v0.19 + ESP18. USB_TX_HEADER records sender
+header checks before submission and after completion, changed-byte masks and
+read-only uncached header checks. FIFO_DIAG checks the ESP header immediately
+after the FIFO copy. CHANNEL_DIAG snapshots active controller channels on invalid
+frames, watchdog failure and pre-mount status. Payloads/raw headers are not logged.
+Transfer decisions and retry thresholds remain unchanged. These are diagnostics,
+not a confirmed fix. Install the bundled shared transport helpers together.
+
+USB diagnostic candidate v0.19 / ESP17: logs enumeration stages, frame-header
 validation reasons and endpoint pending/completion progress. No payloads are
 logged. Retry rules, timeouts and browser lifecycle are unchanged. The PSP USB
 transport log adds USB_DIAG; ESP status adds ENUM_DIAG and BULK_DIAG.
@@ -11,7 +19,7 @@ transport and must be installed with this package. Test connected browser idle
 for60 seconds, then one HTTP page; capture UART and copy logs after exit.
 This is diagnostic work, not a demonstrated dropout fix.
 
-ESP WiFi native browser candidate v0.18 — E1000 / owned 6.61 / ARK-5 / ESP17
+ESP WiFi native browser candidate v0.18 — E1000 / owned 6.61 / ARK-5 / ESP18
 
 Browser and Online Manual now use Sony's original VSH actions. L+R+SQUARE queues
 that same native browser action. The plugin does not load an EBOOT, draw a GU
