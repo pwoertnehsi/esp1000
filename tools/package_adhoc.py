@@ -32,6 +32,9 @@ def main():
     shutil.copy2(ROOT/'third_party/aemu/gpl-3.0.txt',plugin/'COPYING.txt')
     app=out/'PSP/GAME/esp-adhoc-peer';app.mkdir(parents=True)
     shutil.copy2(ROOT/'adhoc/peer_test/EBOOT.PBP',app/'EBOOT.PBP')
+    # PPSSPP treats any PSP/GAME path as its own emulated memory stick.
+    pc=out/'ppsspp/esp-adhoc-peer';pc.mkdir(parents=True)
+    shutil.copy2(app/'EBOOT.PBP',pc/'EBOOT.PBP')
     (out/'BUILD.json').write_text(json.dumps(provenance,indent=2)+'\n')
     manifest={str(p.relative_to(out)):hashlib.sha256(p.read_bytes()).hexdigest() for p in out.rglob('*') if p.is_file()}
     (out/'SHA256.json').write_text(json.dumps(manifest,indent=2)+'\n')

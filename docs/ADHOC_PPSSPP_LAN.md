@@ -62,7 +62,10 @@ release: use the adapted modules as one set.
    relay, ENet server connection and UPnP for this local test. Permit TCP27312
    and the test's UDP13090 on the PC's LAN firewall. ESP and PC must share a LAN
    without wireless client isolation. Avoid changing the MAC to the PSP's MAC.
-2. Run the packaged `PSP/GAME/esp-adhoc-peer/EBOOT.PBP` in PPSSPP. On the PSP,
+2. Run the packaged `ppsspp/esp-adhoc-peer/EBOOT.PBP` in PPSSPP.
+   The identical PSP copy stays under `PSP/GAME/esp-adhoc-peer/EBOOT.PBP`;
+   do not open that packaged path in PPSSPP, which interprets `PSP/GAME` as
+   belonging to its own emulated memory stick. On the PSP,
    enable `game, ms0:/seplugins/esp-adhoc/atpro.prx, on` in ARK's plugin list,
    then launch **ESP1000 Ad Hoc Peer Test**. The VSH entries remain unchanged.
 3. Press CROSS in both tests. They use product ID `ESP100001`, group `ESP1000`
