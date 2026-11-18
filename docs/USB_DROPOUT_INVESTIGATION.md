@@ -216,3 +216,15 @@ resolver cleanup to finish. Host tests verify those references are retained
 while Browser is present and released once it is absent. Cleanup markers
 300/301/302 bracket session stop and unload;310/311 and312/313 bracket INET
 and COMMON utility unloads. Hardware confirmation remains required.
+
+The teardown-order candidate did not restore Browser exit: the loading circle
+continued and input had no effect. The updated bridge binary was read back and
+matched the built hash. The virtual driver again reached STOP_END successfully,
+but the bridge never recorded session-stop completion. Earlier markers can be
+suppressed while accessory USB is active, so their absence does not prove that
+the facade worker is stuck in a callback. The next diagnostic helper records
+cleanup steps only after successful driver stop:20 driver stopped,21 driver
+unloaded,22/23 DNS restore,24/25 resolver termination,26/27 INET termination,
+28/29 NET termination,30 cleanup complete,31/32 thread-info release and33 worker
+return. These markers contain no credentials or packet payloads. No new recovery
+claim is made by this diagnostic-only update.

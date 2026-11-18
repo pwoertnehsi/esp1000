@@ -4,6 +4,9 @@
 #include <string.h>
 #include "native_session_shim.h"
 #include "../wifi_plugin/native_session/main.c"
+int sceIoOpen(const char *p,int f,int m){(void)p;(void)f;(void)m;assert(!driver_started);return 9;}
+int sceIoWrite(int f,const void *p,unsigned n){assert(f==9 && p && n<80);return n;}
+int sceIoClose(int f){assert(f==9);return 0;}
 static unsigned now;
 static int loss_started,recovery_ticks,mode,net_inits,net_terms,inet_terms,resolver_terms,stopped,unloaded,configured,restored,paused;
 int sceNetGetMallocStat(SceNetMallocStat *s){s->pool=mode==1 || mode==7?0:128*1024;return 0;}

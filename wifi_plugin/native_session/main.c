@@ -2,6 +2,7 @@
 #include <pspkernel.h>
 #include <pspmodulemgr.h>
 #include <pspnet.h>
+#include <pspiofilemgr.h>
 #include <pspnet_inet.h>
 #include <pspnet_resolver.h>
 #include <kubridge.h>
@@ -62,17 +63,37 @@ static int setup(void)
     if(adapter_start(&transport))return -1;
     adapter_owned=1;return 0;
 }
+/* Called only after the virtual driver has stopped USB, or when setup never
+ * started it. No file is held across a native cleanup call. */
+static int cleanup_logging;
+static void cleanup_mark(unsigned step,int result)
+{
+    if(!cleanup_logging)return;
+    char line[80];unsigned used=0;
+    const char *names[]={"SESSION_CLEANUP step="," result="};
+    unsigned values[]={step,(unsigned)result};
+    static const char hex[]="0123456789abcdef";
+    for(unsigned i=0;i<2;++i) {
+        unsigned n=strlen(names[i]);memcpy(line+used,names[i],n);used+=n;
+        for(unsigned j=0;j<8;++j)line[used++]=hex[(values[i]>>(28-4*j))&15];
+    }
+    line[used++]='\n';
+    int fd=sceIoOpen("ms0:/native-wifi.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
+    if(fd>=0){sceIoWrite(fd,line,used);sceIoClose(fd);}
+}
 static int cleanup(void)
 {
+    int r;
     if(adapter_owned){if(adapter_pause())return -1;adapter_dispose();adapter_owned=0;}
     if(browser_lookup_cleanup())return -1;
-    if(driver_started){int status;int r=sceKernelStopModule(driver,0,NULL,&status,NULL);if(r<0 || status<0)return -1;driver_started=0;}
-    if(driver>=0){if(sceKernelUnloadModule(driver)<0)return -1;driver=-1;}
-    if(browser_dns_restore())return -1;
-    if(resolver_owned){if(sceNetResolverTerm())return -1;resolver_owned=0;}
-    if(inet_owned){if(sceNetInetTerm())return -1;inet_owned=0;}
-    if(net_owned){if(sceNetTerm())return -1;net_owned=0;net_live=0;}
-    return 0;
+    if(driver_started){int status;r=sceKernelStopModule(driver,0,NULL,&status,NULL);if(r<0 || status<0)return -1;driver_started=0;}
+    cleanup_logging=1;cleanup_mark(20,0);
+    if(driver>=0){r=sceKernelUnloadModule(driver);cleanup_mark(21,r);if(r<0)return -1;driver=-1;}
+    cleanup_mark(22,0);r=browser_dns_restore();cleanup_mark(23,r);if(r)return -1;
+    if(resolver_owned){cleanup_mark(24,0);r=sceNetResolverTerm();cleanup_mark(25,r);if(r)return -1;resolver_owned=0;}
+    if(inet_owned){cleanup_mark(26,0);r=sceNetInetTerm();cleanup_mark(27,r);if(r)return -1;inet_owned=0;}
+    if(net_owned){cleanup_mark(28,0);r=sceNetTerm();cleanup_mark(29,r);if(r)return -1;net_owned=0;net_live=0;}
+    cleanup_mark(30,0);return 0;
 }
 static int worker(SceSize size,void *args)
 {
@@ -99,8 +120,9 @@ static int worker(SceSize size,void *args)
     while(control->info_users)sceKernelDelayThread(1000);
     control->info_callback=0;
     if(cleanup()){unsafe=1;control->result=-2;}
-    if(net_live)sceNetFreeThreadinfo(sceKernelGetThreadId());
-    return 0;
+    cleanup_mark(31,net_live);
+    if(net_live){int r=sceNetFreeThreadinfo(sceKernelGetThreadId());cleanup_mark(32,r);}
+    cleanup_mark(33,control->result);return 0;
 }
 int module_start(SceSize size,void *args)
 {

@@ -55,7 +55,7 @@ unsigned sctrlHENFindFunction(const char *,const char *,unsigned);
     def test_native_session(self):
         with tempfile.TemporaryDirectory() as d:
             tmp=Path(d)
-            for name in ['pspkernel.h','pspmodulemgr.h','pspnet.h','pspnet_inet.h','pspnet_resolver.h','pspnet_apctl.h','kubridge.h']:
+            for name in ['pspkernel.h','pspmodulemgr.h','pspnet.h','pspnet_inet.h','pspnet_resolver.h','pspnet_apctl.h','kubridge.h','pspiofilemgr.h']:
                 (tmp/name).write_text('#include "native_session_shim.h"\n')
             exe=tmp/'session'
             subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast','-Wno-int-to-pointer-cast','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),str(ROOT/'tests/native_session_test.c'),'-o',str(exe)],check=True)
