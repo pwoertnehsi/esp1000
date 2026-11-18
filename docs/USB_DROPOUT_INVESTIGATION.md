@@ -106,3 +106,37 @@ span interrupt progress; they are not an atomic hardware trace. No payload,
 raw header or buffer address is logged. FIFO copies, controller registers,
 packet acceptance and retry thresholds remain unchanged. Timing perturbation
 from instrumentation remains possible; the fault is not declared fixed.
+
+## Sender/FIFO capture result — PSP v0.19 / ESP18
+
+The user connected and left Browser untouched, then mounted the PSP for log
+collection. The normal native-profile-to-Ethernet handoff completed. At ESP
+uptime116241ms the outgoing watchdog fired after5002ms without progress on a
+packet fragment. Both IN and OUT requests were pending, and Wi-Fi remained
+associated. There were zero invalid application frames in this run. FIFO checks
+were zero with offset0/count64/capacity64 and no reported overflow.
+
+The PSP sender completed78 frames before the stall. Cached header checks,
+uncached checks, sticky changed-byte mask and all failure counters remained zero.
+The PSP had no pending send and one posted receive whose age grew. This capture
+therefore reproduces the stall without the earlier magic failure; that failure
+is not a necessary trigger and cannot be treated as the established root cause.
+
+Best-effort DWC2 channel snapshots at the stall:
+
+| Channel | Endpoint | HCCHAR | HCTSIZ | HCINT | Mask |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 82 | 80489040 | 00080040 | 00000000 | 000005b9 |
+| 1 | 03 | 80481840 | 40080040 | 00000000 | 000004d9 |
+
+Both channels were allocated/enabled with no recorded byte progress. These
+single snapshots do not establish whether scheduling, controller/interrupt state,
+PSP endpoint state or physical signaling initiated the stall. The watchdog then
+restarted the host, USB re-enumerated, and the native session ended.
+
+Before another timing/transport change, repeat this exact build with the current
+cable/adapter connections immobilized and stable external ESP power. Keep the
+software and test sequence unchanged. If the same failure persists, the next
+controller investigation needs global port/frame/interrupt state and retry/error
+counts, rather than another header-only diagnostic. Raw evidence is retained
+locally under milestones/buffer-fifo-v19-capture.
