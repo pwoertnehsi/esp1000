@@ -1,0 +1,5394 @@
+[
+  {
+    "file": "modules/utility.prx",
+    "sha256": "848eac8ca6a928e765bbf129985fab143935244208bf32d71a6e1b1e7ab1e89f",
+    "file_bytes": 51958,
+    "module": "sceUtility_Driver",
+    "module_attributes": "0x1007",
+    "module_version_bytes": [
+      2,
+      1
+    ],
+    "elf_entry": "0x00001138",
+    "segments": [
+      {
+        "type": 1,
+        "offset": 160,
+        "vaddr": 0,
+        "paddr": 2147519508,
+        "filesz": 45112,
+        "memsz": 45112,
+        "flags": 5,
+        "align": 16
+      },
+      {
+        "type": 1,
+        "offset": 45280,
+        "vaddr": 45120,
+        "paddr": 0,
+        "filesz": 1716,
+        "memsz": 2036,
+        "flags": 6,
+        "align": 16
+      }
+    ],
+    "exports": [
+      {
+        "library": "syslib",
+        "table_address": "0x000089D4",
+        "version": "0x0000",
+        "flags": "0x8000",
+        "function_count": 1,
+        "variable_count": 2,
+        "entries": [
+          {
+            "nid": "0xD632ACDB",
+            "address": "0x00001138",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF01D73A7",
+            "address": "0x00008B74",
+            "kind": "variable"
+          },
+          {
+            "nid": "0x11B97506",
+            "address": "0x0000B034",
+            "kind": "variable"
+          }
+        ]
+      },
+      {
+        "library": "sceUtility_driver",
+        "table_address": "0x000089E4",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x20C68C34",
+            "address": "0x00001158",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF062AEA6",
+            "address": "0x00000000",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceUtility",
+        "table_address": "0x000089F4",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 104,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x0251B134",
+            "address": "0x00005594",
+            "kind": "function"
+          },
+          {
+            "nid": "0x05AFB9E4",
+            "address": "0x00005CD0",
+            "kind": "function",
+            "sdk_name": "sceUtilityHtmlViewerUpdate"
+          },
+          {
+            "nid": "0x06A48659",
+            "address": "0x00005820",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0940A1B9",
+            "address": "0x00005AA8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x094198B8",
+            "address": "0x00005ADC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0D5BC6D2",
+            "address": "0x00003910",
+            "kind": "function",
+            "sdk_name": "sceUtilityLoadUsbModule"
+          },
+          {
+            "nid": "0x0E0C27AF",
+            "address": "0x00005BD4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0F3EEAAC",
+            "address": "0x00005278",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1281DA8E",
+            "address": "0x0000530C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x147F7C85",
+            "address": "0x000052A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x149A7895",
+            "address": "0x000051B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1579A159",
+            "address": "0x0000343C",
+            "kind": "function",
+            "sdk_name": "sceUtilityLoadNetModule"
+          },
+          {
+            "nid": "0x16A1A8D8",
+            "address": "0x000052DC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x16D02AF0",
+            "address": "0x0000565C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x180F7B62",
+            "address": "0x0000549C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x24AC31EB",
+            "address": "0x000053D4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x28D35634",
+            "address": "0x00006CEC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2995D020",
+            "address": "0x00005D54",
+            "kind": "function",
+            "sdk_name": "sceUtility_2995D020"
+          },
+          {
+            "nid": "0x2A2B3DE0",
+            "address": "0x0000485C",
+            "kind": "function",
+            "sdk_name": "sceUtilityLoadModule"
+          },
+          {
+            "nid": "0x2AD8E239",
+            "address": "0x00004FBC",
+            "kind": "function",
+            "sdk_name": "sceUtilityMsgDialogInitStart"
+          },
+          {
+            "nid": "0x2B96173B",
+            "address": "0x00005884",
+            "kind": "function"
+          },
+          {
+            "nid": "0x32E32DCB",
+            "address": "0x00005408",
+            "kind": "function"
+          },
+          {
+            "nid": "0x34B78343",
+            "address": "0x0000644C",
+            "kind": "function",
+            "sdk_name": "sceUtilityGetSystemParamString"
+          },
+          {
+            "nid": "0x3A15CD0A",
+            "address": "0x00005B0C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3AAD51DC",
+            "address": "0x00005A14",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3AD50AE7",
+            "address": "0x00005D34",
+            "kind": "function",
+            "sdk_name": "sceNetplayDialogInitStart"
+          },
+          {
+            "nid": "0x3DFAEBA9",
+            "address": "0x000050E8",
+            "kind": "function",
+            "sdk_name": "sceUtilityOskShutdownStart"
+          },
+          {
+            "nid": "0x417BED54",
+            "address": "0x00005D44",
+            "kind": "function",
+            "sdk_name": "sceNetplayDialogUpdate"
+          },
+          {
+            "nid": "0x41E30674",
+            "address": "0x00006434",
+            "kind": "function",
+            "sdk_name": "sceUtilitySetSystemParamString"
+          },
+          {
+            "nid": "0x42071A83",
+            "address": "0x00005724",
+            "kind": "function"
+          },
+          {
+            "nid": "0x434D4B3A",
+            "address": "0x000069B0",
+            "kind": "function",
+            "sdk_name": "sceUtilityGetNetParam"
+          },
+          {
+            "nid": "0x45C18506",
+            "address": "0x00005D74",
+            "kind": "function",
+            "sdk_name": "sceUtilitySetSystemParamInt"
+          },
+          {
+            "nid": "0x4928BD96",
+            "address": "0x00005084",
+            "kind": "function",
+            "sdk_name": "sceUtilityMsgDialogAbort"
+          },
+          {
+            "nid": "0x4A833BA4",
+            "address": "0x000051E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4AECD179",
+            "address": "0x00005438",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4B0A8FE5",
+            "address": "0x000057EC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4B85C861",
+            "address": "0x00005118",
+            "kind": "function",
+            "sdk_name": "sceUtilityOskUpdate"
+          },
+          {
+            "nid": "0x4DB1E739",
+            "address": "0x00004E2C",
+            "kind": "function",
+            "sdk_name": "sceUtilityNetconfInitStart"
+          },
+          {
+            "nid": "0x4FED24D8",
+            "address": "0x0000708C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x50C4CD57",
+            "address": "0x00004EF4",
+            "kind": "function",
+            "sdk_name": "sceUtilitySavedataInitStart"
+          },
+          {
+            "nid": "0x54A5C62F",
+            "address": "0x000059B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5EEE6548",
+            "address": "0x00006804",
+            "kind": "function",
+            "sdk_name": "sceUtilityCheckNetParam"
+          },
+          {
+            "nid": "0x5EF1C24A",
+            "address": "0x00005340",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6332AA39",
+            "address": "0x00004EC4",
+            "kind": "function",
+            "sdk_name": "sceUtilityNetconfGetStatus"
+          },
+          {
+            "nid": "0x64D50C56",
+            "address": "0x00003488",
+            "kind": "function",
+            "sdk_name": "sceUtilityUnloadNetModule"
+          },
+          {
+            "nid": "0x67AF3428",
+            "address": "0x00004FF0",
+            "kind": "function",
+            "sdk_name": "sceUtilityMsgDialogShutdownStart"
+          },
+          {
+            "nid": "0x6F56F9CF",
+            "address": "0x00005918",
+            "kind": "function"
+          },
+          {
+            "nid": "0x70267ADF",
+            "address": "0x00006D60",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7853182D",
+            "address": "0x00004DC8",
+            "kind": "function",
+            "sdk_name": "sceUtilityGameSharingUpdate"
+          },
+          {
+            "nid": "0x81C44706",
+            "address": "0x000058B4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8326AB05",
+            "address": "0x0000594C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x86A03A27",
+            "address": "0x00005C38",
+            "kind": "function"
+          },
+          {
+            "nid": "0x86ABDB1B",
+            "address": "0x000056F4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8874DBE0",
+            "address": "0x00004F8C",
+            "kind": "function",
+            "sdk_name": "sceUtilitySavedataGetStatus"
+          },
+          {
+            "nid": "0x88BC7406",
+            "address": "0x00005D6C",
+            "kind": "function",
+            "sdk_name": "sceUtility_88BC7406"
+          },
+          {
+            "nid": "0x89317C8F",
+            "address": "0x000057BC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x91E70E35",
+            "address": "0x00004E90",
+            "kind": "function",
+            "sdk_name": "sceUtilityNetconfUpdate"
+          },
+          {
+            "nid": "0x943CBA46",
+            "address": "0x00005244",
+            "kind": "function"
+          },
+          {
+            "nid": "0x946963F3",
+            "address": "0x00004DFC",
+            "kind": "function",
+            "sdk_name": "sceUtilityGameSharingGetStatus"
+          },
+          {
+            "nid": "0x95FC253B",
+            "address": "0x00005020",
+            "kind": "function",
+            "sdk_name": "sceUtilityMsgDialogUpdate"
+          },
+          {
+            "nid": "0x9790B33C",
+            "address": "0x00004F28",
+            "kind": "function",
+            "sdk_name": "sceUtilitySavedataShutdownStart"
+          },
+          {
+            "nid": "0x9A1C91D7",
+            "address": "0x00005054",
+            "kind": "function",
+            "sdk_name": "sceUtilityMsgDialogGetStatus"
+          },
+          {
+            "nid": "0x9F313D14",
+            "address": "0x00005B40",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA03D29BA",
+            "address": "0x00005370",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA084E056",
+            "address": "0x00005850",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA50E5B30",
+            "address": "0x00005214",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA5DA2406",
+            "address": "0x00005E34",
+            "kind": "function",
+            "sdk_name": "sceUtilityGetSystemParamInt"
+          },
+          {
+            "nid": "0xA7BB7C67",
+            "address": "0x00005A44",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAB083EA9",
+            "address": "0x000055F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB0FB7FF5",
+            "address": "0x00005C04",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB57E95D9",
+            "address": "0x0000546C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB62A4061",
+            "address": "0x00005D5C",
+            "kind": "function",
+            "sdk_name": "sceUtility_B62A4061"
+          },
+          {
+            "nid": "0xB6CEE597",
+            "address": "0x00005D4C",
+            "kind": "function",
+            "sdk_name": "sceNetplayDialogGetStatus"
+          },
+          {
+            "nid": "0xB8592D5F",
+            "address": "0x000059E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBC6B6296",
+            "address": "0x00005D3C",
+            "kind": "function",
+            "sdk_name": "sceNetplayDialogShutdownStart"
+          },
+          {
+            "nid": "0xBDA7D894",
+            "address": "0x00005D04",
+            "kind": "function",
+            "sdk_name": "sceUtilityHtmlViewerGetStatus"
+          },
+          {
+            "nid": "0xC130D441",
+            "address": "0x00005A78",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC4700FA3",
+            "address": "0x000053A4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC492F751",
+            "address": "0x00004D64",
+            "kind": "function",
+            "sdk_name": "sceUtilityGameSharingInitStart"
+          },
+          {
+            "nid": "0xC629AF26",
+            "address": "0x00003DE8",
+            "kind": "function",
+            "sdk_name": "sceUtilityLoadAvModule"
+          },
+          {
+            "nid": "0xCDC3AA41",
+            "address": "0x00005C6C",
+            "kind": "function",
+            "sdk_name": "sceUtilityHtmlViewerInitStart"
+          },
+          {
+            "nid": "0xD17A0573",
+            "address": "0x00005758",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD23665F4",
+            "address": "0x00005B70",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD4B95FFB",
+            "address": "0x00004F58",
+            "kind": "function",
+            "sdk_name": "sceUtilitySavedataUpdate"
+          },
+          {
+            "nid": "0xD4C2BD73",
+            "address": "0x00005BA4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD81957B7",
+            "address": "0x0000562C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD852CDCE",
+            "address": "0x00005788",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDA97F1AA",
+            "address": "0x0000597C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDDE5389D",
+            "address": "0x0000517C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE19C97D6",
+            "address": "0x00005690",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE49BFE92",
+            "address": "0x00004928",
+            "kind": "function",
+            "sdk_name": "sceUtilityUnloadModule"
+          },
+          {
+            "nid": "0xE7B778D8",
+            "address": "0x000058E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xECE1D3E5",
+            "address": "0x00006C78",
+            "kind": "function"
+          },
+          {
+            "nid": "0xED0FAD38",
+            "address": "0x00005D64",
+            "kind": "function",
+            "sdk_name": "sceUtility_ED0FAD38"
+          },
+          {
+            "nid": "0xEF3582B2",
+            "address": "0x00006DD4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEFC6F80F",
+            "address": "0x00004D98",
+            "kind": "function",
+            "sdk_name": "sceUtilityGameSharingShutdownStart"
+          },
+          {
+            "nid": "0xF3F76017",
+            "address": "0x0000514C",
+            "kind": "function",
+            "sdk_name": "sceUtilityOskGetStatus"
+          },
+          {
+            "nid": "0xF3FBC572",
+            "address": "0x000056C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF5CE1134",
+            "address": "0x00005CA0",
+            "kind": "function",
+            "sdk_name": "sceUtilityHtmlViewerShutdownStart"
+          },
+          {
+            "nid": "0xF6269B82",
+            "address": "0x000050B4",
+            "kind": "function",
+            "sdk_name": "sceUtilityOskInitStart"
+          },
+          {
+            "nid": "0xF64910F0",
+            "address": "0x00003984",
+            "kind": "function",
+            "sdk_name": "sceUtilityUnloadUsbModule"
+          },
+          {
+            "nid": "0xF7D8D092",
+            "address": "0x00003E30",
+            "kind": "function",
+            "sdk_name": "sceUtilityUnloadAvModule"
+          },
+          {
+            "nid": "0xF88155F6",
+            "address": "0x00004E60",
+            "kind": "function",
+            "sdk_name": "sceUtilityNetconfShutdownStart"
+          },
+          {
+            "nid": "0xF9E0008C",
+            "address": "0x000055C8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceUtility_private",
+        "table_address": "0x00008A08",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 54,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x0027D953",
+            "address": "0x0000131C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x031D0944",
+            "address": "0x00001544",
+            "kind": "function"
+          },
+          {
+            "nid": "0x048BFC46",
+            "address": "0x0000236C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0C0AE566",
+            "address": "0x00002AE4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0D6B23A4",
+            "address": "0x000012E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x10D1B3FF",
+            "address": "0x0000147C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x14E94D25",
+            "address": "0x00001298",
+            "kind": "function"
+          },
+          {
+            "nid": "0x186A2C84",
+            "address": "0x0000266C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1E82FB49",
+            "address": "0x00001464",
+            "kind": "function"
+          },
+          {
+            "nid": "0x26D0B065",
+            "address": "0x00005500",
+            "kind": "function"
+          },
+          {
+            "nid": "0x29AFE096",
+            "address": "0x000026B4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x31516141",
+            "address": "0x0000159C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x34340686",
+            "address": "0x00002890",
+            "kind": "function"
+          },
+          {
+            "nid": "0x363A12E2",
+            "address": "0x00000A60",
+            "kind": "function"
+          },
+          {
+            "nid": "0x369D25E4",
+            "address": "0x00002814",
+            "kind": "function"
+          },
+          {
+            "nid": "0x39E7692B",
+            "address": "0x00001424",
+            "kind": "function"
+          },
+          {
+            "nid": "0x40FBA532",
+            "address": "0x00004458",
+            "kind": "function"
+          },
+          {
+            "nid": "0x421E2726",
+            "address": "0x00001498",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4F6FFC7C",
+            "address": "0x00002864",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5809B44A",
+            "address": "0x00001458",
+            "kind": "function"
+          },
+          {
+            "nid": "0x59EB3A17",
+            "address": "0x00000AC0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5C494AC6",
+            "address": "0x0000352C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5DCBD3C0",
+            "address": "0x00001470",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5ED16EBA",
+            "address": "0x00000B98",
+            "kind": "function"
+          },
+          {
+            "nid": "0x69AB28E8",
+            "address": "0x00002838",
+            "kind": "function"
+          },
+          {
+            "nid": "0x756A93B3",
+            "address": "0x000054CC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x78A2FE0C",
+            "address": "0x00002848",
+            "kind": "function"
+          },
+          {
+            "nid": "0x78EC982D",
+            "address": "0x00000B74",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7E0D4BCD",
+            "address": "0x00002774",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7EBD6208",
+            "address": "0x00004424",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8024FCA7",
+            "address": "0x00002738",
+            "kind": "function"
+          },
+          {
+            "nid": "0x86AA70BC",
+            "address": "0x000027F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8D681EE0",
+            "address": "0x000013E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x966912D2",
+            "address": "0x000015C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x981FFD72",
+            "address": "0x00005564",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA1348D82",
+            "address": "0x00001488",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA25E0194",
+            "address": "0x00001440",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA6B323E1",
+            "address": "0x000014C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAC7FD75C",
+            "address": "0x000013A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xACB67A01",
+            "address": "0x00002D2C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB34EC4AD",
+            "address": "0x00002C08",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB9D9C78F",
+            "address": "0x00001570",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBAFFB9D5",
+            "address": "0x0000282C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBBCD1885",
+            "address": "0x00002F98",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC1916D25",
+            "address": "0x00001364",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC7D5983F",
+            "address": "0x000034F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCDEEBEE2",
+            "address": "0x000027BC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCE484145",
+            "address": "0x00005530",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDF025E50",
+            "address": "0x0000144C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE0F5DEC1",
+            "address": "0x000026F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE8EE4E87",
+            "address": "0x00000FDC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEA446CD5",
+            "address": "0x00001434",
+            "kind": "function"
+          },
+          {
+            "nid": "0xED4E37CA",
+            "address": "0x00002820",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFC841AC3",
+            "address": "0x00002808",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceUtility_netparam_internal",
+        "table_address": "0x00008A1C",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 9,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x02598DB8",
+            "address": "0x00006E48",
+            "kind": "function"
+          },
+          {
+            "nid": "0x09905636",
+            "address": "0x00006F60",
+            "kind": "function"
+          },
+          {
+            "nid": "0x239F260D",
+            "address": "0x00006BDC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4CB183A4",
+            "address": "0x0000693C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5D63AA06",
+            "address": "0x00006B2C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x61D0686E",
+            "address": "0x000068D4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x67C2105B",
+            "address": "0x00006A78",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6B1BC62C",
+            "address": "0x0000686C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6D77B975",
+            "address": "0x0000704C",
+            "kind": "function"
+          }
+        ]
+      }
+    ],
+    "imports": [
+      {
+        "library": "sceReg_driver",
+        "table_address": "0x00008A38",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 13,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x38415B9F",
+            "address": "0x00008930",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3B6CA1E6",
+            "address": "0x00008938",
+            "kind": "function"
+          },
+          {
+            "nid": "0x49C70163",
+            "address": "0x00008940",
+            "kind": "function"
+          },
+          {
+            "nid": "0x49D77D65",
+            "address": "0x00008948",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4F471457",
+            "address": "0x00008950",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5FD4764A",
+            "address": "0x00008958",
+            "kind": "function"
+          },
+          {
+            "nid": "0x61DB9D06",
+            "address": "0x00008960",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9980519F",
+            "address": "0x00008968",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD743A608",
+            "address": "0x00008970",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDBA46704",
+            "address": "0x00008978",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF2619407",
+            "address": "0x00008980",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF4A3E396",
+            "address": "0x00008988",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFC742751",
+            "address": "0x00008990",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "scePower_driver",
+        "table_address": "0x00008A4C",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x315B8CB6",
+            "address": "0x00008918",
+            "kind": "function"
+          },
+          {
+            "nid": "0x766CD857",
+            "address": "0x00008920",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceCtrl_driver",
+        "table_address": "0x00008A60",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 3,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x2BA616AF",
+            "address": "0x000088F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF6E94EA3",
+            "address": "0x00008900",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF8EC18BD",
+            "address": "0x00008908",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "SysclibForKernel",
+        "table_address": "0x00008A74",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 5,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x10F3BB61",
+            "address": "0x00008860",
+            "kind": "function",
+            "sdk_name": "memset"
+          },
+          {
+            "nid": "0x52DF196C",
+            "address": "0x00008868",
+            "kind": "function",
+            "sdk_name": "strlen"
+          },
+          {
+            "nid": "0xB49A7697",
+            "address": "0x00008870",
+            "kind": "function",
+            "sdk_name": "strncpy"
+          },
+          {
+            "nid": "0xC0AB8932",
+            "address": "0x00008878",
+            "kind": "function",
+            "sdk_name": "strcmp"
+          },
+          {
+            "nid": "0xC2145E80",
+            "address": "0x00008880",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "InterruptManagerForKernel",
+        "table_address": "0x00008A88",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x092968F4",
+            "address": "0x000087B8",
+            "kind": "function",
+            "sdk_name": "sceKernelCpuSuspendIntr"
+          },
+          {
+            "nid": "0x5F10D406",
+            "address": "0x000087C0",
+            "kind": "function",
+            "sdk_name": "sceKernelCpuResumeIntr"
+          }
+        ]
+      },
+      {
+        "library": "ThreadManForKernel",
+        "table_address": "0x00008AA0",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 14,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x1FB15A32",
+            "address": "0x00008888",
+            "kind": "function",
+            "sdk_name": "sceKernelSetEventFlag"
+          },
+          {
+            "nid": "0x278C0DF5",
+            "address": "0x00008890",
+            "kind": "function",
+            "sdk_name": "sceKernelWaitThreadEnd"
+          },
+          {
+            "nid": "0x293B45B8",
+            "address": "0x00008898",
+            "kind": "function"
+          },
+          {
+            "nid": "0x369ED59D",
+            "address": "0x000088A0",
+            "kind": "function",
+            "sdk_name": "sceKernelGetSystemTimeLow"
+          },
+          {
+            "nid": "0x402FCF22",
+            "address": "0x000088A8",
+            "kind": "function",
+            "sdk_name": "sceKernelWaitEventFlag"
+          },
+          {
+            "nid": "0x446D8DE6",
+            "address": "0x000088B0",
+            "kind": "function",
+            "sdk_name": "sceKernelCreateThread"
+          },
+          {
+            "nid": "0x55C20A00",
+            "address": "0x000088B8",
+            "kind": "function",
+            "sdk_name": "sceKernelCreateEventFlag"
+          },
+          {
+            "nid": "0x809CE29B",
+            "address": "0x000088C0",
+            "kind": "function",
+            "sdk_name": "sceKernelExitDeleteThread"
+          },
+          {
+            "nid": "0x812346E4",
+            "address": "0x000088C8",
+            "kind": "function",
+            "sdk_name": "sceKernelClearEventFlag"
+          },
+          {
+            "nid": "0x9FA03CD3",
+            "address": "0x000088D0",
+            "kind": "function",
+            "sdk_name": "sceKernelDeleteThread"
+          },
+          {
+            "nid": "0xBC31C1B9",
+            "address": "0x000088D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCEADEB47",
+            "address": "0x000088E0",
+            "kind": "function",
+            "sdk_name": "sceKernelDelayThread"
+          },
+          {
+            "nid": "0xEF9E4C70",
+            "address": "0x000088E8",
+            "kind": "function",
+            "sdk_name": "sceKernelDeleteEventFlag"
+          },
+          {
+            "nid": "0xF475845D",
+            "address": "0x000088F0",
+            "kind": "function",
+            "sdk_name": "sceKernelStartThread"
+          }
+        ]
+      },
+      {
+        "library": "ModuleMgrForKernel",
+        "table_address": "0x00008AB8",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 6,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x387E3CA9",
+            "address": "0x000087F0",
+            "kind": "function",
+            "sdk_name": "sceKernelUnloadModule"
+          },
+          {
+            "nid": "0x3FF74DF1",
+            "address": "0x000087F8",
+            "kind": "function",
+            "sdk_name": "sceKernelStartModule"
+          },
+          {
+            "nid": "0x939E4270",
+            "address": "0x00008800",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD4EE2D26",
+            "address": "0x00008808",
+            "kind": "function",
+            "sdk_name": "sceKernelLoadModuleToBlock"
+          },
+          {
+            "nid": "0xD86DD11B",
+            "address": "0x00008810",
+            "kind": "function",
+            "sdk_name": "sceKernelSearchModuleByName"
+          },
+          {
+            "nid": "0xE5D6087B",
+            "address": "0x00008818",
+            "kind": "function",
+            "sdk_name": "sceKernelStopModule"
+          }
+        ]
+      },
+      {
+        "library": "IoFileMgrForKernel",
+        "table_address": "0x00008ACC",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x54F5FB11",
+            "address": "0x000087C8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceSysEventForKernel",
+        "table_address": "0x00008AE4",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0xCD9E4BB5",
+            "address": "0x000089B8",
+            "kind": "function",
+            "sdk_name": "sceKernelRegisterSysEventHandler"
+          },
+          {
+            "nid": "0xD7D3FDCD",
+            "address": "0x000089C0",
+            "kind": "function",
+            "sdk_name": "sceKernelUnregisterSysEventHandler"
+          }
+        ]
+      },
+      {
+        "library": "sceSuspendForKernel",
+        "table_address": "0x00008AF8",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 4,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x3AEE7261",
+            "address": "0x00008998",
+            "kind": "function",
+            "sdk_name": "sceKernelPowerUnlock"
+          },
+          {
+            "nid": "0x3E0271D3",
+            "address": "0x000089A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA569E425",
+            "address": "0x000089A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEADB1BD7",
+            "address": "0x000089B0",
+            "kind": "function",
+            "sdk_name": "sceKernelPowerLock"
+          }
+        ]
+      },
+      {
+        "library": "KDebugForKernel",
+        "table_address": "0x00008B0C",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 4,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x47570AC5",
+            "address": "0x000087D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x84F370BC",
+            "address": "0x000087D8",
+            "kind": "function",
+            "sdk_name": "Kprintf"
+          },
+          {
+            "nid": "0x86010FCB",
+            "address": "0x000087E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xACF427DC",
+            "address": "0x000087E8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "SysMemForKernel",
+        "table_address": "0x00008B20",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 8,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x07C586A1",
+            "address": "0x00008820",
+            "kind": "function",
+            "sdk_name": "sceKernelGetModel"
+          },
+          {
+            "nid": "0x1AB50974",
+            "address": "0x00008828",
+            "kind": "function",
+            "sdk_name": "sceKernelJointMemoryBlock"
+          },
+          {
+            "nid": "0x22A114DC",
+            "address": "0x00008830",
+            "kind": "function",
+            "sdk_name": "sceKernelMemset32"
+          },
+          {
+            "nid": "0x7158CE7E",
+            "address": "0x00008838",
+            "kind": "function",
+            "sdk_name": "sceKernelAllocPartitionMemory"
+          },
+          {
+            "nid": "0xB4F00CB5",
+            "address": "0x00008840",
+            "kind": "function",
+            "sdk_name": "sceKernelGetCompiledSdkVersion"
+          },
+          {
+            "nid": "0xC1A26C6F",
+            "address": "0x00008848",
+            "kind": "function",
+            "sdk_name": "sceKernelFreePartitionMemory"
+          },
+          {
+            "nid": "0xE860BE8F",
+            "address": "0x00008850",
+            "kind": "function",
+            "sdk_name": "sceKernelQueryMemoryBlockInfo"
+          },
+          {
+            "nid": "0xEF29061C",
+            "address": "0x00008858",
+            "kind": "function",
+            "sdk_name": "sceKernelGetGameInfo"
+          }
+        ]
+      },
+      {
+        "library": "InitForKernel",
+        "table_address": "0x00008B34",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 3,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x27932388",
+            "address": "0x000087A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7233B5BC",
+            "address": "0x000087A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA18A4A8B",
+            "address": "0x000087B0",
+            "kind": "function",
+            "sdk_name": "sceKernelInitDiscImage"
+          }
+        ]
+      },
+      {
+        "library": "scePspNpDrm_driver",
+        "table_address": "0x00008B48",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x2D88879A",
+            "address": "0x00008928",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceMeCore_driver",
+        "table_address": "0x00008B5C",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x5DFF5C50",
+            "address": "0x00008910",
+            "kind": "function"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "modules/vshmain.prx",
+    "sha256": "dd283103f78db14a8bd08c8aa03ecc01807850baed54fb77b3c38ba7ffff712f",
+    "file_bytes": 397158,
+    "module": "vsh_module",
+    "module_attributes": "0x0800",
+    "module_version_bytes": [
+      1,
+      1
+    ],
+    "elf_entry": "0x0000F5F0",
+    "segments": [
+      {
+        "type": 1,
+        "offset": 160,
+        "vaddr": 0,
+        "paddr": 262316,
+        "filesz": 349888,
+        "memsz": 349888,
+        "flags": 7,
+        "align": 16
+      },
+      {
+        "type": 1,
+        "offset": 350048,
+        "vaddr": 349888,
+        "paddr": 0,
+        "filesz": 5348,
+        "memsz": 30176,
+        "flags": 6,
+        "align": 16
+      }
+    ],
+    "exports": [
+      {
+        "library": "syslib",
+        "table_address": "0x0003FCB4",
+        "version": "0x0000",
+        "flags": "0x8000",
+        "function_count": 2,
+        "variable_count": 3,
+        "entries": [
+          {
+            "nid": "0xD632ACDB",
+            "address": "0x0000F5F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCEE8593C",
+            "address": "0x0000F68C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF01D73A7",
+            "address": "0x0004000C",
+            "kind": "variable"
+          },
+          {
+            "nid": "0x11B97506",
+            "address": "0x0004F4F8",
+            "kind": "variable"
+          },
+          {
+            "nid": "0x0F7C276C",
+            "address": "0x0004F4FC",
+            "kind": "variable"
+          }
+        ]
+      },
+      {
+        "library": "vsh",
+        "table_address": "0x0003FCC4",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 164,
+        "variable_count": 1,
+        "entries": [
+          {
+            "nid": "0x0120D4AE",
+            "address": "0x00010AE8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x05A2E98E",
+            "address": "0x00014A00",
+            "kind": "function"
+          },
+          {
+            "nid": "0x065C5F79",
+            "address": "0x0000039C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x069F3DED",
+            "address": "0x0000DB80",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0707DF82",
+            "address": "0x000005DC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0AAEFC63",
+            "address": "0x0000DF40",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0B1583E7",
+            "address": "0x00009110",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0B2640C0",
+            "address": "0x00006FC4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0DEBBACA",
+            "address": "0x0000D09C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0EF8EA67",
+            "address": "0x000109D4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0F356450",
+            "address": "0x000101B4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x108AAF3D",
+            "address": "0x000111B4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x10D0168C",
+            "address": "0x0000D6E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x11EE6A5D",
+            "address": "0x0000DA60",
+            "kind": "function"
+          },
+          {
+            "nid": "0x13463F86",
+            "address": "0x0003999C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1525CE79",
+            "address": "0x0000A2CC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x162F858E",
+            "address": "0x00010C3C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x168464BC",
+            "address": "0x0000B4BC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x19B997A9",
+            "address": "0x00037C2C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1C431F00",
+            "address": "0x00006EEC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1C4CB349",
+            "address": "0x00004254",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1C95E5A6",
+            "address": "0x0000010C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2048E296",
+            "address": "0x00037BBC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x205EBE85",
+            "address": "0x00007004",
+            "kind": "function"
+          },
+          {
+            "nid": "0x221256AC",
+            "address": "0x0000D434",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2262B917",
+            "address": "0x00013508",
+            "kind": "function"
+          },
+          {
+            "nid": "0x243C87B6",
+            "address": "0x00037E70",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2AC678C4",
+            "address": "0x000041D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2B7F0381",
+            "address": "0x00010A34",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2D5F69DC",
+            "address": "0x00010930",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2EA8487A",
+            "address": "0x0000C874",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2EDC4E4D",
+            "address": "0x0000AB50",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2F4BA422",
+            "address": "0x0000C000",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3104DAFD",
+            "address": "0x0000C71C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x31AAE310",
+            "address": "0x0000965C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x323EF1FA",
+            "address": "0x0003C1CC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x343F22BB",
+            "address": "0x0000F520",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3480F185",
+            "address": "0x0000AB30",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3841A74A",
+            "address": "0x0000D34C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x38BCD465",
+            "address": "0x0003A86C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x391CC4F0",
+            "address": "0x00037D64",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3990B09C",
+            "address": "0x00037D18",
+            "kind": "function"
+          },
+          {
+            "nid": "0x39922394",
+            "address": "0x0000D268",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3BB9AF69",
+            "address": "0x000048C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3E0FD9AB",
+            "address": "0x0000494C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x40197CB2",
+            "address": "0x00012DC4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x40F428DA",
+            "address": "0x0000085C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x410363B4",
+            "address": "0x000129F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4123101C",
+            "address": "0x0003BA3C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x413E9AF3",
+            "address": "0x00007070",
+            "kind": "function"
+          },
+          {
+            "nid": "0x43496564",
+            "address": "0x0000DC08",
+            "kind": "function"
+          },
+          {
+            "nid": "0x494E0E33",
+            "address": "0x00002F80",
+            "kind": "function"
+          },
+          {
+            "nid": "0x49B07C8F",
+            "address": "0x00003BC0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x49B71831",
+            "address": "0x00003D98",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4A4F5B00",
+            "address": "0x000044B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4B8108D0",
+            "address": "0x00006EA0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4D883F6E",
+            "address": "0x00010D68",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4E9AFF66",
+            "address": "0x00037CE0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4F9462C1",
+            "address": "0x0000C1D4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5003FAEA",
+            "address": "0x00008588",
+            "kind": "function"
+          },
+          {
+            "nid": "0x54F6DA7B",
+            "address": "0x00007030",
+            "kind": "function"
+          },
+          {
+            "nid": "0x554CD064",
+            "address": "0x0000AABC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x57D0F9AC",
+            "address": "0x00010A98",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5A65DAD3",
+            "address": "0x00003D14",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5B51D3C0",
+            "address": "0x00009D20",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5BECDB1A",
+            "address": "0x0000F704",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5FAB4CC4",
+            "address": "0x00013888",
+            "kind": "function"
+          },
+          {
+            "nid": "0x618E985E",
+            "address": "0x000004F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6297919E",
+            "address": "0x0000404C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x642A477E",
+            "address": "0x00006F84",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6825D192",
+            "address": "0x00000208",
+            "kind": "function"
+          },
+          {
+            "nid": "0x698FEDD8",
+            "address": "0x0000D5FC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x69DE78E8",
+            "address": "0x00003EC4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6BCE9323",
+            "address": "0x00039FAC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6C582683",
+            "address": "0x00003998",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6E382720",
+            "address": "0x0001018C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6E9685A2",
+            "address": "0x0000B370",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6EB091A4",
+            "address": "0x000045BC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x714FF1E9",
+            "address": "0x000150B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x719E700C",
+            "address": "0x0000D518",
+            "kind": "function"
+          },
+          {
+            "nid": "0x778D2C13",
+            "address": "0x0000CF48",
+            "kind": "function"
+          },
+          {
+            "nid": "0x782862E2",
+            "address": "0x00003360",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7A96848F",
+            "address": "0x00010F50",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7AF1659D",
+            "address": "0x000391C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7BCC606F",
+            "address": "0x00004640",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7BE30EDD",
+            "address": "0x00037CC0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x802235B9",
+            "address": "0x0000C47C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x82EBDC8C",
+            "address": "0x00006F04",
+            "kind": "function"
+          },
+          {
+            "nid": "0x85279945",
+            "address": "0x0000701C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x857E7B0F",
+            "address": "0x000110EC",
+            "kind": "function"
+          },
+          {
+            "nid": "0x858291A3",
+            "address": "0x00003AC8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x85B81B75",
+            "address": "0x0000C260",
+            "kind": "function"
+          },
+          {
+            "nid": "0x86435A6A",
+            "address": "0x0000B148",
+            "kind": "function"
+          },
+          {
+            "nid": "0x874D1732",
+            "address": "0x0000C220",
+            "kind": "function"
+          },
+          {
+            "nid": "0x896A595D",
+            "address": "0x00004150",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8B22CFB1",
+            "address": "0x0000B0E4",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8D848761",
+            "address": "0x00003910",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8E164988",
+            "address": "0x00013CA8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8F81F4D8",
+            "address": "0x0003A73C",
+            "kind": "function"
+          },
+          {
+            "nid": "0x96794E31",
+            "address": "0x000046C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9730255D",
+            "address": "0x0000C008",
+            "kind": "function"
+          },
+          {
+            "nid": "0x97AAF5CD",
+            "address": "0x00004844",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9D6FBA1A",
+            "address": "0x00039FC8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9DF0D3D8",
+            "address": "0x000092B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA46B024C",
+            "address": "0x0000A7C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA61F3BDD",
+            "address": "0x0000453C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA719DB25",
+            "address": "0x000042FC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAA335B0B",
+            "address": "0x000100D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAAAB51B9",
+            "address": "0x0000A1CC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAEA2AB11",
+            "address": "0x00004400",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAFA8F20B",
+            "address": "0x00009470",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB16B7118",
+            "address": "0x0000AC8C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB3F73584",
+            "address": "0x00006E58",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB8365DF7",
+            "address": "0x00013DEC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB919386B",
+            "address": "0x0000F6AC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB9478F40",
+            "address": "0x00006E48",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBABDDD81",
+            "address": "0x000394A4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBC0422ED",
+            "address": "0x00011E68",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBCA8FB42",
+            "address": "0x0000B6D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBDE89BE6",
+            "address": "0x000070F4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBE003A0E",
+            "address": "0x00003FC8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC14B4F7F",
+            "address": "0x000047C4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC1817D32",
+            "address": "0x00003C94",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC41D4157",
+            "address": "0x00003E1C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC6922F3E",
+            "address": "0x00007084",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC8DCD175",
+            "address": "0x0000C2E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC9D9B19F",
+            "address": "0x00004744",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCAE91621",
+            "address": "0x00003F48",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCC3668E9",
+            "address": "0x0003C184",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCF2A3265",
+            "address": "0x00039F78",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCF2B993C",
+            "address": "0x000398F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD15BCDAA",
+            "address": "0x00008200",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD2F7566A",
+            "address": "0x00039F04",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD53FE7FF",
+            "address": "0x00006F44",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD794B959",
+            "address": "0x000150A4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDA380D7C",
+            "address": "0x000138A4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDB35E950",
+            "address": "0x0000ABC8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDFAC6EE6",
+            "address": "0x00009A38",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE14A0B27",
+            "address": "0x0003A5EC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE36C5E82",
+            "address": "0x000040CC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE427FB4B",
+            "address": "0x0000A7CC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE433A0FD",
+            "address": "0x00013DCC",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE4CC22EC",
+            "address": "0x00008F6C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE5F093D9",
+            "address": "0x00003C10",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE67508C9",
+            "address": "0x00010E14",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE7A08CE4",
+            "address": "0x0001047C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE8368408",
+            "address": "0x0000437C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE98D9505",
+            "address": "0x0000B570",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEB028869",
+            "address": "0x0003AB5C",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEB448D40",
+            "address": "0x00015098",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEB5360E8",
+            "address": "0x0000C6C4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEC609F60",
+            "address": "0x0000D184",
+            "kind": "function"
+          },
+          {
+            "nid": "0xED97E49F",
+            "address": "0x00007098",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEE76AE81",
+            "address": "0x000079B4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF0DF2267",
+            "address": "0x0000D8E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF1BC09D5",
+            "address": "0x00039468",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF2BE2783",
+            "address": "0x0003B820",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF2E1E9A8",
+            "address": "0x0000B2F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF51D6775",
+            "address": "0x000089D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF6F82BFE",
+            "address": "0x00010114",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF9C0F933",
+            "address": "0x0000F744",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFAB1C740",
+            "address": "0x00039980",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFC5BB3A0",
+            "address": "0x000399A4",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFE0BEDD0",
+            "address": "0x0000A380",
+            "kind": "function"
+          },
+          {
+            "nid": "0x17110676",
+            "address": "0x00055668",
+            "kind": "variable"
+          }
+        ]
+      }
+    ],
+    "imports": [
+      {
+        "library": "sceGe_user",
+        "table_address": "0x0003FCE0",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 3,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x03444EB4",
+            "address": "0x0003EEE8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAB49E76A",
+            "address": "0x0003EEF0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB287BD61",
+            "address": "0x0003EEF8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceHttp",
+        "table_address": "0x0003FCF4",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 5,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0xAB1ABE07",
+            "address": "0x0003EF00",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBAC31BF1",
+            "address": "0x0003EF08",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD1C8945E",
+            "address": "0x0003EF10",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE4D21302",
+            "address": "0x0003EF18",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF9D8EB63",
+            "address": "0x0003EF20",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceNet",
+        "table_address": "0x0003FD08",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x281928A9",
+            "address": "0x0003EF40",
+            "kind": "function",
+            "sdk_name": "sceNetTerm"
+          },
+          {
+            "nid": "0x39AF39A6",
+            "address": "0x0003EF48",
+            "kind": "function",
+            "sdk_name": "sceNetInit"
+          }
+        ]
+      },
+      {
+        "library": "sceNetInet",
+        "table_address": "0x0003FD1C",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x17943399",
+            "address": "0x0003EF70",
+            "kind": "function",
+            "sdk_name": "sceNetInetInit"
+          },
+          {
+            "nid": "0xA9ED66B9",
+            "address": "0x0003EF78",
+            "kind": "function",
+            "sdk_name": "sceNetInetTerm"
+          }
+        ]
+      },
+      {
+        "library": "sceNetResolver",
+        "table_address": "0x0003FD30",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x6138194A",
+            "address": "0x0003EF80",
+            "kind": "function",
+            "sdk_name": "sceNetResolverTerm"
+          },
+          {
+            "nid": "0xF3370E61",
+            "address": "0x0003EF88",
+            "kind": "function",
+            "sdk_name": "sceNetResolverInit"
+          }
+        ]
+      },
+      {
+        "library": "sceNetApctl",
+        "table_address": "0x0003FD44",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0xB3EDD0EC",
+            "address": "0x0003EF60",
+            "kind": "function",
+            "sdk_name": "sceNetApctlTerm"
+          },
+          {
+            "nid": "0xE2F91F9B",
+            "address": "0x0003EF68",
+            "kind": "function",
+            "sdk_name": "sceNetApctlInit"
+          }
+        ]
+      },
+      {
+        "library": "sceNetAdhocctl",
+        "table_address": "0x0003FD58",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x9D689E13",
+            "address": "0x0003EF50",
+            "kind": "function",
+            "sdk_name": "sceNetAdhocctlTerm"
+          },
+          {
+            "nid": "0xE26F226E",
+            "address": "0x0003EF58",
+            "kind": "function",
+            "sdk_name": "sceNetAdhocctlInit"
+          }
+        ]
+      },
+      {
+        "library": "sceNp",
+        "table_address": "0x0003FD6C",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x37E1E274",
+            "address": "0x0003EF90",
+            "kind": "function"
+          },
+          {
+            "nid": "0x857B47D3",
+            "address": "0x0003EF98",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceNpAuth",
+        "table_address": "0x0003FD80",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x4EC1F667",
+            "address": "0x0003EFA0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA1DE86F8",
+            "address": "0x0003EFA8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceNpService",
+        "table_address": "0x0003FD94",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x00ACFAC3",
+            "address": "0x0003EFE0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0F8F5821",
+            "address": "0x0003EFE8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceNpCommerce2",
+        "table_address": "0x0003FDA8",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x0E9956E3",
+            "address": "0x0003EFB0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA5A34EA4",
+            "address": "0x0003EFB8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceNpCommerce2Store",
+        "table_address": "0x0003FDBC",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x59D8A74D",
+            "address": "0x0003EFD0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8455D3ED",
+            "address": "0x0003EFD8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceNpCommerce2RegCam",
+        "table_address": "0x0003FDD0",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x0400E86A",
+            "address": "0x0003EFC0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x78E3D827",
+            "address": "0x0003EFC8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "scePspNpDrm_user",
+        "table_address": "0x0003FDE4",
+        "version": "0x0011",
+        "flags": "0x4009",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x08D98894",
+            "address": "0x0003F808",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceOpenPSID",
+        "table_address": "0x0003FDF8",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0xC69BEBCE",
+            "address": "0x0003EFF0",
+            "kind": "function",
+            "sdk_name": "sceOpenPSIDGetOpenPSID"
+          }
+        ]
+      },
+      {
+        "library": "sceSsl",
+        "table_address": "0x0003FE0C",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x191CDEFF",
+            "address": "0x0003F8B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x957ECBE2",
+            "address": "0x0003F8B8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceUtility_netparam_internal",
+        "table_address": "0x0003FE20",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 3,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x02598DB8",
+            "address": "0x0003F918",
+            "kind": "function"
+          },
+          {
+            "nid": "0x09905636",
+            "address": "0x0003F920",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6B1BC62C",
+            "address": "0x0003F928",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceResmgr",
+        "table_address": "0x0003FE34",
+        "version": "0x0000",
+        "flags": "0x4009",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x9DC14891",
+            "address": "0x00000600",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceMlnBridge",
+        "table_address": "0x0003FE48",
+        "version": "0x0011",
+        "flags": "0x4009",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x6DEA83B1",
+            "address": "0x0003EF28",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "SysMemUserForUser",
+        "table_address": "0x0003FE5C",
+        "version": "0x0011",
+        "flags": "0x4000",
+        "function_count": 6,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x237DBD4F",
+            "address": "0x0003EDD8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x358CA1BB",
+            "address": "0x0003EDE0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9D9A5BA1",
+            "address": "0x0003EDE8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xACBD88CA",
+            "address": "0x0003EDF0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF77D77CB",
+            "address": "0x0003EDF8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF919F628",
+            "address": "0x0003EE00",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceDisplay",
+        "table_address": "0x0003FE70",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x9C6EAAD7",
+            "address": "0x0003EEE0",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceReg",
+        "table_address": "0x0003FE84",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 11,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x0CAE832B",
+            "address": "0x0003F810",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0D69BF40",
+            "address": "0x0003F818",
+            "kind": "function"
+          },
+          {
+            "nid": "0x17768E14",
+            "address": "0x0003F820",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1D8A762E",
+            "address": "0x0003F828",
+            "kind": "function"
+          },
+          {
+            "nid": "0x30BE0259",
+            "address": "0x0003F830",
+            "kind": "function"
+          },
+          {
+            "nid": "0x39461B4D",
+            "address": "0x0003F838",
+            "kind": "function"
+          },
+          {
+            "nid": "0x57641A81",
+            "address": "0x0003F840",
+            "kind": "function"
+          },
+          {
+            "nid": "0x92E41280",
+            "address": "0x0003F848",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC5768D02",
+            "address": "0x0003F850",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDEDA92BF",
+            "address": "0x0003F858",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFA8A5739",
+            "address": "0x0003F860",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceRtc",
+        "table_address": "0x0003FE98",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 9,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x34885E0D",
+            "address": "0x0003F868",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3F7AD767",
+            "address": "0x0003F870",
+            "kind": "function",
+            "sdk_name": "sceRtcGetCurrentTick"
+          },
+          {
+            "nid": "0x57726BC1",
+            "address": "0x0003F878",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6A676D2D",
+            "address": "0x0003F880",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6FF40ACC",
+            "address": "0x0003F888",
+            "kind": "function",
+            "sdk_name": "sceRtcGetTick"
+          },
+          {
+            "nid": "0x7ED29E40",
+            "address": "0x0003F890",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC2DDBEB5",
+            "address": "0x0003F898",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE51B4B7A",
+            "address": "0x0003F8A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFB3B18CD",
+            "address": "0x0003F8A8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceUsb",
+        "table_address": "0x0003FEAC",
+        "version": "0x0011",
+        "flags": "0x4009",
+        "function_count": 4,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x89DE0DC5",
+            "address": "0x0003F8F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8BFC3DE8",
+            "address": "0x0003F900",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAE5DE6AF",
+            "address": "0x0003F908",
+            "kind": "function",
+            "sdk_name": "sceUsbStart"
+          },
+          {
+            "nid": "0xC2464FA0",
+            "address": "0x0003F910",
+            "kind": "function",
+            "sdk_name": "sceUsbStop"
+          }
+        ]
+      },
+      {
+        "library": "sceVshBridge",
+        "table_address": "0x0003FEC0",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 68,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x01730088",
+            "address": "0x0003F938",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0543156C",
+            "address": "0x0003F940",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0C0D5913",
+            "address": "0x0003F948",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0D684A0B",
+            "address": "0x0003F950",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0D7A4FE4",
+            "address": "0x0003F958",
+            "kind": "function"
+          },
+          {
+            "nid": "0x12B07B05",
+            "address": "0x0003F960",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1D5C579F",
+            "address": "0x0003F968",
+            "kind": "function"
+          },
+          {
+            "nid": "0x21C243FE",
+            "address": "0x0003F970",
+            "kind": "function"
+          },
+          {
+            "nid": "0x21D4D038",
+            "address": "0x0003F978",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2380DC08",
+            "address": "0x0003F980",
+            "kind": "function",
+            "sdk_name": "vshIoDevctl"
+          },
+          {
+            "nid": "0x27BDA326",
+            "address": "0x0003F988",
+            "kind": "function"
+          },
+          {
+            "nid": "0x27CD418C",
+            "address": "0x0003F990",
+            "kind": "function"
+          },
+          {
+            "nid": "0x29CDFFBA",
+            "address": "0x0003F998",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2EBD2323",
+            "address": "0x0003F9A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3785D08B",
+            "address": "0x0003F9A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3A46C639",
+            "address": "0x0003F9B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3C90E435",
+            "address": "0x0003F9B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3D30FEB6",
+            "address": "0x0003F9C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4A596D2D",
+            "address": "0x0003F9C8",
+            "kind": "function",
+            "sdk_name": "vshImposeSetParam"
+          },
+          {
+            "nid": "0x4DB43867",
+            "address": "0x0003F9D0",
+            "kind": "function",
+            "sdk_name": "vshIdStorageLookup"
+          },
+          {
+            "nid": "0x53BFD101",
+            "address": "0x0003F9D8",
+            "kind": "function",
+            "sdk_name": "vshMSAudioCheckICV"
+          },
+          {
+            "nid": "0x582B5281",
+            "address": "0x0003F9E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x59197BE8",
+            "address": "0x0003F9E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5B7F3339",
+            "address": "0x0003F9F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5C2983C2",
+            "address": "0x0003F9F8",
+            "kind": "function",
+            "sdk_name": "sceVshBridge_5C2983C2"
+          },
+          {
+            "nid": "0x5E0F5543",
+            "address": "0x0003FA00",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5E5AF7A2",
+            "address": "0x0003FA08",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5F35E8FE",
+            "address": "0x0003FA10",
+            "kind": "function"
+          },
+          {
+            "nid": "0x61001D64",
+            "address": "0x0003FA18",
+            "kind": "function"
+          },
+          {
+            "nid": "0x63047647",
+            "address": "0x0003FA20",
+            "kind": "function"
+          },
+          {
+            "nid": "0x639C3CB3",
+            "address": "0x0003FA28",
+            "kind": "function",
+            "sdk_name": "vshImposeGetParam"
+          },
+          {
+            "nid": "0x63E69956",
+            "address": "0x0003FA30",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6CAEB765",
+            "address": "0x0003FA38",
+            "kind": "function",
+            "sdk_name": "vshMSAudioAuth"
+          },
+          {
+            "nid": "0x7423151D",
+            "address": "0x0003FA40",
+            "kind": "function"
+          },
+          {
+            "nid": "0x74DA9D25",
+            "address": "0x0003FA48",
+            "kind": "function"
+          },
+          {
+            "nid": "0x74DBE57E",
+            "address": "0x0003FA50",
+            "kind": "function"
+          },
+          {
+            "nid": "0x791FCD43",
+            "address": "0x0003FA58",
+            "kind": "function"
+          },
+          {
+            "nid": "0x79B916E1",
+            "address": "0x0003FA60",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7A90D816",
+            "address": "0x0003FA68",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7B14CE2B",
+            "address": "0x0003FA70",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7D1C13B5",
+            "address": "0x0003FA78",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7E117907",
+            "address": "0x0003FA80",
+            "kind": "function"
+          },
+          {
+            "nid": "0x81682A40",
+            "address": "0x0003FA88",
+            "kind": "function"
+          },
+          {
+            "nid": "0x837C457A",
+            "address": "0x0003FA90",
+            "kind": "function"
+          },
+          {
+            "nid": "0x88C35487",
+            "address": "0x0003FA98",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9056DE3A",
+            "address": "0x0003FAA0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9347D693",
+            "address": "0x0003FAA8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9427C909",
+            "address": "0x0003FAB0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9940D95C",
+            "address": "0x0003FAB8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA29B5A33",
+            "address": "0x0003FAC0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA5628F0D",
+            "address": "0x0003FAC8",
+            "kind": "function",
+            "sdk_name": "vshKernelLoadModuleVSH"
+          },
+          {
+            "nid": "0xAAB9A9EF",
+            "address": "0x0003FAD0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xABB84565",
+            "address": "0x0003FAD8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB8B07CAF",
+            "address": "0x0003FAE0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC51A6C26",
+            "address": "0x0003FAE8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC6395C03",
+            "address": "0x0003FAF0",
+            "kind": "function",
+            "sdk_name": "vshCtrlReadBufferPositive"
+          },
+          {
+            "nid": "0xC949966C",
+            "address": "0x0003FAF8",
+            "kind": "function",
+            "sdk_name": "sceVshBridge_C949966C"
+          },
+          {
+            "nid": "0xCCD27632",
+            "address": "0x0003FB00",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCD1A2C46",
+            "address": "0x0003FB08",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCE32CBEF",
+            "address": "0x0003FB10",
+            "kind": "function",
+            "sdk_name": "vshMSAudioInit"
+          },
+          {
+            "nid": "0xD39DE400",
+            "address": "0x0003FB18",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD47041CA",
+            "address": "0x0003FB20",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD7D7E7B6",
+            "address": "0x0003FB28",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDB7C3D5A",
+            "address": "0x0003FB30",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE174218C",
+            "address": "0x0003FB38",
+            "kind": "function",
+            "sdk_name": "sceVshBridge_E174218C"
+          },
+          {
+            "nid": "0xE533E98C",
+            "address": "0x0003FB40",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE5DA5E95",
+            "address": "0x0003FB48",
+            "kind": "function",
+            "sdk_name": "vshMSAudioEnd"
+          },
+          {
+            "nid": "0xEBC3A334",
+            "address": "0x0003FB50",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceVshCommonGui",
+        "table_address": "0x0003FED4",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 22,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x038BC86D",
+            "address": "0x0003FB58",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0689BA75",
+            "address": "0x0003FB60",
+            "kind": "function"
+          },
+          {
+            "nid": "0x139338D6",
+            "address": "0x0003FB68",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1B096DFA",
+            "address": "0x0003FB70",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1BF87B3D",
+            "address": "0x0003FB78",
+            "kind": "function"
+          },
+          {
+            "nid": "0x25E69478",
+            "address": "0x0003FB80",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2DBD3B5B",
+            "address": "0x0003FB88",
+            "kind": "function"
+          },
+          {
+            "nid": "0x32801AAA",
+            "address": "0x0003FB90",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4A405949",
+            "address": "0x0003FB98",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5EACC88B",
+            "address": "0x0003FBA0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x604AC67F",
+            "address": "0x0003FBA8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8CF6D61A",
+            "address": "0x0003FBB0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8F16588E",
+            "address": "0x0003FBB8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x955D9062",
+            "address": "0x0003FBC0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA135343D",
+            "address": "0x0003FBC8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB78A3C31",
+            "address": "0x0003FBD0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC77DB3BE",
+            "address": "0x0003FBD8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCFD48537",
+            "address": "0x0003FBE0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD957207D",
+            "address": "0x0003FBE8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE2BEB7B9",
+            "address": "0x0003FBF0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF708C5E4",
+            "address": "0x0003FBF8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFE32F7E3",
+            "address": "0x0003FC00",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceVshCommonUtil",
+        "table_address": "0x0003FEE8",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 21,
+        "variable_count": 1,
+        "entries": [
+          {
+            "nid": "0x0A708F40",
+            "address": "0x0003FC08",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1BC70F77",
+            "address": "0x0003FC10",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1D7E0B27",
+            "address": "0x0003FC18",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2058CEAA",
+            "address": "0x0003FC20",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2D320307",
+            "address": "0x0003FC28",
+            "kind": "function"
+          },
+          {
+            "nid": "0x34826464",
+            "address": "0x0003FC30",
+            "kind": "function"
+          },
+          {
+            "nid": "0x38C93C16",
+            "address": "0x0003FC38",
+            "kind": "function"
+          },
+          {
+            "nid": "0x392A75EF",
+            "address": "0x0003FC40",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3CA4266A",
+            "address": "0x0003FC48",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3F28E621",
+            "address": "0x0003FC50",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4A92625E",
+            "address": "0x0003FC58",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5A1359E0",
+            "address": "0x0003FC60",
+            "kind": "function"
+          },
+          {
+            "nid": "0x649C3568",
+            "address": "0x0003FC68",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8381781A",
+            "address": "0x0003FC70",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9869763D",
+            "address": "0x0003FC78",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA16F632D",
+            "address": "0x0003FC80",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA721B1D1",
+            "address": "0x0003FC88",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBC01322B",
+            "address": "0x0003FC90",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE6C36E64",
+            "address": "0x0003FC98",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF9DB4018",
+            "address": "0x0003FCA0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFC3BC7EE",
+            "address": "0x0003FCA8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "scePaf",
+        "table_address": "0x0003FF00",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 251,
+        "variable_count": 6,
+        "entries": [
+          {
+            "nid": "0x0085C4A5",
+            "address": "0x0003EFF8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x00B832B2",
+            "address": "0x0003F000",
+            "kind": "function"
+          },
+          {
+            "nid": "0x02A60EBD",
+            "address": "0x0003F008",
+            "kind": "function"
+          },
+          {
+            "nid": "0x03B20F85",
+            "address": "0x0003F010",
+            "kind": "function"
+          },
+          {
+            "nid": "0x04A7B506",
+            "address": "0x0003F018",
+            "kind": "function"
+          },
+          {
+            "nid": "0x04E015E4",
+            "address": "0x0003F020",
+            "kind": "function"
+          },
+          {
+            "nid": "0x05E14B72",
+            "address": "0x0003F028",
+            "kind": "function"
+          },
+          {
+            "nid": "0x075FACE4",
+            "address": "0x0003F030",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0929EF0D",
+            "address": "0x0003F038",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0A1E907A",
+            "address": "0x0003F040",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0B95292E",
+            "address": "0x0003F048",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0C2CD696",
+            "address": "0x0003F050",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0E8CA0D0",
+            "address": "0x0003F058",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0EE8FFFF",
+            "address": "0x0003F060",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0F19FF55",
+            "address": "0x0003F068",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0FC5E0EF",
+            "address": "0x0003F070",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0FC66D1C",
+            "address": "0x0003F078",
+            "kind": "function"
+          },
+          {
+            "nid": "0x10E9CF5B",
+            "address": "0x0003F080",
+            "kind": "function"
+          },
+          {
+            "nid": "0x11D950F0",
+            "address": "0x0003F088",
+            "kind": "function"
+          },
+          {
+            "nid": "0x126454E6",
+            "address": "0x0003F090",
+            "kind": "function"
+          },
+          {
+            "nid": "0x13B2C7BB",
+            "address": "0x0003F098",
+            "kind": "function"
+          },
+          {
+            "nid": "0x14EF73B2",
+            "address": "0x0003F0A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x167BA176",
+            "address": "0x0003F0A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x16CA066C",
+            "address": "0x0003F0B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1775C8E3",
+            "address": "0x0003F0B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x177C1E4F",
+            "address": "0x0003F0C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x17B4723E",
+            "address": "0x0003F0C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1941469E",
+            "address": "0x0003F0D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1C80A4DC",
+            "address": "0x0003F0D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1E443486",
+            "address": "0x0003F0E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1FB4579B",
+            "address": "0x0003F0E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x22420CC7",
+            "address": "0x0003F0F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x22560E39",
+            "address": "0x0003F0F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x23A245C3",
+            "address": "0x0003F100",
+            "kind": "function"
+          },
+          {
+            "nid": "0x26717465",
+            "address": "0x0003F108",
+            "kind": "function"
+          },
+          {
+            "nid": "0x279F57C3",
+            "address": "0x0003F110",
+            "kind": "function"
+          },
+          {
+            "nid": "0x28C3DFA5",
+            "address": "0x0003F118",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2B889C55",
+            "address": "0x0003F120",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2C0F0975",
+            "address": "0x0003F128",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2C22C6FB",
+            "address": "0x0003F130",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2C23C4E2",
+            "address": "0x0003F138",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2D138A74",
+            "address": "0x0003F140",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2D92A298",
+            "address": "0x0003F148",
+            "kind": "function"
+          },
+          {
+            "nid": "0x304F6CF4",
+            "address": "0x0003F150",
+            "kind": "function"
+          },
+          {
+            "nid": "0x30AF7A24",
+            "address": "0x0003F158",
+            "kind": "function"
+          },
+          {
+            "nid": "0x319A6571",
+            "address": "0x0003F160",
+            "kind": "function"
+          },
+          {
+            "nid": "0x327B34BF",
+            "address": "0x0003F168",
+            "kind": "function"
+          },
+          {
+            "nid": "0x330BD953",
+            "address": "0x0003F170",
+            "kind": "function"
+          },
+          {
+            "nid": "0x362F4258",
+            "address": "0x0003F178",
+            "kind": "function"
+          },
+          {
+            "nid": "0x36E2C527",
+            "address": "0x0003F180",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3710132E",
+            "address": "0x0003F188",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3782A7C2",
+            "address": "0x0003F190",
+            "kind": "function"
+          },
+          {
+            "nid": "0x379A3D64",
+            "address": "0x0003F198",
+            "kind": "function"
+          },
+          {
+            "nid": "0x37A80B89",
+            "address": "0x0003F1A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x37ABB4A1",
+            "address": "0x0003F1A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3874A5F8",
+            "address": "0x0003F1B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3876721B",
+            "address": "0x0003F1B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3A4504D5",
+            "address": "0x0003F1C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3A5E1022",
+            "address": "0x0003F1C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3BF0DB62",
+            "address": "0x0003F1D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3C0E9C2D",
+            "address": "0x0003F1D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3E22B04E",
+            "address": "0x0003F1E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3ED6EA7F",
+            "address": "0x0003F1E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x3F65FC71",
+            "address": "0x0003F1F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x40A2FAC3",
+            "address": "0x0003F1F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x412B2F09",
+            "address": "0x0003F200",
+            "kind": "function"
+          },
+          {
+            "nid": "0x428E7562",
+            "address": "0x0003F208",
+            "kind": "function"
+          },
+          {
+            "nid": "0x430D11DC",
+            "address": "0x0003F210",
+            "kind": "function"
+          },
+          {
+            "nid": "0x438B6847",
+            "address": "0x0003F218",
+            "kind": "function"
+          },
+          {
+            "nid": "0x440665DB",
+            "address": "0x0003F220",
+            "kind": "function"
+          },
+          {
+            "nid": "0x44AE2A91",
+            "address": "0x0003F228",
+            "kind": "function"
+          },
+          {
+            "nid": "0x465B3A83",
+            "address": "0x0003F230",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4792CA66",
+            "address": "0x0003F238",
+            "kind": "function"
+          },
+          {
+            "nid": "0x485B96FB",
+            "address": "0x0003F240",
+            "kind": "function"
+          },
+          {
+            "nid": "0x491E69CE",
+            "address": "0x0003F248",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4AA46320",
+            "address": "0x0003F250",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4AF28AF7",
+            "address": "0x0003F258",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4BC342F7",
+            "address": "0x0003F260",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4CA9F1A7",
+            "address": "0x0003F268",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4CF09BA2",
+            "address": "0x0003F270",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4CFAB8D4",
+            "address": "0x0003F278",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4D45C2CF",
+            "address": "0x0003F280",
+            "kind": "function"
+          },
+          {
+            "nid": "0x4F7B8133",
+            "address": "0x0003F288",
+            "kind": "function"
+          },
+          {
+            "nid": "0x505EA775",
+            "address": "0x0003F290",
+            "kind": "function"
+          },
+          {
+            "nid": "0x512737D3",
+            "address": "0x0003F298",
+            "kind": "function"
+          },
+          {
+            "nid": "0x537B3828",
+            "address": "0x0003F2A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x53B0C35F",
+            "address": "0x0003F2A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5476FD2B",
+            "address": "0x0003F2B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x54807A37",
+            "address": "0x0003F2B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x58BD2AEB",
+            "address": "0x0003F2C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5905DF98",
+            "address": "0x0003F2C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5A6CAFE2",
+            "address": "0x0003F2D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5B257A25",
+            "address": "0x0003F2D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5B46340C",
+            "address": "0x0003F2E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5CC6AA3C",
+            "address": "0x0003F2E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5CE2ACF4",
+            "address": "0x0003F2F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5D22ED89",
+            "address": "0x0003F2F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5E9078F9",
+            "address": "0x0003F300",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5E909060",
+            "address": "0x0003F308",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6195CF7C",
+            "address": "0x0003F310",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6332FF84",
+            "address": "0x0003F318",
+            "kind": "function"
+          },
+          {
+            "nid": "0x66832B20",
+            "address": "0x0003F320",
+            "kind": "function"
+          },
+          {
+            "nid": "0x675047B1",
+            "address": "0x0003F328",
+            "kind": "function"
+          },
+          {
+            "nid": "0x67FF4EBC",
+            "address": "0x0003F330",
+            "kind": "function"
+          },
+          {
+            "nid": "0x685F8622",
+            "address": "0x0003F338",
+            "kind": "function"
+          },
+          {
+            "nid": "0x68685412",
+            "address": "0x0003F340",
+            "kind": "function"
+          },
+          {
+            "nid": "0x68B4E5A8",
+            "address": "0x0003F348",
+            "kind": "function"
+          },
+          {
+            "nid": "0x698098B9",
+            "address": "0x0003F350",
+            "kind": "function"
+          },
+          {
+            "nid": "0x69A1E33B",
+            "address": "0x0003F358",
+            "kind": "function"
+          },
+          {
+            "nid": "0x69D71FBF",
+            "address": "0x0003F360",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6A17A477",
+            "address": "0x0003F368",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6E36E1D9",
+            "address": "0x0003F370",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6F3415DD",
+            "address": "0x0003F378",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6FBEAC03",
+            "address": "0x0003F380",
+            "kind": "function"
+          },
+          {
+            "nid": "0x706ABBFF",
+            "address": "0x0003F388",
+            "kind": "function"
+          },
+          {
+            "nid": "0x713256AB",
+            "address": "0x0003F390",
+            "kind": "function"
+          },
+          {
+            "nid": "0x726DFBA9",
+            "address": "0x0003F398",
+            "kind": "function"
+          },
+          {
+            "nid": "0x72B16452",
+            "address": "0x0003F3A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7364C1F7",
+            "address": "0x0003F3A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x73DA59C1",
+            "address": "0x0003F3B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x73F0D607",
+            "address": "0x0003F3B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x73F36F1F",
+            "address": "0x0003F3C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x777E5AC9",
+            "address": "0x0003F3C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x77ADEAEB",
+            "address": "0x0003F3D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x78037E0C",
+            "address": "0x0003F3D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x781E5F1E",
+            "address": "0x0003F3E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7869A05E",
+            "address": "0x0003F3E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x79174B51",
+            "address": "0x0003F3F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7B7133D5",
+            "address": "0x0003F3F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7B77B7E7",
+            "address": "0x0003F400",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7C92BF10",
+            "address": "0x0003F408",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7D7DEB7E",
+            "address": "0x0003F410",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7DF192FA",
+            "address": "0x0003F418",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7E0A6B25",
+            "address": "0x0003F420",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7E160F18",
+            "address": "0x0003F428",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7E3A3D9B",
+            "address": "0x0003F430",
+            "kind": "function"
+          },
+          {
+            "nid": "0x7E545DA3",
+            "address": "0x0003F438",
+            "kind": "function"
+          },
+          {
+            "nid": "0x80390D7B",
+            "address": "0x0003F440",
+            "kind": "function"
+          },
+          {
+            "nid": "0x81F7BDC2",
+            "address": "0x0003F448",
+            "kind": "function"
+          },
+          {
+            "nid": "0x85BFE0DD",
+            "address": "0x0003F450",
+            "kind": "function"
+          },
+          {
+            "nid": "0x85CFB6E6",
+            "address": "0x0003F458",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8871CAB9",
+            "address": "0x0003F460",
+            "kind": "function"
+          },
+          {
+            "nid": "0x88CE8467",
+            "address": "0x0003F468",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8BC9927A",
+            "address": "0x0003F470",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8DB83D04",
+            "address": "0x0003F478",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8EDF4126",
+            "address": "0x0003F480",
+            "kind": "function"
+          },
+          {
+            "nid": "0x8FA84E15",
+            "address": "0x0003F488",
+            "kind": "function"
+          },
+          {
+            "nid": "0x918BCA8B",
+            "address": "0x0003F490",
+            "kind": "function"
+          },
+          {
+            "nid": "0x91973397",
+            "address": "0x0003F498",
+            "kind": "function"
+          },
+          {
+            "nid": "0x942E8711",
+            "address": "0x0003F4A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x94AFA971",
+            "address": "0x0003F4A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9684511F",
+            "address": "0x0003F4B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x96ECA540",
+            "address": "0x0003F4B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x995294D1",
+            "address": "0x0003F4C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9A418CCC",
+            "address": "0x0003F4C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9AE88FFF",
+            "address": "0x0003F4D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9AF12ADC",
+            "address": "0x0003F4D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9D93A13C",
+            "address": "0x0003F4E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9E236520",
+            "address": "0x0003F4E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9EEFEF9D",
+            "address": "0x0003F4F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9EF44AF8",
+            "address": "0x0003F4F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9F12D4D1",
+            "address": "0x0003F500",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9F3E4ED9",
+            "address": "0x0003F508",
+            "kind": "function"
+          },
+          {
+            "nid": "0x9FA3F3F6",
+            "address": "0x0003F510",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA04B4F40",
+            "address": "0x0003F518",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA138A376",
+            "address": "0x0003F520",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA140233F",
+            "address": "0x0003F528",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA2ADF6EC",
+            "address": "0x0003F530",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA4EAD0A0",
+            "address": "0x0003F538",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA5BBFD24",
+            "address": "0x0003F540",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA69A5266",
+            "address": "0x0003F548",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA7353F2A",
+            "address": "0x0003F550",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA7784A89",
+            "address": "0x0003F558",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA9645067",
+            "address": "0x0003F560",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA989A2C4",
+            "address": "0x0003F568",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAB0731F2",
+            "address": "0x0003F570",
+            "kind": "function"
+          },
+          {
+            "nid": "0xABB3AE55",
+            "address": "0x0003F578",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAC29C247",
+            "address": "0x0003F580",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAC98B0C3",
+            "address": "0x0003F588",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAD454A8F",
+            "address": "0x0003F590",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAE5D4943",
+            "address": "0x0003F598",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAF067FA2",
+            "address": "0x0003F5A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB03CB9A0",
+            "address": "0x0003F5A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB05D9677",
+            "address": "0x0003F5B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB4C7DE8E",
+            "address": "0x0003F5B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB6A3AB1E",
+            "address": "0x0003F5C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB6D58D98",
+            "address": "0x0003F5C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB73A78AF",
+            "address": "0x0003F5D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB94AD2A4",
+            "address": "0x0003F5D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB9DDDCC8",
+            "address": "0x0003F5E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBB89C9EA",
+            "address": "0x0003F5E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBCA8DE39",
+            "address": "0x0003F5F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC0E15A55",
+            "address": "0x0003F5F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC1B36CF9",
+            "address": "0x0003F600",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC1D8F2DC",
+            "address": "0x0003F608",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC22BACF3",
+            "address": "0x0003F610",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC327FF14",
+            "address": "0x0003F618",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC3B97D0D",
+            "address": "0x0003F620",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC3D5A672",
+            "address": "0x0003F628",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC59FC3D0",
+            "address": "0x0003F630",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC5C17E46",
+            "address": "0x0003F638",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC5C4707A",
+            "address": "0x0003F640",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC735969B",
+            "address": "0x0003F648",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC7F002F1",
+            "address": "0x0003F650",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC839B167",
+            "address": "0x0003F658",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC853CAF6",
+            "address": "0x0003F660",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC8F930E9",
+            "address": "0x0003F668",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCC3426BF",
+            "address": "0x0003F670",
+            "kind": "function"
+          },
+          {
+            "nid": "0xCCC1E8F7",
+            "address": "0x0003F678",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD0D9615E",
+            "address": "0x0003F680",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD0DFA412",
+            "address": "0x0003F688",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD1755221",
+            "address": "0x0003F690",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD21E2DFC",
+            "address": "0x0003F698",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD229572C",
+            "address": "0x0003F6A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD2FCE506",
+            "address": "0x0003F6A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD31D6132",
+            "address": "0x0003F6B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD590412B",
+            "address": "0x0003F6B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD5F2C162",
+            "address": "0x0003F6C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD6A63A45",
+            "address": "0x0003F6C8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD7DCB972",
+            "address": "0x0003F6D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD9E2D6E1",
+            "address": "0x0003F6D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xD9FC24EA",
+            "address": "0x0003F6E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDA8D097D",
+            "address": "0x0003F6E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDB1612F1",
+            "address": "0x0003F6F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDD10B322",
+            "address": "0x0003F6F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDD23970A",
+            "address": "0x0003F700",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDD588D1C",
+            "address": "0x0003F708",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDDE74F3B",
+            "address": "0x0003F710",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE00895CD",
+            "address": "0x0003F718",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE0B32AE8",
+            "address": "0x0003F720",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE1B1B2F9",
+            "address": "0x0003F728",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE4B97CA1",
+            "address": "0x0003F730",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE67517D2",
+            "address": "0x0003F738",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE6D56019",
+            "address": "0x0003F740",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE7263320",
+            "address": "0x0003F748",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE9570AA3",
+            "address": "0x0003F750",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEA681A0B",
+            "address": "0x0003F758",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF09010AF",
+            "address": "0x0003F760",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF207376F",
+            "address": "0x0003F768",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF265E4F0",
+            "address": "0x0003F770",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF48A9040",
+            "address": "0x0003F778",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF4C130B8",
+            "address": "0x0003F780",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF4EBA045",
+            "address": "0x0003F788",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFA60E9C4",
+            "address": "0x0003F790",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFAB38CB0",
+            "address": "0x0003F798",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFC5C8A32",
+            "address": "0x0003F7A0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFD048927",
+            "address": "0x0003F7A8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFD38EF6C",
+            "address": "0x0003F7B0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFE99F522",
+            "address": "0x0003F7B8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFF01EBA9",
+            "address": "0x0003F7C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xFFBAD89D",
+            "address": "0x0003F7C8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceMpeg",
+        "table_address": "0x0003FF18",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x682A619B",
+            "address": "0x0003EF30",
+            "kind": "function"
+          },
+          {
+            "nid": "0x874624D6",
+            "address": "0x0003EF38",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceAtrac3plus",
+        "table_address": "0x0003FF2C",
+        "version": "0x0011",
+        "flags": "0x0009",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x132F1ECA",
+            "address": "0x0003EED0",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceCtrl",
+        "table_address": "0x0003FF40",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x3A622550",
+            "address": "0x0003EED8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "scePower",
+        "table_address": "0x0003FF54",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 7,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x04B7766E",
+            "address": "0x0003F7D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x0AFD0D8B",
+            "address": "0x0003F7D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1E490401",
+            "address": "0x0003F7E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2085D15D",
+            "address": "0x0003F7E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x469989AD",
+            "address": "0x0003F7F0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAC32C9CC",
+            "address": "0x0003F7F8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xDFA8BAF8",
+            "address": "0x0003F800",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceVaudio",
+        "table_address": "0x0003FF68",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0xCBD4AC51",
+            "address": "0x0003F930",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceUmdUser",
+        "table_address": "0x0003FF7C",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 5,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x46EBB729",
+            "address": "0x0003F8D0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x87533940",
+            "address": "0x0003F8D8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xAEE7404D",
+            "address": "0x0003F8E0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBD2BDE07",
+            "address": "0x0003F8E8",
+            "kind": "function"
+          },
+          {
+            "nid": "0xC6183D47",
+            "address": "0x0003F8F0",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "IoFileMgrForUser",
+        "table_address": "0x0003FF90",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 16,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x06A70004",
+            "address": "0x0003ED10",
+            "kind": "function"
+          },
+          {
+            "nid": "0x109F50BC",
+            "address": "0x0003ED18",
+            "kind": "function",
+            "sdk_name": "sceIoOpen"
+          },
+          {
+            "nid": "0x27EB27B8",
+            "address": "0x0003ED20",
+            "kind": "function",
+            "sdk_name": "sceIoLseek"
+          },
+          {
+            "nid": "0x42EC03AC",
+            "address": "0x0003ED28",
+            "kind": "function",
+            "sdk_name": "sceIoWrite"
+          },
+          {
+            "nid": "0x54F5FB11",
+            "address": "0x0003ED30",
+            "kind": "function"
+          },
+          {
+            "nid": "0x63632449",
+            "address": "0x0003ED38",
+            "kind": "function"
+          },
+          {
+            "nid": "0x6A638D83",
+            "address": "0x0003ED40",
+            "kind": "function",
+            "sdk_name": "sceIoRead"
+          },
+          {
+            "nid": "0x6D08A871",
+            "address": "0x0003ED48",
+            "kind": "function"
+          },
+          {
+            "nid": "0x779103A0",
+            "address": "0x0003ED50",
+            "kind": "function"
+          },
+          {
+            "nid": "0x810C4BC3",
+            "address": "0x0003ED58",
+            "kind": "function",
+            "sdk_name": "sceIoClose"
+          },
+          {
+            "nid": "0xACE946E8",
+            "address": "0x0003ED60",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB29DDF9C",
+            "address": "0x0003ED68",
+            "kind": "function"
+          },
+          {
+            "nid": "0xB2A628C1",
+            "address": "0x0003ED70",
+            "kind": "function"
+          },
+          {
+            "nid": "0xE3EB004C",
+            "address": "0x0003ED78",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEB092469",
+            "address": "0x0003ED80",
+            "kind": "function"
+          },
+          {
+            "nid": "0xF27A9C51",
+            "address": "0x0003ED88",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "Kernel_Library",
+        "table_address": "0x0003FFA4",
+        "version": "0x0011",
+        "flags": "0x0001",
+        "function_count": 6,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0xA089ECA4",
+            "address": "0x0003ED90",
+            "kind": "function"
+          },
+          {
+            "nid": "0xBEA46419",
+            "address": "0x0003ED98",
+            "kind": "function"
+          },
+          {
+            "nid": "0x092968F4",
+            "address": "0x0003EDA0",
+            "kind": "function",
+            "sdk_name": "sceKernelCpuSuspendIntr"
+          },
+          {
+            "nid": "0x15B6446B",
+            "address": "0x0003EDA8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x1839852A",
+            "address": "0x0003EDB0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x5F10D406",
+            "address": "0x0003EDB8",
+            "kind": "function",
+            "sdk_name": "sceKernelCpuResumeIntr"
+          }
+        ]
+      },
+      {
+        "library": "ModuleMgrForUser",
+        "table_address": "0x0003FFB8",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 3,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0xD1FF982A",
+            "address": "0x0003EDC0",
+            "kind": "function"
+          },
+          {
+            "nid": "0x2E0911AA",
+            "address": "0x0003EDC8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x50F0C1EC",
+            "address": "0x0003EDD0",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "sceSuspendForUser",
+        "table_address": "0x0003FFCC",
+        "version": "0x0011",
+        "flags": "0x4000",
+        "function_count": 2,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x3E0271D3",
+            "address": "0x0003F8C0",
+            "kind": "function"
+          },
+          {
+            "nid": "0xA569E425",
+            "address": "0x0003F8C8",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "ThreadManForUser",
+        "table_address": "0x0003FFE0",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 24,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0xC07BB470",
+            "address": "0x0003EE08",
+            "kind": "function",
+            "sdk_name": "sceKernelCreateFpl"
+          },
+          {
+            "nid": "0xCEADEB47",
+            "address": "0x0003EE10",
+            "kind": "function",
+            "sdk_name": "sceKernelDelayThread"
+          },
+          {
+            "nid": "0xD6DA4BA1",
+            "address": "0x0003EE18",
+            "kind": "function",
+            "sdk_name": "sceKernelCreateSema"
+          },
+          {
+            "nid": "0xE81CAF8F",
+            "address": "0x0003EE20",
+            "kind": "function"
+          },
+          {
+            "nid": "0xED1410E0",
+            "address": "0x0003EE28",
+            "kind": "function",
+            "sdk_name": "sceKernelDeleteFpl"
+          },
+          {
+            "nid": "0xEDBA5844",
+            "address": "0x0003EE30",
+            "kind": "function"
+          },
+          {
+            "nid": "0xEF9E4C70",
+            "address": "0x0003EE38",
+            "kind": "function",
+            "sdk_name": "sceKernelDeleteEventFlag"
+          },
+          {
+            "nid": "0x1FB15A32",
+            "address": "0x0003EE40",
+            "kind": "function",
+            "sdk_name": "sceKernelSetEventFlag"
+          },
+          {
+            "nid": "0xF475845D",
+            "address": "0x0003EE48",
+            "kind": "function",
+            "sdk_name": "sceKernelStartThread"
+          },
+          {
+            "nid": "0xF6414A71",
+            "address": "0x0003EE50",
+            "kind": "function"
+          },
+          {
+            "nid": "0x28B6489C",
+            "address": "0x0003EE58",
+            "kind": "function",
+            "sdk_name": "sceKernelDeleteSema"
+          },
+          {
+            "nid": "0x349D6D6C",
+            "address": "0x0003EE60",
+            "kind": "function"
+          },
+          {
+            "nid": "0x369ED59D",
+            "address": "0x0003EE68",
+            "kind": "function",
+            "sdk_name": "sceKernelGetSystemTimeLow"
+          },
+          {
+            "nid": "0x3F53E640",
+            "address": "0x0003EE70",
+            "kind": "function",
+            "sdk_name": "sceKernelSignalSema"
+          },
+          {
+            "nid": "0x402FCF22",
+            "address": "0x0003EE78",
+            "kind": "function",
+            "sdk_name": "sceKernelWaitEventFlag"
+          },
+          {
+            "nid": "0x446D8DE6",
+            "address": "0x0003EE80",
+            "kind": "function",
+            "sdk_name": "sceKernelCreateThread"
+          },
+          {
+            "nid": "0x4E3A1105",
+            "address": "0x0003EE88",
+            "kind": "function",
+            "sdk_name": "sceKernelWaitSema"
+          },
+          {
+            "nid": "0x55C20A00",
+            "address": "0x0003EE90",
+            "kind": "function",
+            "sdk_name": "sceKernelCreateEventFlag"
+          },
+          {
+            "nid": "0x60107536",
+            "address": "0x0003EE98",
+            "kind": "function"
+          },
+          {
+            "nid": "0x623AE665",
+            "address": "0x0003EEA0",
+            "kind": "function",
+            "sdk_name": "sceKernelTryAllocateFpl"
+          },
+          {
+            "nid": "0x812346E4",
+            "address": "0x0003EEA8",
+            "kind": "function",
+            "sdk_name": "sceKernelClearEventFlag"
+          },
+          {
+            "nid": "0x9FA03CD3",
+            "address": "0x0003EEB0",
+            "kind": "function",
+            "sdk_name": "sceKernelDeleteThread"
+          },
+          {
+            "nid": "0xA66B0120",
+            "address": "0x0003EEB8",
+            "kind": "function"
+          },
+          {
+            "nid": "0x19CFF145",
+            "address": "0x0003EEC0",
+            "kind": "function"
+          }
+        ]
+      },
+      {
+        "library": "UtilsForUser",
+        "table_address": "0x0003FFF4",
+        "version": "0x0011",
+        "flags": "0x4001",
+        "function_count": 1,
+        "variable_count": 0,
+        "entries": [
+          {
+            "nid": "0x79D1C3FA",
+            "address": "0x0003EEC8",
+            "kind": "function"
+          }
+        ]
+      }
+    ]
+  }
+]

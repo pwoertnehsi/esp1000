@@ -1,0 +1,124 @@
+{
+  "kind": "pbp",
+  "parts": [
+    {
+      "name": "PARAM.SFO",
+      "offset": 40,
+      "bytes": 2080
+    },
+    {
+      "name": "ICON0.PNG",
+      "offset": 2120,
+      "bytes": 11114
+    },
+    {
+      "name": "ICON1.PMF",
+      "offset": 13234,
+      "bytes": 0
+    },
+    {
+      "name": "PIC0.PNG",
+      "offset": 13234,
+      "bytes": 0
+    },
+    {
+      "name": "PIC1.PNG",
+      "offset": 13234,
+      "bytes": 35430
+    },
+    {
+      "name": "SND0.AT3",
+      "offset": 48664,
+      "bytes": 0
+    },
+    {
+      "name": "DATA.PSP",
+      "offset": 48664,
+      "bytes": 490382
+    },
+    {
+      "name": "DATA.PSAR",
+      "offset": 539046,
+      "bytes": 5911980
+    }
+  ],
+  "archive": "ARK installer bundle",
+  "entries": [
+    {
+      "name": "ICON0.PNG",
+      "bytes": 12751
+    },
+    {
+      "name": "ICON1.PMF",
+      "bytes": 366592
+    },
+    {
+      "name": "PIC1.PNG",
+      "bytes": 225132
+    },
+    {
+      "name": "SND0.AT3",
+      "bytes": 61172
+    },
+    {
+      "name": "PARAM.SFO",
+      "bytes": 4912
+    },
+    {
+      "name": "SAVEDATA.BIN",
+      "bytes": 32
+    },
+    {
+      "name": "FLASH0.ARK",
+      "bytes": 187918
+    },
+    {
+      "name": "FLASH150.ARK",
+      "bytes": 387326
+    },
+    {
+      "name": "DC10.ARK",
+      "bytes": 301681
+    },
+    {
+      "name": "LANG.ARK",
+      "bytes": 329196
+    },
+    {
+      "name": "LANG150.ARK",
+      "bytes": 130032
+    },
+    {
+      "name": "VBOOT.PBP",
+      "bytes": 2141490
+    },
+    {
+      "name": "VSHMENU.PRX",
+      "bytes": 9364
+    },
+    {
+      "name": "XBOOT.PBP",
+      "bytes": 1600064
+    },
+    {
+      "name": "UPDATER.TXT",
+      "bytes": 31
+    },
+    {
+      "name": "PS1SPU.PRX",
+      "bytes": 33065
+    },
+    {
+      "name": "IDSREG.PRX",
+      "bytes": 104002
+    },
+    {
+      "name": "USBDEV.PRX",
+      "bytes": 9418
+    },
+    {
+      "name": "IOP.PRX",
+      "bytes": 7522
+    }
+  ]
+}

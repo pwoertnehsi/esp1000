@@ -1,0 +1,294 @@
+{
+  "source_sha256": "968be73e096dc0da044774462cbe5ee649f9d6bca1a5e1a072f9fb1b7eefa06b",
+  "module": "sceNetApctl_Library",
+  "version": [
+    3,
+    1
+  ],
+  "imports": [
+    {
+      "library": "sceWlanDrv",
+      "table_address": "0x000111B0",
+      "version": "0x0011",
+      "flags": "0x4001",
+      "function_count": 1,
+      "variable_count": 0,
+      "entries": [
+        {
+          "nid": "0xD7763699",
+          "address": "0x00011138",
+          "kind": "function",
+          "sdk_name": "sceWlanGetSwitchState"
+        }
+      ]
+    },
+    {
+      "library": "sceWlanDrv_lib",
+      "table_address": "0x000111C4",
+      "version": "0x0011",
+      "flags": "0x4001",
+      "function_count": 2,
+      "variable_count": 0,
+      "entries": [
+        {
+          "nid": "0x482CAE9A",
+          "address": "0x00011140",
+          "kind": "function",
+          "sdk_name": "sceWlanDevAttach"
+        },
+        {
+          "nid": "0xC9A8CAB7",
+          "address": "0x00011148",
+          "kind": "function",
+          "sdk_name": "sceWlanDevDetach"
+        }
+      ]
+    },
+    {
+      "library": "sceNet_lib",
+      "table_address": "0x00011228",
+      "version": "0x0011",
+      "flags": "0x0009",
+      "function_count": 25,
+      "variable_count": 0,
+      "entries": [
+        {
+          "nid": "0x1858883D",
+          "address": "0x00011030",
+          "kind": "function",
+          "sdk_name": "sceNetRand"
+        },
+        {
+          "nid": "0x3B617AA0",
+          "address": "0x00011038",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_3B617AA0"
+        },
+        {
+          "nid": "0x43EE76EC",
+          "address": "0x00011040",
+          "kind": "function"
+        },
+        {
+          "nid": "0x4753D878",
+          "address": "0x00011048",
+          "kind": "function"
+        },
+        {
+          "nid": "0x5216CBF5",
+          "address": "0x00011050",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_5216CBF5"
+        },
+        {
+          "nid": "0x75D9985C",
+          "address": "0x00011058",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_75D9985C"
+        },
+        {
+          "nid": "0x7BA3ED91",
+          "address": "0x00011060",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_7BA3ED91"
+        },
+        {
+          "nid": "0x80C9F02A",
+          "address": "0x00011068",
+          "kind": "function"
+        },
+        {
+          "nid": "0x8D33C11D",
+          "address": "0x00011070",
+          "kind": "function",
+          "sdk_name": "sceNetConfigGetEtherAddr"
+        },
+        {
+          "nid": "0x8DA79EB0",
+          "address": "0x00011078",
+          "kind": "function"
+        },
+        {
+          "nid": "0xA55C914F",
+          "address": "0x00011080",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_A55C914F"
+        },
+        {
+          "nid": "0xAB375964",
+          "address": "0x00011088",
+          "kind": "function"
+        },
+        {
+          "nid": "0xAB7DD9A5",
+          "address": "0x00011090",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_AB7DD9A5"
+        },
+        {
+          "nid": "0xB5CE388A",
+          "address": "0x00011098",
+          "kind": "function"
+        },
+        {
+          "nid": "0xB6FC0A5B",
+          "address": "0x000110A0",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_B6FC0A5B"
+        },
+        {
+          "nid": "0xB9085A96",
+          "address": "0x000110A8",
+          "kind": "function"
+        },
+        {
+          "nid": "0xC431A214",
+          "address": "0x000110B0",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_C431A214"
+        },
+        {
+          "nid": "0xD1BE2CE9",
+          "address": "0x000110B8",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_D1BE2CE9"
+        },
+        {
+          "nid": "0xD2422E4D",
+          "address": "0x000110C0",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_D2422E4D"
+        },
+        {
+          "nid": "0xD8722983",
+          "address": "0x000110C8",
+          "kind": "function"
+        },
+        {
+          "nid": "0xDA02F383",
+          "address": "0x000110D0",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_DA02F383"
+        },
+        {
+          "nid": "0xDB88F458",
+          "address": "0x000110D8",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_DB88F458"
+        },
+        {
+          "nid": "0xE0A81C7C",
+          "address": "0x000110E0",
+          "kind": "function"
+        },
+        {
+          "nid": "0xE1F4696F",
+          "address": "0x000110E8",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_E1F4696F"
+        },
+        {
+          "nid": "0xF355C73B",
+          "address": "0x000110F0",
+          "kind": "function",
+          "sdk_name": "sceNet_lib_F355C73B"
+        }
+      ]
+    },
+    {
+      "library": "sceNetInet_lib",
+      "table_address": "0x00011250",
+      "version": "0x0011",
+      "flags": "0x0009",
+      "function_count": 16,
+      "variable_count": 0,
+      "entries": [
+        {
+          "nid": "0x0238B6DF",
+          "address": "0x00010FB0",
+          "kind": "function"
+        },
+        {
+          "nid": "0x4C13BE10",
+          "address": "0x00010FB8",
+          "kind": "function"
+        },
+        {
+          "nid": "0x4F68DB0E",
+          "address": "0x00010FC0",
+          "kind": "function"
+        },
+        {
+          "nid": "0x5155EC8A",
+          "address": "0x00010FC8",
+          "kind": "function"
+        },
+        {
+          "nid": "0x59561561",
+          "address": "0x00010FD0",
+          "kind": "function"
+        },
+        {
+          "nid": "0x6A046357",
+          "address": "0x00010FD8",
+          "kind": "function"
+        },
+        {
+          "nid": "0x7776A492",
+          "address": "0x00010FE0",
+          "kind": "function"
+        },
+        {
+          "nid": "0x7CB1D9E3",
+          "address": "0x00010FE8",
+          "kind": "function"
+        },
+        {
+          "nid": "0x8FE19FC4",
+          "address": "0x00010FF0",
+          "kind": "function"
+        },
+        {
+          "nid": "0xA94A75E7",
+          "address": "0x00010FF8",
+          "kind": "function"
+        },
+        {
+          "nid": "0xAAF4895A",
+          "address": "0x00011000",
+          "kind": "function"
+        },
+        {
+          "nid": "0xAC9D90A5",
+          "address": "0x00011008",
+          "kind": "function"
+        },
+        {
+          "nid": "0xAEE60F84",
+          "address": "0x00011010",
+          "kind": "function"
+        },
+        {
+          "nid": "0xD609AD36",
+          "address": "0x00011018",
+          "kind": "function"
+        },
+        {
+          "nid": "0xDC38FEE9",
+          "address": "0x00011020",
+          "kind": "function"
+        },
+        {
+          "nid": "0xE6F67D14",
+          "address": "0x00011028",
+          "kind": "function"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Addresses are pre-relocation; prototypes require call-site validation.",
+    "Native browser wrappers also import non-SDK APCTL entries. Public GetState/Connect replacements alone do not cover stock UI.",
+    "The browser launcher requests APCTL initialization/state only; it does not request radio attach/connect."
+  ]
+}

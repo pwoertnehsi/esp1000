@@ -1,0 +1,46 @@
+**/build/
+**/__pycache__/
+*.o
+*.elf
+*.prx
+*.SFO
+*.PBP
+esp_link/sdkconfig
+esp_link/sdkconfig.old
+esp_link/dependencies.lock
+logs/
+artifacts/
+.uart-bridge/
+esp_link/main/wifi_credentials.h
+
+# Local decrypted installer input; firmware extraction stays under artifacts/.
+*.PBP.dec
+
+# Local Git metadata (the session's .git mount is read-only).
+.git-local/
+
+# Generated build trees and compiler/package output.
+/build-*/
+**/managed_components/
+*.a
+*.bin
+*.map
+*.d
+*.pyc
+*.zip
+*.orig
+*.log
+
+# Private configuration, workspace history and raw hardware captures.
+.env
+.env.*
+!.env.example
+.agents/
+.codex/
+.aws/
+claude_project
+PROJECT_CONTEXT.md
+pulseview/
+modules/
+module_listings.txt
+milestones/

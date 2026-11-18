@@ -1,0 +1,418 @@
+[
+  {
+    "consumer": "modules/ifhandle.prx",
+    "library": "sceWlanDrv_driver",
+    "nid": "0x2519EAA7",
+    "import_stub": "0x000032A0",
+    "provider": "modules/wlan.prx",
+    "export_address": "0x00017664"
+  },
+  {
+    "consumer": "modules/ifhandle.prx",
+    "library": "sceWlanDrv_driver",
+    "nid": "0x325F7172",
+    "import_stub": "0x000032A8",
+    "provider": "modules/wlan.prx",
+    "export_address": "0x00017828"
+  },
+  {
+    "consumer": "modules/ifhandle.prx",
+    "library": "sceWlanDrv_driver",
+    "nid": "0xB6A9700D",
+    "import_stub": "0x000032B0",
+    "provider": "modules/wlan.prx",
+    "export_address": "0x000177EC"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x23E51D8F",
+    "import_stub": "0x000008E0",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00002328"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x48CCE3C1",
+    "import_stub": "0x000008E8",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008A90"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x7B87815D",
+    "import_stub": "0x000008F0",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008A84"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x8A3EB5D2",
+    "import_stub": "0x000008F8",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008A5C"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x90B82F55",
+    "import_stub": "0x00000900",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008A74"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x913EC15D",
+    "import_stub": "0x00000908",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00002444"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xB1644BE7",
+    "import_stub": "0x00000910",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008224"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xC1E2A540",
+    "import_stub": "0x00000918",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008364"
+  },
+  {
+    "consumer": "modules/usbacc.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xFBA2072B",
+    "import_stub": "0x00000920",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008A3C"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x23E51D8F",
+    "import_stub": "0x000084C4",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00002328"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x913EC15D",
+    "import_stub": "0x000084CC",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00002444"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xB1644BE7",
+    "import_stub": "0x000084D4",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008224"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xC1E2A540",
+    "import_stub": "0x000084DC",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008364"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xCC57EC9D",
+    "import_stub": "0x000084E4",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00002564"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xEDA8A020",
+    "import_stub": "0x000084EC",
+    "provider": "modules/usb.prx",
+    "export_address": "0x000005C4"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x0CD7D4AA",
+    "import_stub": "0x0000849C",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x00000068"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x18B04C82",
+    "import_stub": "0x000084A4",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x000004E0"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x2A100C1F",
+    "import_stub": "0x000084AC",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x00000154"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x2E251404",
+    "import_stub": "0x000084B4",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x000004AC"
+  },
+  {
+    "consumer": "modules/usbcam.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x79A1C743",
+    "import_stub": "0x000084BC",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x00000000"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x913EC15D",
+    "import_stub": "0x00005128",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00002444"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0x951A24CC",
+    "import_stub": "0x00005130",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00005E04"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xB1644BE7",
+    "import_stub": "0x00005138",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008224"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xC1E2A540",
+    "import_stub": "0x00005140",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00008364"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xC21645A4",
+    "import_stub": "0x00005148",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00002F40"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xC5E53685",
+    "import_stub": "0x00005150",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00003094"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xCC57EC9D",
+    "import_stub": "0x00005158",
+    "provider": "modules/usb.prx",
+    "export_address": "0x00002564"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbBus_driver",
+    "nid": "0xEDA8A020",
+    "import_stub": "0x00005160",
+    "provider": "modules/usb.prx",
+    "export_address": "0x000005C4"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x0CD7D4AA",
+    "import_stub": "0x00005100",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x00000068"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x18B04C82",
+    "import_stub": "0x00005108",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x000004E0"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x2A100C1F",
+    "import_stub": "0x00005110",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x00000154"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x2E251404",
+    "import_stub": "0x00005118",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x000004AC"
+  },
+  {
+    "consumer": "modules/usbgps.prx",
+    "library": "sceUsbAcc_internal",
+    "nid": "0x79A1C743",
+    "import_stub": "0x00005120",
+    "provider": "modules/usbacc.prx",
+    "export_address": "0x00000000"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0x16042084",
+    "import_stub": "0x000182B8",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000968"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xC9344A59",
+    "import_stub": "0x000182C0",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000984"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xAE81C0CB",
+    "import_stub": "0x000182C8",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000A34"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0x54D1AEA1",
+    "import_stub": "0x000182D0",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000A78"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xF94BAF52",
+    "import_stub": "0x000182D8",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000A94"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0x263767F6",
+    "import_stub": "0x000182E0",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x000002F8"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xE2F4F1C9",
+    "import_stub": "0x000182E8",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x000003B4"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xC28F6FF2",
+    "import_stub": "0x000182F0",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000AC0"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0x16246B99",
+    "import_stub": "0x000182F8",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000AF8"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xC6D14282",
+    "import_stub": "0x00018300",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000B5C"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xD5AD6DEA",
+    "import_stub": "0x00018308",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000B78"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0x15CFE3C0",
+    "import_stub": "0x00018310",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x000018B4"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0x9A6261EC",
+    "import_stub": "0x00018318",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00001D04"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xF8825DC4",
+    "import_stub": "0x00018320",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00001A44"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xF56FAC82",
+    "import_stub": "0x00018328",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00001B18"
+  },
+  {
+    "consumer": "modules/wlan.prx",
+    "library": "sceNetIfhandle_driver",
+    "nid": "0xFD8585E1",
+    "import_stub": "0x00018330",
+    "provider": "modules/ifhandle.prx",
+    "export_address": "0x00000D8C"
+  }
+]

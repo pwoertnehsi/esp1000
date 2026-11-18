@@ -1,0 +1,6 @@
+CONFIG_IDF_TARGET="esp32s3"
+# The S3's USB-Serial-JTAG shares the USB PHY with the host controller, so the
+# console must stay on UART0 (the USB-UART bridge on your dev board).
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=n

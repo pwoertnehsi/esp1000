@@ -1,0 +1,17 @@
+CONFIG_IDF_TARGET="esp32s3"
+# The S3's USB-Serial-JTAG shares the USB PHY with the host controller, so the
+# console must stay on UART0 (the USB-UART bridge on your dev board).
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=n
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+# Externally powered networking profile. No DFS/light sleep while USB hosts.
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_160=y
+# PHY ceiling applies during radio initialization, before the runtime TX cap.
+CONFIG_ESP_PHY_MAX_WIFI_TX_POWER=20
+CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=y
+
+CONFIG_LWIP_IP_FORWARD=y
+CONFIG_LWIP_IPV4_NAPT=y
+CONFIG_LWIP_TCPIP_TASK_STACK_SIZE=8192

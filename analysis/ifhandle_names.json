@@ -1,0 +1,15 @@
+{
+  "0x16042084": "sceNetCreateIfhandleEther",
+  "0xC9344A59": "sceNetDestroyIfhandleEther",
+  "0xAE81C0CB": "sceNetAttachIfhandleEther",
+  "0x54D1AEA1": "sceNetDetachIfhandleEther",
+  "0xC28F6FF2": "sceNetIfEnqueue",
+  "0xE2F4F1C9": "sceNetIfDequeue",
+  "0x16246B99": "sceNetIfPrepend",
+  "0x0296C7D6": "sceNetIfhandleIfIoctl",
+  "0x15CFE3C0": "sceNetMallocInternal",
+  "0x76BAD213": "sceNetFreeInternal",
+  "0xF56FAC82": "sceNetMFreem",
+  "0xC80181A2": "sceNetGetDropRate",
+  "0xFD8585E1": "sceNetSetDropRate"
+}

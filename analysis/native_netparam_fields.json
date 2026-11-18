@@ -1,0 +1,198 @@
+{
+  "source_sha256": "848eac8ca6a928e765bbf129985fab143935244208bf32d71a6e1b1e7ab1e89f",
+  "table_offset": "0xac20",
+  "fields": [
+    {
+      "index": 0,
+      "type": 3,
+      "size": 64,
+      "name": "cnf_name"
+    },
+    {
+      "index": 1,
+      "type": 3,
+      "size": 33,
+      "name": "ssid"
+    },
+    {
+      "index": 2,
+      "type": 2,
+      "size": 4,
+      "name": "auth_proto"
+    },
+    {
+      "index": 3,
+      "type": 4,
+      "size": 13,
+      "name": "wep_key"
+    },
+    {
+      "index": 4,
+      "type": 2,
+      "size": 4,
+      "name": "how_to_set_ip"
+    },
+    {
+      "index": 5,
+      "type": 3,
+      "size": 16,
+      "name": "ip_address"
+    },
+    {
+      "index": 6,
+      "type": 3,
+      "size": 16,
+      "name": "netmask"
+    },
+    {
+      "index": 7,
+      "type": 3,
+      "size": 16,
+      "name": "default_route"
+    },
+    {
+      "index": 8,
+      "type": 2,
+      "size": 4,
+      "name": "dns_flag"
+    },
+    {
+      "index": 9,
+      "type": 3,
+      "size": 16,
+      "name": "primary_dns"
+    },
+    {
+      "index": 10,
+      "type": 3,
+      "size": 16,
+      "name": "secondary_dns"
+    },
+    {
+      "index": 11,
+      "type": 3,
+      "size": 128,
+      "name": "auth_name"
+    },
+    {
+      "index": 12,
+      "type": 3,
+      "size": 128,
+      "name": "auth_key"
+    },
+    {
+      "index": 13,
+      "type": 2,
+      "size": 4,
+      "name": "http_proxy_flag"
+    },
+    {
+      "index": 14,
+      "type": 3,
+      "size": 128,
+      "name": "http_proxy_server"
+    },
+    {
+      "index": 15,
+      "type": 2,
+      "size": 4,
+      "name": "http_proxy_port"
+    },
+    {
+      "index": 16,
+      "type": 2,
+      "size": 4,
+      "name": "version"
+    },
+    {
+      "index": 17,
+      "type": 2,
+      "size": 4,
+      "name": "device"
+    },
+    {
+      "index": 18,
+      "type": 2,
+      "size": 4,
+      "name": "auth_8021x_type"
+    },
+    {
+      "index": 19,
+      "type": 3,
+      "size": 128,
+      "name": "auth_8021x_auth_name"
+    },
+    {
+      "index": 20,
+      "type": 3,
+      "size": 128,
+      "name": "auth_8021x_auth_key"
+    },
+    {
+      "index": 21,
+      "type": 2,
+      "size": 4,
+      "name": "wpa_key_type"
+    },
+    {
+      "index": 22,
+      "type": 4,
+      "size": 64,
+      "name": "wpa_key"
+    },
+    {
+      "index": 23,
+      "type": 2,
+      "size": 4,
+      "name": "browser_flag"
+    },
+    {
+      "index": 24,
+      "type": 2,
+      "size": 4,
+      "name": "wifisvc_config"
+    },
+    {
+      "index": 25,
+      "type": 3,
+      "size": 128,
+      "name": "wifisvc_auth_name"
+    },
+    {
+      "index": 26,
+      "type": 3,
+      "size": 128,
+      "name": "wifisvc_auth_key"
+    },
+    {
+      "index": 27,
+      "type": 2,
+      "size": 4,
+      "name": "wifisvc_option"
+    },
+    {
+      "index": 28,
+      "type": 3,
+      "size": 16,
+      "name": "last_leased_dhcp_addr"
+    },
+    {
+      "index": 29,
+      "type": 2,
+      "size": 4,
+      "name": "bt_id"
+    },
+    {
+      "index": 30,
+      "type": 3,
+      "size": 65,
+      "name": "at_command"
+    },
+    {
+      "index": 31,
+      "type": 3,
+      "size": 33,
+      "name": "phone_number"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "htmlviewer_ui.prx": {
+    "source": "artifacts/firmware/661-encrypted/F0/vsh/module/htmlviewer_ui.prx",
+    "sha256": "94022385ecb189150077edd186bc65875d280eaa19a7d913b70e1a981dfbfd6e",
+    "bytes": 196192,
+    "decrypted_sha256": "52cbe5ef27af2a2e1cf6a8bbb8cc22db8dcb992547e06dd4b99f414e7ce7f381"
+  },
+  "netfront.prx": {
+    "source": "artifacts/firmware/661-encrypted/F0/vsh/module/netfront.prx",
+    "sha256": "ac60c0b7e6896ab2405ba812d99967f6c6f765ac1e8a87432f5d493e201b668f",
+    "bytes": 574816,
+    "decrypted_sha256": "89591d6d43ccf43330c715da4588850c1faf5774afc20617982f6e6b04d62a5f"
+  },
+  "libslim.prx": {
+    "source": "artifacts/firmware/661-encrypted/F0/vsh/module/libslim.prx",
+    "sha256": "31932c4e030be8faba1bbd4a7fc0bed494cb78e9b99e70756d5c73420dc92866",
+    "bytes": 40896,
+    "decrypted_sha256": "6210e3d6fd0b054a6c33030cfd7a425070ea21f7e8a066f85e65a4ba52426ff4"
+  },
+  "libwww.prx": {
+    "source": "artifacts/firmware/661-encrypted/F0/vsh/module/libwww.prx",
+    "sha256": "a813ff511946634348c2591e524affb124fc840f5183ddeec8fc37479272d51c",
+    "bytes": 401696,
+    "decrypted_sha256": "30986a7489170b631b6974616db77574544d961018f509c267d9ae7c8592d2ac"
+  },
+  "mm_flash.prx": {
+    "source": "artifacts/firmware/661-encrypted/F0/vsh/module/mm_flash.prx",
+    "sha256": "53504637411e9f33f597e3238a8a98bf7b3e1df51ff64ec5b67939b46ea7ec23",
+    "bytes": 424368,
+    "decrypted_sha256": "fd4245f064619655cfb7623bc2a8779d01bf394a005c84ea7048200ecc78b46f"
+  }
+}

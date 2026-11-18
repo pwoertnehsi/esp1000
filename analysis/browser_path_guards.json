@@ -1,0 +1,90 @@
+[
+  {
+    "module": "sceUtility_Driver",
+    "version": [
+      2,
+      1
+    ],
+    "text_size": 45112,
+    "sha256": "848eac8ca6a928e765bbf129985fab143935244208bf32d71a6e1b1e7ab1e89f",
+    "paths": [
+      {
+        "offset": 40292,
+        "original": "flash0:/vsh/module/htmlviewer_ui.prx",
+        "redirected": "brows0:/vsh/module/htmlviewer_ui.prx"
+      },
+      {
+        "offset": 40432,
+        "original": "flash0:/vsh/module/netfront.prx",
+        "redirected": "brows0:/vsh/module/netfront.prx"
+      },
+      {
+        "offset": 40548,
+        "original": "flash0:/vsh/module/libslim.prx",
+        "redirected": "brows0:/vsh/module/libslim.prx"
+      },
+      {
+        "offset": 40588,
+        "original": "flash0:/vsh/module/libwww.prx",
+        "redirected": "brows0:/vsh/module/libwww.prx"
+      },
+      {
+        "offset": 40508,
+        "original": "flash0:/vsh/module/mm_flash.prx",
+        "redirected": "brows0:/vsh/module/mm_flash.prx"
+      }
+    ],
+    "anchors": [
+      [
+        9072,
+        666763232
+      ],
+      [
+        9080,
+        2947743756
+      ],
+      [
+        9088,
+        2947678216
+      ],
+      [
+        9100,
+        2947612676
+      ]
+    ]
+  },
+  {
+    "module": "sceVshHVUtility_Module",
+    "version": [
+      1,
+      1
+    ],
+    "text_size": 59400,
+    "sha256": "ed91856b26b27d6cf847fbe49ff4daf443885f7fed7f37021d529eed6110f263",
+    "paths": [
+      {
+        "offset": 53312,
+        "original": "flash0:/vsh/resource/",
+        "redirected": "ms0:/b0/vsh/resource/"
+      }
+    ],
+    "anchors": [
+      [
+        9184,
+        666763248
+      ],
+      [
+        9188,
+        2947612676
+      ],
+      [
+        9196,
+        2947547136
+      ],
+      [
+        9200,
+        2948530184
+      ]
+    ]
+  }
+]

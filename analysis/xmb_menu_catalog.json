@@ -1,0 +1,623 @@
+{
+  "module": "vsh_module",
+  "source_sha256": "dd283103f78db14a8bd08c8aa03ecc01807850baed54fb77b3c38ba7ffff712f",
+  "rows": [
+    {
+      "offset": 346912,
+      "category": 0,
+      "item": 0,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msg_system_update",
+      "action": 4,
+      "argument": 0,
+      "restore": false
+    },
+    {
+      "offset": 346928,
+      "category": 0,
+      "item": 1,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_usb",
+      "action": 2,
+      "argument": 5,
+      "restore": false
+    },
+    {
+      "offset": 346944,
+      "category": 0,
+      "item": 2,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_video",
+      "action": 2,
+      "argument": 0,
+      "restore": false
+    },
+    {
+      "offset": 346960,
+      "category": 0,
+      "item": 3,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_photo",
+      "action": 2,
+      "argument": 1,
+      "restore": false
+    },
+    {
+      "offset": 346976,
+      "category": 0,
+      "item": 4,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_console",
+      "action": 2,
+      "argument": 2,
+      "restore": false
+    },
+    {
+      "offset": 346992,
+      "category": 0,
+      "item": 5,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_theme",
+      "action": 2,
+      "argument": 3,
+      "restore": false
+    },
+    {
+      "offset": 347008,
+      "category": 0,
+      "item": 6,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_date",
+      "action": 2,
+      "argument": 4,
+      "restore": false
+    },
+    {
+      "offset": 347024,
+      "category": 0,
+      "item": 7,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_powersave",
+      "action": 2,
+      "argument": 8,
+      "restore": false
+    },
+    {
+      "offset": 347040,
+      "category": 0,
+      "item": 8,
+      "mask": 688,
+      "region": 4294967295,
+      "label": "msg_bt_device_settings",
+      "action": 32,
+      "argument": 0,
+      "restore": false
+    },
+    {
+      "offset": 347056,
+      "category": 0,
+      "item": 9,
+      "mask": 1022,
+      "region": 4294967295,
+      "label": "msg_display_setting",
+      "action": 2,
+      "argument": 10,
+      "restore": false
+    },
+    {
+      "offset": 347072,
+      "category": 0,
+      "item": 10,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_sound",
+      "action": 2,
+      "argument": 6,
+      "restore": false
+    },
+    {
+      "offset": 347088,
+      "category": 0,
+      "item": 11,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_security",
+      "action": 2,
+      "argument": 7,
+      "restore": false
+    },
+    {
+      "offset": 347104,
+      "category": 0,
+      "item": 12,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_rss",
+      "action": 2,
+      "argument": 9,
+      "restore": true
+    },
+    {
+      "offset": 347120,
+      "category": 0,
+      "item": 13,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msgtop_sysconf_network",
+      "action": 3,
+      "argument": 3,
+      "restore": true
+    },
+    {
+      "offset": 347136,
+      "category": 2,
+      "item": 35,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msgtop_camera",
+      "action": 19,
+      "argument": 0,
+      "restore": false
+    },
+    {
+      "offset": 347152,
+      "category": 3,
+      "item": 50,
+      "mask": 1023,
+      "region": 688,
+      "label": "msg_music_unlimited",
+      "action": 36,
+      "argument": 6,
+      "restore": false
+    },
+    {
+      "offset": 347168,
+      "category": 3,
+      "item": 47,
+      "mask": 2047,
+      "region": 4294967295,
+      "label": "msg_sensme_channels",
+      "action": 33,
+      "argument": 6,
+      "restore": false
+    },
+    {
+      "offset": 347184,
+      "category": 1,
+      "item": 39,
+      "mask": 1022,
+      "region": 8,
+      "label": "msg_1seg",
+      "action": 25,
+      "argument": 0,
+      "restore": false
+    },
+    {
+      "offset": 347200,
+      "category": 1,
+      "item": 45,
+      "mask": 1022,
+      "region": 64,
+      "label": "msg_tdmb",
+      "action": 31,
+      "argument": 6,
+      "restore": false
+    },
+    {
+      "offset": 347216,
+      "category": 1,
+      "item": 48,
+      "mask": 2047,
+      "region": 8,
+      "label": "msg_bookreader",
+      "action": 34,
+      "argument": 6,
+      "restore": false
+    },
+    {
+      "offset": 347232,
+      "category": 1,
+      "item": 49,
+      "mask": 2047,
+      "region": 688,
+      "label": "msg_digitalcomics",
+      "action": 35,
+      "argument": 6,
+      "restore": false
+    },
+    {
+      "offset": 347248,
+      "category": 1,
+      "item": 51,
+      "mask": 1023,
+      "region": 8,
+      "label": "msg_xradar_portable",
+      "action": 37,
+      "argument": 6,
+      "restore": false
+    },
+    {
+      "offset": 347264,
+      "category": 5,
+      "item": 23,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msgtop_game_gamedl",
+      "action": 12,
+      "argument": 0,
+      "restore": true
+    },
+    {
+      "offset": 347280,
+      "category": 5,
+      "item": 24,
+      "mask": 1359,
+      "region": 4294967295,
+      "label": "msgtop_game_savedata",
+      "action": 11,
+      "argument": 0,
+      "restore": false
+    },
+    {
+      "offset": 347296,
+      "category": 6,
+      "item": 37,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msg_onlinemanual",
+      "action": 22,
+      "argument": 2,
+      "restore": true
+    },
+    {
+      "offset": 347312,
+      "category": 6,
+      "item": 33,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msgtop_network_lftv",
+      "action": 18,
+      "argument": 0,
+      "restore": true
+    },
+    {
+      "offset": 347328,
+      "category": 6,
+      "item": 38,
+      "mask": 1022,
+      "region": 4294967295,
+      "label": "msg_skype",
+      "action": 24,
+      "argument": 0,
+      "restore": true
+    },
+    {
+      "offset": 347344,
+      "category": 6,
+      "item": 36,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msg_ps3_connection",
+      "action": 30,
+      "argument": 18,
+      "restore": true
+    },
+    {
+      "offset": 347360,
+      "category": 6,
+      "item": 40,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msg_internetradio",
+      "action": 27,
+      "argument": 0,
+      "restore": true
+    },
+    {
+      "offset": 347376,
+      "category": 6,
+      "item": 34,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msgtop_network_rss",
+      "action": 8,
+      "argument": 11,
+      "restore": true
+    },
+    {
+      "offset": 347392,
+      "category": 6,
+      "item": 32,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msgtop_network_browser",
+      "action": 16,
+      "argument": 0,
+      "restore": true
+    },
+    {
+      "offset": 347408,
+      "category": 6,
+      "item": 41,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msg_internet_search",
+      "action": 29,
+      "argument": 6,
+      "restore": true
+    },
+    {
+      "offset": 347424,
+      "category": 7,
+      "item": 42,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msg_signup",
+      "action": 30,
+      "argument": 1,
+      "restore": true
+    },
+    {
+      "offset": 347440,
+      "category": 7,
+      "item": 44,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msg_ps_store",
+      "action": 30,
+      "argument": 3,
+      "restore": true
+    },
+    {
+      "offset": 347456,
+      "category": 7,
+      "item": 46,
+      "mask": 1023,
+      "region": 4294967295,
+      "label": "msg_information_board",
+      "action": 30,
+      "argument": 8,
+      "restore": true
+    }
+  ],
+  "anchors": [
+    [
+      132692,
+      666763104
+    ],
+    [
+      132696,
+      2948530324
+    ],
+    [
+      133072,
+      2382495756
+    ],
+    [
+      134808,
+      5509156
+    ],
+    [
+      134880,
+      209024
+    ],
+    [
+      134896,
+      405760
+    ],
+    [
+      140872,
+      666763200
+    ],
+    [
+      92784,
+      666763232
+    ],
+    [
+      92744,
+      2382692364
+    ],
+    [
+      92752,
+      2382626824
+    ],
+    [
+      198832,
+      2382692408
+    ],
+    [
+      198840,
+      2382626868
+    ],
+    [
+      130756,
+      604308016
+    ],
+    [
+      130784,
+      604373012
+    ],
+    [
+      130788,
+      1413480487
+    ]
+  ],
+  "resources": [
+    {
+      "offset": 348272,
+      "words": [
+        17731,
+        21315,
+        18244,
+        1023,
+        4294967295
+      ],
+      "item": 12,
+      "label": "msgtop_sysconf_rss"
+    },
+    {
+      "offset": 348292,
+      "words": [
+        17475,
+        21059,
+        17988,
+        1023,
+        4294967295
+      ],
+      "item": 13,
+      "label": "msgtop_sysconf_network"
+    },
+    {
+      "offset": 347752,
+      "words": [
+        18757,
+        19781,
+        20805,
+        1023,
+        4294967295
+      ],
+      "item": 23,
+      "label": "msgtop_game_gamedl"
+    },
+    {
+      "offset": 348312,
+      "words": [
+        22597,
+        18246,
+        20550,
+        1023,
+        4294967295
+      ],
+      "item": 37,
+      "label": "msg_onlinemanual"
+    },
+    {
+      "offset": 348332,
+      "words": [
+        21573,
+        17222,
+        19526,
+        1023,
+        4294967295
+      ],
+      "item": 33,
+      "label": "msgtop_network_lftv"
+    },
+    {
+      "offset": 348352,
+      "words": [
+        23109,
+        18758,
+        21062,
+        1022,
+        4294967295
+      ],
+      "item": 38,
+      "label": "msg_skype"
+    },
+    {
+      "offset": 348372,
+      "words": [
+        22341,
+        17990,
+        20294,
+        1023,
+        4294967295
+      ],
+      "item": 36,
+      "label": "msg_ps3_connection"
+    },
+    {
+      "offset": 348392,
+      "words": [
+        16710,
+        19014,
+        21318,
+        1023,
+        4294967295
+      ],
+      "item": 40,
+      "label": "msg_internetradio"
+    },
+    {
+      "offset": 348412,
+      "words": [
+        22085,
+        17734,
+        20038,
+        1023,
+        4294967295
+      ],
+      "item": 34,
+      "label": "msgtop_network_rss"
+    },
+    {
+      "offset": 348432,
+      "words": [
+        21829,
+        17478,
+        19782,
+        1023,
+        4294967295
+      ],
+      "item": 32,
+      "label": "msgtop_network_browser"
+    },
+    {
+      "offset": 348452,
+      "words": [
+        16966,
+        19270,
+        21574,
+        1023,
+        4294967295
+      ],
+      "item": 41,
+      "label": "msg_internet_search"
+    },
+    {
+      "offset": 347832,
+      "words": [
+        21830,
+        22854,
+        17223,
+        1023,
+        4294967295
+      ],
+      "item": 42,
+      "label": "msg_signup"
+    },
+    {
+      "offset": 347852,
+      "words": [
+        22086,
+        23110,
+        17479,
+        1023,
+        4294967295
+      ],
+      "item": 44,
+      "label": "msg_ps_store"
+    },
+    {
+      "offset": 347932,
+      "words": [
+        22598,
+        16967,
+        17991,
+        1023,
+        4294967295
+      ],
+      "item": 46,
+      "label": "msg_information_board"
+    }
+  ]
+}

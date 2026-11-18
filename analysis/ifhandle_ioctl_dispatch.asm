@@ -1,0 +1,82 @@
+
+/tmp/psp-ifhandle.bin:     file format binary
+
+
+Disassembly of section .data:
+
+000001cc <.data+0x1cc>:
+     1cc:	27bdffe0 	addiu	sp,sp,-32
+     1d0:	001b1ac0 	sll	v1,k1,0xb
+     1d4:	afb00010 	sw	s0,16(sp)
+     1d8:	03608021 	move	s0,k1
+     1dc:	0060d821 	move	k1,v1
+     1e0:	10800036 	beqz	a0,0x2bc
+     1e4:	afbf0014 	sw	ra,20(sp)
+     1e8:	00643824 	and	a3,v1,a0
+     1ec:	04e20034 	bltzl	a3,0x2c0
+     1f0:	0200d821 	move	k1,s0
+     1f4:	50c00032 	beqzl	a2,0x2c0
+     1f8:	0200d821 	move	k1,s0
+     1fc:	00663824 	and	a3,v1,a2
+     200:	04e2002f 	bltzl	a3,0x2c0
+     204:	0200d821 	move	k1,s0
+     208:	3c080000 	lui	t0,0x0
+     20c:	25030038 	addiu	v1,t0,56
+     210:	00003821 	move	a3,zero
+     214:	8c680000 	lw	t0,0(v1)
+     218:	51000005 	beqzl	t0,0x230
+     21c:	24e70001 	addiu	a3,a3,1
+     220:	8d090000 	lw	t1,0(t0)
+     224:	51240006 	beql	t1,a0,0x240
+     228:	24030008 	li	v1,8
+     22c:	24e70001 	addiu	a3,a3,1
+     230:	28ea0008 	slti	t2,a3,8
+     234:	1540fff7 	bnez	t2,0x214
+     238:	24630004 	addiu	v1,v1,4
+     23c:	24030008 	li	v1,8
+     240:	10e3001e 	beq	a3,v1,0x2bc
+     244:	2ca40065 	sltiu	a0,a1,101
+     248:	afa00000 	sw	zero,0(sp)
+     24c:	10800028 	beqz	a0,0x2f0
+     250:	afa00004 	sw	zero,4(sp)
+     254:	3c0e0000 	lui	t6,0x0
+     258:	00056880 	sll	t5,a1,0x2
+     25c:	25c23ab0 	addiu	v0,t6,15024
+     260:	01a26021 	addu	t4,t5,v0
+     264:	8d8b0000 	lw	t3,0(t4)
+     268:	01600008 	jr	t3
+     26c:	00000000 	nop
+     270:	8cc20010 	lw	v0,16(a2)
+     274:	8cc30018 	lw	v1,24(a2)
+     278:	afa20000 	sw	v0,0(sp)
+     27c:	afa30004 	sw	v1,4(sp)
+     280:	8fa20000 	lw	v0,0(sp)
+     284:	50400005 	beqzl	v0,0x29c
+     288:	8fa20004 	lw	v0,4(sp)
+     28c:	03627824 	and	t7,k1,v0
+     290:	05e2000b 	bltzl	t7,0x2c0
+     294:	0200d821 	move	k1,s0
+     298:	8fa20004 	lw	v0,4(sp)
+     29c:	10400003 	beqz	v0,0x2ac
+     2a0:	0362c024 	and	t8,k1,v0
+     2a4:	07020006 	bltzl	t8,0x2c0
+     2a8:	0200d821 	move	k1,s0
+     2ac:	8d190014 	lw	t9,20(t0)
+     2b0:	01002021 	move	a0,t0
+     2b4:	0320f809 	jalr	t9
+     2b8:	03a03821 	move	a3,sp
+     2bc:	0200d821 	move	k1,s0
+     2c0:	8fbf0014 	lw	ra,20(sp)
+     2c4:	8fb00010 	lw	s0,16(sp)
+     2c8:	03e00008 	jr	ra
+     2cc:	27bd0020 	addiu	sp,sp,32
+     2d0:	8cc20018 	lw	v0,24(a2)
+     2d4:	080000a0 	j	0x280
+     2d8:	afa20000 	sw	v0,0(sp)
+     2dc:	8cc20010 	lw	v0,16(a2)
+     2e0:	0800009e 	j	0x278
+     2e4:	8cc30014 	lw	v1,20(a2)
+     2e8:	080000b5 	j	0x2d4
+     2ec:	8cc20010 	lw	v0,16(a2)
+     2f0:	080000a0 	j	0x280
+     2f4:	00003021 	move	a2,zero
