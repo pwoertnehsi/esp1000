@@ -106,6 +106,13 @@ static void print_fifo(void)
     __sync_synchronize();if(revision!=fifo_revision)return;
     ESP_LOGI("psp-link","FIFO_DIAG copies=%u channel=%u bytes=%u offset=%u capacity=%u checks=%02x overflow=%u",
              copies,channel,bytes,offset,capacity,checks,overflow);
+    if(tuh_inited()) {
+        psp_dwc2_fifo_diag_t layout;hcd_dwc2_diag_fifo(0,&layout);
+        ESP_LOGI(TAG,"FIFO_LAYOUT rx_words=%" PRIu32 " np_start=%" PRIu32 " np_words=%" PRIu32
+                 " p_start=%" PRIu32 " p_words=%" PRIu32 " ram=%08" PRIx32,
+                 layout.rx_words,layout.nonperiodic&65535,layout.nonperiodic>>16,
+                 layout.periodic&65535,layout.periodic>>16,layout.ram);
+    }
 }
 static void print_channels(void)
 {
@@ -634,7 +641,7 @@ void app_main(void)
     native_profile_start();
     usb_router_start();
     local_tcp_start();
-    ESP_LOGI(TAG, "PSP link host v21 Ad Hoc port recovery; runtime credentials. UART0 115200; type help. D+=20 D-=19");
+    ESP_LOGI(TAG, "PSP link host v22 non-overlapping USB host FIFOs; runtime credentials. UART0 115200; type help. D+=20 D-=19");
     ESP_LOGI(TAG, "Two-cable setup: connector VBUS is external; GPIO4 does not switch its 5V");
     int64_t next_ping = now_ms() + 2000;
     int64_t next_status = now_ms() + 10000;

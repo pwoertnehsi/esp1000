@@ -21,3 +21,14 @@ before/after FIFO copies and exports a read-only channel snapshot. The project
 observer only inspects its own receive buffer, in the ISR without logging or
 blocking. `diagnostics.h` is the project's diagnostic interface. Controller
 registers, buffers and transfer acceptance/retry decisions are not modified.
+
+Local correction (2026-11-18, ESP22): the imported host FIFO allocator deducted
+RX storage from the top-of-RAM cursor before placing TX regions, even though RX
+starts at hardware address zero. This placed both TX FIFOs over RX memory.
+Remove that deduction and use the actual channel count for RX/DMA reservations,
+as in current upstream TinyUSB's `dfifo_host_init`. On ESP32-S3 slave mode with
+eight channels and 256 RAM words: RX [0,140), periodic TX [140,224), non-periodic
+TX [224,256). A read-only FIFO register snapshot permits runtime verification.
+The actual allocator is compiled in a host sanitizer regression test across
+full/high-speed and DMA/slave configurations; the prior allocator fails the
+non-overlap assertion. No endpoint/PID/retry or timeout policy is changed.

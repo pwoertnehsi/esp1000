@@ -7,6 +7,10 @@ typedef struct {
     uint32_t hcchar,hctsiz,hcint,hcintmsk,transferred,capacity;
     uint8_t allocated,endpoint;
 } psp_dwc2_channel_diag_t;
+typedef struct {
+    uint32_t rx_words,nonperiodic,periodic,ram;
+} psp_dwc2_fifo_diag_t;
+void hcd_dwc2_diag_fifo(uint8_t rhport,psp_dwc2_fifo_diag_t *out);
 unsigned hcd_dwc2_diag_channels(uint8_t rhport,psp_dwc2_channel_diag_t *out,unsigned capacity);
 /* Called in the receive ISR, phase0 before copy / phase1 after copy. Implementations
  * must be bounded, nonblocking and must not log. Default observer is a no-op. */

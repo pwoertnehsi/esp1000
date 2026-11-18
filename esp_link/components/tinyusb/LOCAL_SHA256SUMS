@@ -1,2 +1,2 @@
 500a341a0e0b1a31e24479d86907fa9b5e859e557d2f6550320470fab00a10f6  src/host/usbh.c
-2e68945260080eb17b05215f9e23daf5bceb0305903f753f66ab67f5ce47fde9  src/portable/synopsys/dwc2/hcd_dwc2.c
+6b7ca5b8e099bc74e1415063f78f89ab831adbbeafc7f54efd7b96cd656c3bf4  src/portable/synopsys/dwc2/hcd_dwc2.c
