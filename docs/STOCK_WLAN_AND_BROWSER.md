@@ -3,8 +3,9 @@
 ## Installation and User Experience
 
 Supported integration target: **6.61 ARK-5 on PSP-E1000**. Other CFWs are
-out of scope for now. Rely on ARK-5's existing WPA2 feature; do not bundle a
-second copy of its patches.
+out of scope for now. The ESP backend must work without ARK's native-radio WPA2
+extension: the user reports that it is omitted on E1000. No CFW reinstall or
+flash replacement is needed for the ESP's radio security.
 
 Target a memory-stick CFW plugin with reversible RAM hooks, clear adapter status,
 and a documented disable path. Preserve the stock network setup dialog and saved
@@ -27,26 +28,30 @@ before each load/unload, and releases only modules acquired by that run.
 
 ## WPA2: Radio Security and PSP Compatibility Are Different
 
-The existing ESP station connection already implements WPA2 through ESP-IDF.
-That remains the adapter's radio security implementation; no new PSP cryptographic
-stack is needed for the USB-to-ESP packet backend.
+The current ESP station backend already has WPA2-Personal support in its code
+path. ESP-IDF performs association and key exchange. Native scan rows explicitly
+recognize WPA2 and map AES networks to Sony's existing WPA-PSK (AES) profile
+format. The saved profile supplies the passphrase (8–63 characters) or raw PSK;
+profile security value4 is Sony's AES format, not a requirement for WPA1.
+The ESP auth threshold is a minimum, not an exact protocol selection (see the
+[ESP-IDF guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-guides/wifi-driver/overview.html)).
+This path does not require ARK's native-radio WPA2 patches. A WPA2-only hardware
+test remains necessary before marking WPA2 validated.
 
-The separate [Kethen/wpa2psp plugin](https://github.com/Kethen/wpa2psp) credits
-moment0253 and JoseAaronLopezGarcia and says ARK users already have this feature.
-Its [source](https://github.com/Kethen/wpa2psp/blob/main/wpa2.c) patches
-`sceNetApctl_Library`: WPA2 recognition, RSN data, EAPOL handshake fields and
-related instructions. [ARK-5's current source](https://github.com/PSP-Arkfive/ARK-5/blob/main/Compat/PSP/src/wpa2.c)
-contains the same patch family. These are firmware-offset patches for Sony's
-original path, not an ESP transport backend.
+A separate [Kethen/wpa2psp release](https://github.com/Kethen/wpa2psp/releases/tag/2025-06-25)
+exists, but its author targets 6.61 PRO. Its
+[source](https://github.com/Kethen/wpa2psp/blob/main/wpa2.c) changes the Sony APCTL
+radio stack's WPA2 recognition, RSN and EAPOL handshake. ARK-5 has the same patch
+family in [Compat/PSP/src/wpa2.c](https://github.com/PSP-Arkfive/ARK-5/blob/main/Compat/PSP/src/wpa2.c).
+Those patches do not provide an ESP backend and are unnecessary for the current
+ESP scan/profile path. Do not bundle or enable them as an E1000 fix without a
+specific demonstrated need. No upstream WPA2 code has been copied.
 
-Default integration should coexist with the user's CFW/plugin and avoid applying
-these patches twice. Whether any recognition/profile behavior needs adapting for
-the virtual adapter depends on the supplied APCTL and netconf modules. Do not
-feed a completed ESP Wi-Fi connection through an unmodified PSP radio handshake.
-
-The user has selected ARK-5-only support, so a bundled compatibility build is
-out of scope. No upstream WPA2 code has been copied. The upstream GPL-3.0 notices
-and attribution remain relevant if source is reused for any later work.
+For an ESP hardware test, use a 2.4GHz WPA2-Personal/AES access point, select it
+in native Scan and save/test it with the existing AES choice. Sony's label may
+still say WPA-PSK (AES). If it is shown as unsupported, distinguish scan/UI
+classification from association failure. WPA3-only and enterprise modes remain
+unsupported by the current native profile interface.
 
 ## Original Browser
 

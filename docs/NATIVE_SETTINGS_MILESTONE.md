@@ -56,3 +56,11 @@ bit0 browser plugin, bit1 UI, bit2 engine, bit3 HTTP. It records observations,
 not current module lifetime. Firmware provenance is in
 analysis/native_http_apctl.json. Native launch/exit is confirmed; the HTTP fix
 still needs hardware verification. ESP15 and the saved profile are unchanged.
+
+## Native remote browsing passed — 2026-11-18
+
+The user confirmed that v0.16 worked, including remote pages, after the HTTP
+consumer correction. Native browser launch/exit and saved-profile Internet
+browsing are hardware-confirmed. The user attributes incidental connection
+errors to the temporary physical wiring; these alone do not establish a new
+software regression. Next priority is WPA2 validation, then Ad Hoc.
