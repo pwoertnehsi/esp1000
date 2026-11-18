@@ -17,6 +17,7 @@ extern int wifiNativeRegister(unsigned,unsigned);
 extern int wifiNativeRefresh(void);
 static unsigned owned_net_modules;
 typedef void (*event_fn)(int,int,int,int,void *);
+extern void wifiNativeInvoke(unsigned,event_fn,int,int,int,int,void *);
 static wifi_native_hooks_t hooks={.magic=WIFI_NATIVE_HOOK_MAGIC,.abi=3};
 static wifi_native_usb_control_t usb={.magic=WIFI_NATIVE_USB_MAGIC,.abi=WIFI_NATIVE_USB_ABI};
 static SceUID lock=-1,thread=-1,service=-1;
@@ -30,7 +31,7 @@ static int state,complete;
 static unsigned serial,count,request;
 static native_scan_row_t rows[NATIVE_SCAN_LIMIT];
 static unsigned char diagnostic_buffer[257];
-static struct {event_fn fn;void *arg;int id,active,busy,owner;} handlers[16];
+static struct {event_fn fn;void *arg;int id,active,busy,owner;unsigned gp;} handlers[16];
 static void log_result(unsigned command,int result,unsigned row_count)
 {
     /* Write only after our USB service stops; refuse mass-storage ownership. */
@@ -164,7 +165,7 @@ static int add_handler(event_fn fn,void *arg)
     for(unsigned i=0;i<16;++i)if(!handlers[i].active && !handlers[i].busy) {
         if(++serial>0xffff)serial=1;
         id=0x200000+(serial<<4)+i;
-        handlers[i].fn=fn;handlers[i].arg=arg;handlers[i].id=id;handlers[i].owner=m.modid;handlers[i].active=1;break;
+        handlers[i].fn=fn;handlers[i].arg=arg;handlers[i].id=id;handlers[i].owner=m.modid;handlers[i].gp=m.gp_value;handlers[i].active=1;break;
     }
     leave();return id;
 }
@@ -188,13 +189,14 @@ static void emit(int next,int event,int error)
         enter();event_fn fn=handlers[i].active?handlers[i].fn:NULL;void *arg=handlers[i].arg;
         if(fn) {
             SceModule m;
-            if(kuKernelFindModuleByAddress((void *)fn,&m)<0 || m.modid!=handlers[i].owner) {
+            if(kuKernelFindModuleByAddress((void *)fn,&m)<0 || m.modid!=handlers[i].owner || m.gp_value!=handlers[i].gp) {
                 handlers[i].active=0;fn=NULL;
             }
         }
+        unsigned gp=handlers[i].gp;
         if(fn)handlers[i].busy=1;
         leave();
-        if(fn){fn(old,next,event,error,arg);enter();handlers[i].busy=0;leave();}
+        if(fn){wifiNativeInvoke(gp,fn,old,next,event,error,arg);enter();handlers[i].busy=0;leave();}
     }
 }
 static int stop_service(void)

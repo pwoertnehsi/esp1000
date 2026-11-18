@@ -228,3 +228,22 @@ unloaded,22/23 DNS restore,24/25 resolver termination,26/27 INET termination,
 28/29 NET termination,30 cleanup complete,31/32 thread-info release and33 worker
 return. These markers contain no credentials or packet payloads. No new recovery
 claim is made by this diagnostic-only update.
+
+The next diagnostic session reached every cleanup marker through step33,
+including successful DNS restore, thread-info release and worker return. This
+contradicts the earlier inference that the helper hung in cleanup. Bridge
+completion was still absent; callback dispatch / exit coordination remains the
+relevant boundary.
+
+Inspection of the owned 6.61 APCTL binary reveals a concrete callback ABI
+omission. Handler registration stores a module GP in its callback record
+(0x27ec fallback at0x2824), and dispatch switches GP to that value before jalr,
+then restores its own GP (for example0x2b10..0x2b88). The bridge previously called
+handlers directly from its worker without restoring their module GP. Bridge
+v0.13 stores the validated callback module's gp_value and invokes through an
+assembly trampoline preserving caller GP/RA and all five callback arguments.
+Dispatch revalidates owner ID and GP before calling. The compiled call site
+uses the PSP extended argument registers expected by the trampoline. Host
+facade tests check that the callback module's GP reaches invocation; actual GP
+switching was inspected in PSP disassembly, not executed by host tests. Hardware
+verification is pending; this does not claim to prevent the USB stall.

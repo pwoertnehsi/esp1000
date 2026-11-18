@@ -8,11 +8,14 @@ int sceIoOpen(const char *p,int f,int m){(void)p;(void)f;(void)m;return 7;}
 int sceIoWrite(int f,const void *p,unsigned n){assert(f==7 && n<sizeof(last_log));memcpy(last_log,p,n);last_log[n]=0;return n;}
 int sceIoClose(int f){(void)f;return 0;}
 static int lookup_result,browser_available,profile_security=-1;
-int kuKernelFindModuleByAddress(void *p,SceModule *m){if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;return 0;}
+int kuKernelFindModuleByAddress(void *p,SceModule *m){if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;m->gp_value=0x09123450;return 0;}
 int kuKernelFindModuleByName(char *p,SceModule *m){
     if(!strcmp(p,"htmlviewer_plugin_module")){if(!browser_available)return -1;m->modid=123;return 0;}
     m->modid=hooks.owner;return 0;
 }
+static unsigned callback_invocations;
+void wifiNativeInvoke(unsigned gp,event_fn fn,int old,int next,int code,int error,void *arg)
+{assert(gp==0x09123450);++callback_invocations;fn(old,next,code,error,arg);}
 static unsigned clock_us;
 static int utility_unloads;
 static int simulate_reconnect,reconnect_ticks;
@@ -124,6 +127,7 @@ int main(void)
     assert(event_count==3 && events_seen[0]==10 && events_seen[1]==3 && events_seen[2]==4);
     assert(network_started && session.alive && state==4);
     network_started=0;session.alive=0;pending=0;assert(!del_handler(handler));
+    assert(callback_invocations>=3);
     assert(!wifi_native_adapter_stop());
     puts("PASS: actual native list20 bound, exact field sizes, security mapping, queued commands, events and unavailable ESP cleanup");
 }
