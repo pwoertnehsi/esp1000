@@ -14,6 +14,7 @@ int kuKernelFindModuleByName(char *p,SceModule *m){
     m->modid=hooks.owner;return 0;
 }
 static unsigned clock_us;
+static int utility_unloads;
 static int simulate_reconnect,reconnect_ticks;
 static int loader_result=-55,start_result,start_status,reply_error,stop_error;
 static int events_seen[8],event_count;
@@ -51,7 +52,7 @@ int sceUtilityGetNetParam(int a,int b,netData *c){(void)a;if(b==2 && profile_sec
 int kuKernelLoadModule(const char *a,int b,void *c){(void)a;(void)b;(void)c;return loader_result;}
 int wifiNativeRefresh(void){return 0;}
 int sceUtilityLoadNetModule(int n){(void)n;return 0;}
-int sceUtilityUnloadNetModule(int n){(void)n;return 0;}
+int sceUtilityUnloadNetModule(int n){(void)n;assert(!browser_alive());++utility_unloads;return 0;}
 int wifiNativeRegister(unsigned a,unsigned b){assert(a && b==sizeof(hooks));for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i)hooks.browser_owners[i]=-1;return 0;}
 static void __attribute__((aligned(4))) event(int old,int next,int code,int error,void *arg)
 {(void)old;(void)next;(void)error;assert(arg==(void *)1);assert(event_count<8);events_seen[event_count++]=code;}
@@ -78,7 +79,9 @@ int main(void)
     hooks.browser_owners[0]=123;browser_available=1;
     assert(callback_owner(123) && browser_alive());
     cancel=0;assert(!del_handler(handler) && !cancel); /* Native browser retains the link. */
+    owned_net_modules=3;assert(!release_network_modules() && owned_net_modules==3 && !utility_unloads);
     browser_available=0;assert(!browser_alive());
+    assert(!release_network_modules() && !owned_net_modules && utility_unloads==2);
     handler=add_handler(event,(void *)1);assert(handler>0);
     assert(!del_handler(handler) && cancel); /* Last settings owner still releases it. */
     cancel=0;handler=add_handler(event,(void *)1);assert(handler>0);

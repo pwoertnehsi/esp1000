@@ -244,13 +244,20 @@ static int prepare_network_modules(void)
 }
 static int release_network_modules(void)
 {
+    /* Browser may still be closing sockets / resolver handles after APCTL
+     * disconnect. Keep our utility references until that consumer is gone. */
+    if(browser_alive())return 0;
     if(owned_net_modules&2) {
+        session.stage=310;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
         if(sceUtilityUnloadNetModule(PSP_NET_MODULE_INET)<0)return -1;
+        session.stage=311;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
         owned_net_modules&=~2u;
         if(wifiNativeRefresh()<0)return -1;
     }
     if(owned_net_modules&1) {
+        session.stage=312;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
         if(sceUtilityUnloadNetModule(PSP_NET_MODULE_COMMON)<0)return -1;
+        session.stage=313;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
         owned_net_modules&=~1u;
         if(wifiNativeRefresh()<0)return -1;
     }
@@ -259,8 +266,11 @@ static int release_network_modules(void)
 static int stop_network(void)
 {
     enter();session.ready=0;session.cancel=1;leave();
+    session.stage=300;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
     if(network_started){int status;int r=sceKernelStopModule(network,0,NULL,&status,NULL);if(r<0 || status<0)return -1;network_started=0;}
+    session.stage=301;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
     if(network>=0){if(sceKernelUnloadModule(network)<0)return -1;network=-1;}
+    session.stage=302;log_result(WIFI_NATIVE_CONNECT_COMMAND,0,count);
     return release_network_modules();
 }
 static int start_network(void)
@@ -324,17 +334,23 @@ static int worker(SceSize size,void *args)
         }
         native_profile_clear(&profile,sizeof(profile));
         if(stop_service()<0 && !result)result=-2;
+        int disconnected=0;
         if(!result && command==WIFI_NATIVE_CONNECT_COMMAND) {
             result=start_network();
             if(!result) {
                 emit(3,3,0);emit(4,4,0);
                 result=monitor_network();
             }
+            /* Publish disconnect before native NET teardown. Sony callers
+             * must not wait for GOT_IP to clear while we wait for their NET
+             * resources to be released. */
+            emit(0,result && !cancel?6:5,result && !cancel?(int)0x80410a0du:0);
+            disconnected=1;
             if(stop_network()<0)result=-1;
         }
         log_result(command,result,count);
         enter();pending=0;leave();
-        emit(0,result && !cancel?6:command==WIFI_NATIVE_SCAN_COMMAND?2:5,
+        if(!disconnected)emit(0,result && !cancel?6:command==WIFI_NATIVE_SCAN_COMMAND?2:5,
             result && !cancel?(int)0x80410a0du:0);
     }
     stop_service();return 0;

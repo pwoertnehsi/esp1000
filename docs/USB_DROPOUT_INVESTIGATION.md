@@ -200,3 +200,19 @@ cleanup after the worker exits; successful cleanup clears the unsafe marker.
 Tests exercise profile resubmission and delayed successful cleanup, as well as
 continued unload refusal while cancellation is still failing. These fixes are
 installed for hardware testing; they do not establish the cause of this stall.
+
+The next hardware test connected successfully and initially ran without a
+watchdog reset. A deliberate brief PSP-to-ESP cable interruption re-enumerated,
+but later packet traffic produced a malformed frame and another watchdog reset.
+The browser request timed out, and exiting Browser froze the console. This
+rejects hardware acceptance of the current recovery candidate.
+
+PSP logs show successful USB_STOP, interface detach/destroy and STOP_END for
+that session. They do not identify the later freeze location. The facade had
+reported disconnected only after native session and utility-module cleanup. It
+now publishes disconnect before teardown, and retains its utility references
+while the tracked Browser consumer is still present, allowing its socket and
+resolver cleanup to finish. Host tests verify those references are retained
+while Browser is present and released once it is absent. Cleanup markers
+300/301/302 bracket session stop and unload;310/311 and312/313 bracket INET
+and COMMON utility unloads. Hardware confirmation remains required.
