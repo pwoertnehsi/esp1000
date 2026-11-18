@@ -80,7 +80,9 @@ Configuration lives under `ms0:/seplugins/esp-adhoc/`: `server.txt`,
 hotspot file, aemu uses the first existing saved profile. Credentials remain in
 the native PSP profile. No firmware reinstall or flash0 writes are needed.
 
-PSP transport diagnostics go to `ms0:/esp-adhoc.log` and `ms0:/psp-vnet.log`.
+The peer-test startup stages are saved to `ms0:/esp-adhoc-peer.log`, including
+failures before the ESP backend starts. PSP transport diagnostics go to
+`ms0:/esp-adhoc.log` and `ms0:/psp-vnet.log`.
 The ESP logs mapping results as `adhoc-map`. Keep build manifests and raw hardware
 logs locally; they can contain user-specific identifiers. To disable this
 candidate, turn off only its GAME plugin entry. Preserve the browser entries.
