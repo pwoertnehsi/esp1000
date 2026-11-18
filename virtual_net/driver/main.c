@@ -16,11 +16,15 @@
 #include "frame_queue.h"
 #ifdef VNET_USB_LAB
 #include "usb_transport.h"
+#include "ssl_trace.h"
+#include <psprtc.h>
+static ssl_trace_t ssl_capture;
+static int ssl_capture_enabled;
 #endif
 #include "lab_gateway.h"
 #include "ifhandle_661_guard.h"
 
-PSP_MODULE_INFO("PSP Virtual Interface", PSP_MODULE_KERNEL, 0, 11);
+PSP_MODULE_INFO("PSP Virtual Interface", PSP_MODULE_KERNEL, 0, 12);
 
 #ifdef VNET_USB_LAB
 static volatile vnet_start_result_t *usb_status;
@@ -48,7 +52,7 @@ static volatile int log_running;
 static vnet_log_queue_t log_queue;
 static void write_log(const char *text)
 {
-    SceUID fd=sceIoOpen("ms0:/psp-vnet.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
+    SceUID fd=sceIoOpen(!strncmp(text,"SSL_",4)?"ms0:/ssl-capture.log":"ms0:/psp-vnet.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
     if(fd>=0){sceIoWrite(fd,text,strlen(text));sceIoClose(fd);}
 }
 static int log_task(SceSize size,void *args)
@@ -89,8 +93,16 @@ static void record(const char *format, ...)
 }
 
 #ifdef VNET_USB_LAB
+static void trace_ssl_event(void *ctx,const ssl_trace_event_t *e)
+{
+    (void)ctx;
+    record("SSL_TRACE time_us=%u flow=%u peer=%u.%u.%u.%u local=%u remote=%u dir=%s event=%s a=%08x b=%08x c=%08x",
+        sceKernelGetSystemTimeLow(),e->id,e->peer>>24,(e->peer>>16)&255,(e->peer>>8)&255,e->peer&255,
+        e->local_port,e->remote_port,e->direction?"RX":"TX",ssl_trace_name(e->event),e->a,e->b,e->c);
+}
 static void trace_packet(const char *direction,unsigned count,const unsigned char *frame,unsigned length)
 {
+    if(ssl_capture_enabled)ssl_trace_feed(&ssl_capture,!strcmp(direction,"TX"),frame,length,trace_ssl_event,NULL);
     if(count>64)return;
     packet_trace_t p;if(!packet_trace_parse(&p,frame,length))return;
     record("TCP_TRACE %s #%u %u.%u.%u.%u:%u -> %u.%u.%u.%u:%u proto=%u flags=%02x seq=%08x ack=%08x data=%u crc=%u/%u",
@@ -413,7 +425,17 @@ int module_start(SceSize size, void *args)
     out->result = -1;
     out->flags = 0;
     memset((void *)out->remote_ip,0,4);
-    record("BEGIN virtual interface v0.11 (packet lab; backend selected at build)");
+    record("BEGIN virtual interface v0.12 (packet lab; backend selected at build)");
+#ifdef VNET_USB_LAB
+    int ssl_flag=sceIoOpen("ms0:/ssl-capture.enable",PSP_O_RDONLY,0);
+    ssl_capture_enabled=ssl_flag>=0;
+    if(ssl_flag>=0)sceIoClose(ssl_flag);
+    if(ssl_capture_enabled) {
+        record("SSL_CAPTURE BEGIN version=1 tcp_port=443 flows=%u prefix_bytes=%u event_limit=%u",SSL_TRACE_FLOWS,SSL_TRACE_PREFIX,SSL_TRACE_EVENTS);
+        ScePspDateTime clock;memset(&clock,0,sizeof(clock));int clock_result=sceRtcGetCurrentClock(&clock,0);
+        record("SSL_CAPTURE CLOCK result=%08x utc=%04u-%02u-%02uT%02u:%02u:%02u",clock_result,clock.year,clock.month,clock.day,clock.hour,clock.minute,clock.second);
+    }
+#endif
     if (resolve_abi() < 0) return 0;
     int r = vnet_create(&session, &traced_ops);
     if (r != 0) { out->result = r; return 0; }
@@ -499,6 +521,7 @@ int module_stop(SceSize size, void *args)
         sceKernelDeleteThread(worker); worker = -1;
     }
 #ifdef VNET_USB_LAB
+    if(ssl_capture_enabled){ssl_trace_finish(&ssl_capture,trace_ssl_event,NULL);record("SSL_CAPTURE END evictions=%u log_dropped=%u",ssl_capture.evictions,log_queue.dropped);}
     int usb_stop = vnet_usb_stop();
     record("USB_STOP result=%08x", usb_stop);
     if (usb_stop < 0) return VNET_STOP_UNSAFE;

@@ -1,0 +1,91 @@
+{
+  "note": "NID-name hash matches and owned 6.61 module metadata only; ABI prototypes not established by this inventory. No hooks installed.",
+  "ssl_sha256": "b84f7e182e5d9f220c2d3c7e606f360bcb6a607c0c5aaa94b65ad433702a73f0",
+  "http_sha256": "ffbae22d0750ccf410ced4d4ac2cf9b0941524674999bd12cc0194ce3e249524",
+  "candidates": [
+    {
+      "candidate_name": "SSL_read",
+      "nid": "0xE7C29542",
+      "ssl_export": "0x00026970",
+      "http_import": "0x00017CD0"
+    },
+    {
+      "candidate_name": "SSL_write",
+      "nid": "0xB7CA8717",
+      "ssl_export": "0x000269B8",
+      "http_import": "0x00017C80"
+    },
+    {
+      "candidate_name": "SSL_new",
+      "nid": "0xEBFB0E3C",
+      "ssl_export": "0x000264DC",
+      "http_import": "0x00017CD8"
+    },
+    {
+      "candidate_name": "SSL_free",
+      "nid": "0x84833472",
+      "ssl_export": "0x000266F0",
+      "http_import": "0x00017C20"
+    },
+    {
+      "candidate_name": "SSL_get_error",
+      "nid": "0xB3B04C58",
+      "ssl_export": "0x00027344",
+      "http_import": "0x00017C68"
+    },
+    {
+      "candidate_name": "SSL_do_handshake",
+      "nid": "0xD53ACF30",
+      "ssl_export": "0x000274C8",
+      "http_import": "0x00017CB8"
+    },
+    {
+      "candidate_name": "SSL_set_bio",
+      "nid": "0xB9C8CCE6",
+      "ssl_export": "0x00026898",
+      "http_import": "0x00017C90"
+    },
+    {
+      "candidate_name": "SSL_shutdown",
+      "nid": "0x3E3133D6",
+      "ssl_export": "0x00026A10",
+      "http_import": "0x00017B98"
+    },
+    {
+      "candidate_name": "SSL_CTX_new",
+      "nid": "0xFB8273FE",
+      "ssl_export": "0x00026D70",
+      "http_import": "0x00017CE0"
+    },
+    {
+      "candidate_name": "SSL_CTX_free",
+      "nid": "0x588F2FE8",
+      "ssl_export": "0x00027028",
+      "http_import": "0x00017BD8"
+    },
+    {
+      "candidate_name": "SSL_get_verify_result",
+      "nid": "0xAA3B27CF",
+      "ssl_export": "0x000278BC",
+      "http_import": null
+    },
+    {
+      "candidate_name": "SSLv3_client_method",
+      "nid": "0xB40D11EA",
+      "ssl_export": "0x0001D640",
+      "http_import": "0x00017C70"
+    },
+    {
+      "candidate_name": "TLSv1_client_method",
+      "nid": "0x42FFA860",
+      "ssl_export": "0x00020D5C",
+      "http_import": "0x00017BA0"
+    },
+    {
+      "candidate_name": "ERR_get_error",
+      "nid": "0xE78AD94D",
+      "ssl_export": "0x0001D094",
+      "http_import": null
+    }
+  ]
+}

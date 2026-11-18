@@ -35,3 +35,7 @@ and check power turns off. Repeat a connection to verify fresh ESP startup.
 Use the previously successful side-rail wiring with external ESP power removed
 or isolated. Check USB storage after returning to XMB. Keep GAME Ad Hoc settings
 and wiring unchanged; the existing working game plugin has not been replaced.
+
+The user subsequently confirmed that the on-demand power behavior works in the
+XMB/browser path. Browser freezes remain reported and are outside this power
+change; the confirmation does not establish stable browser exit or TLS support.
