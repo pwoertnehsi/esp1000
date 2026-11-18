@@ -35,3 +35,32 @@ infer that WPA2 authentication failed or silently extend all timeouts.
 Private raw UART and PSP evidence is retained in the ignored local milestone
 directory esp16-dropout-comparison. No SSIDs, MAC addresses or private IPs are
 included in this document.
+
+## Diagnostic build: PSP v0.18 / ESP17
+
+No recovery policy, transfer watchdog threshold or frame acceptance rule changes
+are included. Enumeration observer callbacks only store metadata in a bounded
+32-row ring; UART output is deferred to status reports. ENUM_DIAG phases are
+0=begin, 1=delay dispatch, 2=control completion/dispatch, 3=finish. The stage
+numbers follow the local usbh.c ENUM_* / ENUM_AFTER_* definitions. Phase3 result1
+means success; phase2 uses TinyUSB's transfer result (0=success). Synthetic
+phase2 ADDR0_DEVICE_DESC dispatch records zero bytes without reading its
+uninitialized transfer length. LOCAL_SHA256SUMS records the small vendored hook;
+the original imported SHA256SUMS is preserved.
+
+Frame checks are a bitmask: 1=wrong transfer size, 2=magic, 4=version, 8=type,
+16=payload length outside the fixed frame. No raw bytes or payload are logged.
+ESP BULK_DIAG reports the actual endpoint numbers, current pending request ages,
+last-completion ages/results/byte counts and last invalid-header check mask.
+PSP USB_DIAG adds attachment/epoch state, attach/detach counters, pending request
+ages, results and received header checks to the existing transport log. Buffers
+and transfer scheduling are unchanged. Additional UART output can affect timing;
+a disappearing fault is not by itself proof of a fix.
+
+Controlled test: keep the ESP externally powered; select the saved connection,
+leave the native browser idle for60 seconds, then load one fixed HTTP page such
+as http://suckless.org/faq/ and wait30 seconds. Capture UART throughout; afterward
+mount the PSP to collect psp-vnet.log, native-wifi.log and wifi-vsh.log. Record
+whether the fault first appeared while idle or when loading. A secured cable /
+stable external-power repeat is a separate comparison; change one variable per
+run. Do not reset the ESP after a failure until its diagnostic state is captured.

@@ -305,6 +305,7 @@ static int packet_worker(SceSize size,void *args)
         if(errors!=previous_errors) {
             unsigned stage,bytes;int code;vnet_usb_last_error(&stage,&code,&bytes);
             record("USB_PACKET_ERRORS=%u stage=%u code=%08x bytes=%u",errors,stage,code,bytes);previous_errors=errors;
+            if(stage==2){vnet_usb_progress_t snapshot;vnet_usb_progress(&snapshot);record("USB_FRAME_CHECKS=%02x",snapshot.rx_checks);}
         }
         int ready=vnet_usb_ready();
         int irq=sceKernelCpuSuspendIntr();++usb_status->revision;
@@ -334,6 +335,9 @@ static int packet_worker(SceSize size,void *args)
             record("PIPE rx_queue=%u tx_queue=%u rx_stage=%u tx_stage=%u injected=%u rejected=%u",queued_rx,queued_tx,rx_stage,tx_stage,rx_injected,rejected_packets);last_stats=now;
             vnet_usb_progress_t usb;vnet_usb_progress(&usb);
             record("USB_PIPE busy=%u/%u packet=%u/%u completed=%u/%u age_us=%u/%u",usb.tx_busy,usb.rx_busy,usb.packet_offset,usb.packet_total,usb.tx_frames,usb.rx_frames,usb.tx_age_us,usb.rx_age_us);
+            record("USB_DIAG attached=%u epoch=%u attach/detach=%u/%u pending_us=%u/%u result=%08x/%08x bytes=%u/%u checks=%02x",
+                   usb.attached,usb.epoch_reset,usb.attaches,usb.detaches,usb.tx_pending_us,usb.rx_pending_us,
+                   usb.tx_result,usb.rx_result,usb.tx_bytes,usb.rx_bytes,usb.rx_checks);
         }
         sceKernelDelayThread(1000);
     }

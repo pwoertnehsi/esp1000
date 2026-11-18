@@ -5,6 +5,8 @@
 typedef struct {
     unsigned tx_busy,rx_busy,packet_total,packet_offset;
     unsigned tx_frames,rx_frames,tx_age_us,rx_age_us;
+    unsigned tx_pending_us,rx_pending_us,attached,epoch_reset,attaches,detaches,rx_checks;
+    int tx_result,rx_result;unsigned tx_bytes,rx_bytes;
 } vnet_usb_progress_t;
 /* Called by the USB owner only, alongside poll; ages wrap at uint32 duration. */
 void vnet_usb_progress(vnet_usb_progress_t *progress);

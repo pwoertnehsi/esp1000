@@ -4,6 +4,7 @@
 #include <pspsdk.h>
 #include <string.h>
 #include "packet_link.h"
+#include "link_diagnostics.h"
 #include "usb_transport.h"
 extern int sceUsbAccRegisterType(u16);
 extern int sceUsbAccUnregisterType(u16);
@@ -30,6 +31,8 @@ static link_frame_t scan_request;
 static unsigned start_step;
 static unsigned seq;
 static unsigned sent_frames,received_frames,last_sent,last_received;
+static unsigned tx_submitted,rx_submitted,rx_checks;
+static volatile unsigned attach_count,detach_count;
 
 static packet_link_t packet_tx, packet_rx;
 static int registered, types, bus, acc, own, active, hello_pending, ready;
@@ -63,6 +66,7 @@ static int rx_complete(struct UsbdDeviceReq *req, int a, int b)
 static int on_attach(int value, void *a, void *b)
 {
     (void)a; (void)b;
+    ++attach_count;
     speed = value;
     attached = 1;
     epoch_reset = 1;
@@ -72,6 +76,7 @@ static int on_attach(int value, void *a, void *b)
 static int on_detach(int a, int b, int c)
 {
     (void)a; (void)b; (void)c;
+    ++detach_count;
     attached = 0;
     epoch_reset = 1;
     return 0;
@@ -217,6 +222,10 @@ void vnet_usb_progress(vnet_usb_progress_t *p)
     p->tx_frames=sent_frames;p->rx_frames=received_frames;
     p->tx_age_us=sent_frames?now-last_sent:0;
     p->rx_age_us=received_frames?now-last_received:0;
+    p->tx_pending_us=tx_busy?now-tx_submitted:0;p->rx_pending_us=rx_busy?now-rx_submitted:0;
+    p->attached=attached;p->epoch_reset=epoch_reset;p->attaches=attach_count;p->detaches=detach_count;p->rx_checks=rx_checks;
+    p->tx_result=tx_req.retcode;p->rx_result=rx_req.retcode;
+    p->tx_bytes=tx_req.recvsize;p->rx_bytes=rx_req.recvsize;
 }
 int vnet_usb_can_send(void) { return vnet_usb_ready() && !packet_tx.total; }
 int vnet_usb_send(const void *data,unsigned n)
@@ -245,6 +254,7 @@ int vnet_usb_poll(void *data,unsigned capacity)
     if(rx_busy && rx_done) {
         rx_busy=rx_done=0;
         sceKernelDcacheInvalidateRange(&rx,sizeof(rx));
+        rx_checks=link_frame_checks(&rx,rx_req.recvsize);
         if(!rx_req.retcode && link_valid(&rx,rx_req.recvsize)){++received_frames;last_received=sceKernelGetSystemTimeLow();}
         if(!epoch_reset && attached && (rx_req.retcode || !link_valid(&rx,rx_req.recvsize))) usb_error(2,rx_req.retcode,rx_req.recvsize);
         else if(attached && !epoch_reset && rx.type==LINK_HELLO &&
@@ -289,6 +299,7 @@ int vnet_usb_poll(void *data,unsigned capacity)
         memset(&tx_req,0,sizeof(tx_req)); tx_req.endp=&endpoints[1];
         tx_req.data=&tx; tx_req.size=sizeof(tx); tx_req.func=tx_complete;
         tx_done=0; tx_busy=1;
+        tx_submitted=sceKernelGetSystemTimeLow();
         int r=sceUsbbdReqSend(&tx_req);
         if(r<0) { tx_busy=0; ready=0; usb_error(4,r,0); }
     }
@@ -297,6 +308,7 @@ int vnet_usb_poll(void *data,unsigned capacity)
         memset(&rx_req,0,sizeof(rx_req)); rx_req.endp=&endpoints[2];
         rx_req.data=&rx; rx_req.size=sizeof(rx); rx_req.func=rx_complete;
         rx_done=0; rx_busy=1;
+        rx_submitted=sceKernelGetSystemTimeLow();
         int r=sceUsbbdReqRecv(&rx_req);
         if(r<0) { rx_busy=0; usb_error(5,r,0); }
     }

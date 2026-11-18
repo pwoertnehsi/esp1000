@@ -62,7 +62,14 @@ int main(void) {
     vnet_usb_progress_t progress;vnet_usb_progress(&progress);
     assert(progress.tx_frames==1 && progress.rx_frames==1 && !progress.tx_busy && progress.rx_busy);
     clock_us+=2000000;vnet_usb_progress(&progress);
+    assert(progress.attached && progress.attaches==1 && !progress.detaches);
+    assert(progress.rx_pending_us==2000000 && !progress.tx_pending_us);
+
     assert(progress.tx_age_us==2000000 && progress.rx_age_us==2000000);
+    unsigned previous_errors=vnet_usb_errors();
+    f.magic[0]='X';f.version=2;f.type=0;f.length=49;host_frame(f);
+    vnet_usb_poll(data,sizeof(data));vnet_usb_progress(&progress);
+    assert(vnet_usb_errors()==previous_errors+1 && progress.rx_checks==30 && vnet_usb_ready());
     link_init(&f,LINK_NET_STATUS,2,0,NULL);f.length=8;link_put_u32(f.payload,3);
     const unsigned char ip[4]={203,0,113,7};memcpy(f.payload+4,ip,4);host_frame(f);
     vnet_usb_poll(data,sizeof(data));unsigned char supplied[4];

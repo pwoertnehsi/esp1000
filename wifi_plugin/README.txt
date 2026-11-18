@@ -1,4 +1,17 @@
-ESP WiFi native browser candidate v0.17 — E1000 / owned 6.61 / ARK-5 / ESP16
+USB diagnostic candidate v0.18 / ESP17: logs enumeration stages, frame-header
+validation reasons and endpoint pending/completion progress. No payloads are
+logged. Retry rules, timeouts and browser lifecycle are unchanged. The PSP USB
+transport log adds USB_DIAG; ESP status adds ENUM_DIAG and BULK_DIAG.
+
+USB diagnostic update v0.18 + ESP17:
+Enumeration progress, bounded frame validation reasons and endpoint pending/
+completion times are recorded; no payloads are logged. Timeouts and recovery
+policy are unchanged. psp_vnet.prx and wifi_native_usb.prx share the updated
+transport and must be installed with this package. Test connected browser idle
+for60 seconds, then one HTTP page; capture UART and copy logs after exit.
+This is diagnostic work, not a demonstrated dropout fix.
+
+ESP WiFi native browser candidate v0.18 — E1000 / owned 6.61 / ARK-5 / ESP17
 
 Browser and Online Manual now use Sony's original VSH actions. L+R+SQUARE queues
 that same native browser action. The plugin does not load an EBOOT, draw a GU
