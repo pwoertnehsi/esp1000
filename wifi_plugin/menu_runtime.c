@@ -16,6 +16,27 @@ static uint32_t callbacks[2];
 static uint32_t *trampoline;
 static unsigned activity_calls;
 static wifi_menu_control_t *control;
+static int user_text(SceModule *,unsigned);
+#include "browser_exit_patch.h"
+static unsigned exit_text;
+static void observe_exit(SceModule *m)
+{
+    if(!control || !m || strcmp(m->modname,"htmlviewer_plugin_module"))return;
+    SceModule *bridge=sceKernelFindModuleByName("ESP WiFi XMB Bridge");
+    if(m->version[0]!=1 || m->version[1]!=1 || m->text_size!=0x1f700 || !user_text(m,m->text_addr) ||
+       !m->nsegment || m->segmentaddr[0]!=m->text_addr || m->segmentsize[0]<m->text_size) {control->exit_status=-1;return;}
+    for(unsigned i=0;i<WIFI_EXIT_STAGES;++i)
+        if(!bridge || !user_text(bridge,control->exit_callbacks[i])){control->exit_status=-2;return;}
+    int ours=control->exit_owner==m->modid && exit_text==m->text_addr;
+    if(control->exit_owner>=0 && !ours && sceKernelFindModuleByUID(control->exit_owner)){control->exit_status=-3;return;}
+    unsigned *text=(void *)m->text_addr;
+    if(browser_exit_preflight(text,m->text_addr,control->exit_callbacks,ours)){control->exit_status=-4;return;}
+    for(unsigned i=0;i<WIFI_EXIT_STAGES;++i)control->exit_originals[i]=m->text_addr+browser_exit_calls[i].target;
+    __sync_synchronize();
+    for(unsigned i=0;i<WIFI_EXIT_STAGES;++i)text[browser_exit_calls[i].call/4]=exit_jal(control->exit_callbacks[i]);
+    sceKernelDcacheWritebackInvalidateAll();sceKernelIcacheInvalidateAll();
+    exit_text=m->text_addr;control->exit_owner=m->modid;control->exit_status=1;
+}
 static wifi_menu_snapshot_t evidence;
 void wifi_menu_snapshot(wifi_menu_snapshot_t *out)
 {
@@ -111,7 +132,7 @@ static int on_start(SceModule *m)
 {
     int intr=sceKernelCpuSuspendIntr();++in_handler;sceKernelCpuResumeIntr(intr);
     int r=previous?previous(m):0;
-    intr=sceKernelCpuSuspendIntr();observe(m);--in_handler;sceKernelCpuResumeIntr(intr);
+    intr=sceKernelCpuSuspendIntr();observe(m);observe_exit(m);--in_handler;sceKernelCpuResumeIntr(intr);
     return r;
 }
 int wifiMenuRegister(unsigned address,unsigned size,unsigned first,unsigned second)
@@ -141,7 +162,8 @@ int wifiMenuRelease(void)
     unsigned k1=pspSdkSetK1(0);int intr=sceKernelCpuSuspendIntr();
     /* Native rows may already exist. Never unload their action callbacks while
      * this VSH is alive. Restart VSH to change the plugin configuration. */
-    int result=owner>=0 && sceKernelFindModuleByUID(owner)?-2:0;
+    int result=(owner>=0 && sceKernelFindModuleByUID(owner)) ||
+        (control && control->exit_owner>=0 && sceKernelFindModuleByUID(control->exit_owner))?-2:0;
     if(!result){control=NULL;trampoline=NULL;callbacks[0]=callbacks[1]=0;owner=-1;}
     sceKernelCpuResumeIntr(intr);pspSdkSetK1(k1);return result;
 }
@@ -188,7 +210,8 @@ int wifi_menu_verify(void)
 }
 int wifi_menu_stop(void)
 {
-    if(owner>=0 && sceKernelFindModuleByUID(owner))return -2;
+    if((owner>=0 && sceKernelFindModuleByUID(owner)) ||
+       (control && control->exit_owner>=0 && sceKernelFindModuleByUID(control->exit_owner)))return -2;
     int intr=sceKernelCpuSuspendIntr();
     if(in_handler){sceKernelCpuResumeIntr(intr);return -2;}
     if(installed) {
@@ -201,4 +224,5 @@ int wifi_menu_stop(void)
     control=NULL;sceKernelCpuResumeIntr(intr);return 0;
 }
 
-int wifi_menu_can_stop(void){return owner<0 || !sceKernelFindModuleByUID(owner);}
+int wifi_menu_can_stop(void){return (owner<0 || !sceKernelFindModuleByUID(owner)) &&
+    (!control || control->exit_owner<0 || !sceKernelFindModuleByUID(control->exit_owner));}

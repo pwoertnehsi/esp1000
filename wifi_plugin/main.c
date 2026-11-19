@@ -16,7 +16,7 @@
 #include "menu_control.h"
 #include "browser_runtime.h"
 
-PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,22);
+PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,23);
 extern int wifi_power_can_stop(void);
 #define CHORD (PSP_CTRL_LTRIGGER|PSP_CTRL_RTRIGGER|PSP_CTRL_SQUARE)
 #define ROWS 64u

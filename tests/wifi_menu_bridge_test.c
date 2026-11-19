@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "../wifi_plugin/menu_bridge/main.c"
+int sceIoOpen(const char *p,int f,int m){(void)p;(void)f;(void)m;return -1;}
+int sceIoWrite(int f,const void *p,unsigned n){(void)f;(void)p;return n;}
+int sceIoClose(int f){(void)f;return 0;}
 int wifi_tls_init(void){return 0;}
 int wifi_tls_can_stop(void){return 1;}
 int wifi_native_adapter_start(void){return 0;}
@@ -11,7 +14,7 @@ int wifiMenuOriginal(int action,int argument){++original_calls;last_action=actio
 int wifiMenuRegister(unsigned address,unsigned size,unsigned first,unsigned second)
 {
  assert(address==(unsigned)(uintptr_t)&control && size==sizeof(control));
- assert(control.abi==3 && control.original[0]==(unsigned)(uintptr_t)wifiMenuOriginal && control.original[1]==control.original[0]);
+ assert(control.abi==4 && control.original[0]==(unsigned)(uintptr_t)wifiMenuOriginal && control.original[1]==control.original[0]);
  assert(first==(unsigned)(uintptr_t)execute0 && second==(unsigned)(uintptr_t)execute1);
  ++registrations;return 0;
 }
@@ -22,9 +25,11 @@ int sceKernelStartThread(int t,unsigned s,void *a){(void)t;(void)s;(void)a;retur
 int sceKernelDeleteThread(int t){(void)t;return 0;}
 int sceKernelWaitThreadEnd(int t,unsigned *timeout){(void)t;(void)timeout;return 0;}
 int sceKernelDelayThread(unsigned t){(void)t;running=0;return 0;}
+static int exit_mock(unsigned a,unsigned b){assert(a==7 && b==9);return 123;}
 int main(void)
 {
  assert(!module_start(0,NULL) && registrations==1);
+ control.exit_originals[2]=(unsigned)(uintptr_t)exit_mock;assert(exit_2(7,9)==123);
  control.active=1;
  assert(execute0(3,3)==37 && !control.pending && original_calls==1);
  assert(control.calls==1 && control.last_action==3 && control.last_argument==3);

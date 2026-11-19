@@ -2,7 +2,8 @@
 #define ESP_WIFI_MENU_CONTROL_H
 #include <stdint.h>
 #define WIFI_MENU_MAGIC 0x574d4e31u
-#define WIFI_MENU_ABI 3u
+#define WIFI_MENU_ABI 4u
+#define WIFI_EXIT_STAGES 6u
 /* Commands are bounded integers, never user-supplied paths or strings. */
 enum {WIFI_MENU_NONE=0,WIFI_MENU_BROWSER=1,WIFI_MENU_SETTINGS=2,WIFI_MENU_RSS_SETTINGS=3,
       WIFI_MENU_GAME_SHARING=4,WIFI_MENU_MANUAL=5,WIFI_MENU_LOCATIONFREE=6,WIFI_MENU_SKYPE=7,
@@ -14,6 +15,8 @@ typedef struct {
     volatile uint32_t native_request;
     uint32_t original[2];
     volatile uint32_t calls,last_action,last_argument;
+    uint32_t exit_callbacks[WIFI_EXIT_STAGES],exit_originals[WIFI_EXIT_STAGES];
+    volatile int32_t exit_owner,exit_status;
 } wifi_menu_control_t;
 /* Browser/manual commands identify native VSH actions. The standalone test
  * application also uses this predicate for its explicit diagnostic entry. */

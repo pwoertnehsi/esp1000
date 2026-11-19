@@ -42,3 +42,34 @@ The PSP bridge builds with warnings as errors; the three TLS host test programs
 pass under ASan/UBSan, including positive partial application reads/writes and
 existing failure/cleanup tests. A real browser retry is still required to
 identify the post-handshake failure.
+
+## Close-sequence comparison (VSH entry/bridge 0.23)
+
+Further inspection shows launcher URL startup explicitly locating music, RSS
+or photo owner plugins and arranging asynchronous owner callbacks. A bare call
+to that entry with mode12 and no RSS owner does not reproduce the working path.
+The normal Browser entry has not yet been redirected; the shutdown cause and
+an equivalent owner/return setup remain unresolved.
+
+The next diagnostic intercepts six exact internal calls in the owned HTML viewer
+close function. It records entry (phase0) and return (phase1) to
+ms0:/browser-exit.log, forwarding the original scalar arguments and return value.
+The six stages are calls at 29c4,29cc,29d8,29e4,29ec,29f4 to
+d7a8,d834,1c3c,1bd4,4cec,4c90 respectively. A logged return value from an internal
+void operation is not an error code. It is retained only as diagnostic data.
+
+Module version, size, user text ownership, six original call instructions,
+delay slots and close-function anchors are checked before any patch. Conflicting
+changes fail the whole preflight. Callback addresses belong to the resident
+bridge; unload is refused while the patched HTML viewer remains alive. Menu
+control ABI4 requires the kernel and user modules to be installed together.
+
+The diagnostic changes no launch mode, source URL, teardown ordering, security
+prompt or certificate policy. A clean RSS close and a stalled standalone close
+must be compared before claiming a lifecycle fix. Trace files may also remain
+empty if the close attempt blocks before this particular close function.
+
+The targeted 15 tests pass under ASan/UBSan, including foreign-call refusal,
+atomic preflight, delay-slot preservation, idempotency, live-owner unload refusal
+and forwarding the original exit arguments/return. Both PSP modules build with
+warnings as errors. Hardware comparison remains pending.

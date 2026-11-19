@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "../wifi_plugin/menu_runtime.c"
-static SceModule vsh,bridge;
+static SceModule vsh,bridge,exit_module;
+static int exit_present;
 static STMOD_HANDLER handler;
 static int caches,prior_calls,vsh_present=1;
 static unsigned k1=0x1234;
@@ -15,7 +16,7 @@ void sceKernelDcacheWritebackInvalidateAll(void){++caches;}
 void sceKernelIcacheInvalidateAll(void){++caches;}
 SceModule *sceKernelFindModuleByName(const char *name)
 {if(!strcmp(name,"vsh_module"))return vsh_present?&vsh:NULL;if(!strcmp(name,"ESP WiFi XMB Bridge"))return &bridge;return NULL;}
-SceModule *sceKernelFindModuleByUID(int uid){return uid==vsh.modid && vsh_present?&vsh:NULL;}
+SceModule *sceKernelFindModuleByUID(int uid){return uid==vsh.modid && vsh_present?&vsh:uid==45 && exit_present?&exit_module:NULL;}
 SceModule *sceKernelFindModuleByAddress(unsigned address)
 {return user_text(&vsh,address)?&vsh:user_text(&bridge,address)?&bridge:NULL;}
 STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER next){STMOD_HANDLER old=handler;handler=next;return old;}
@@ -56,6 +57,23 @@ static void check_trampoline(const uint32_t code[4],uint32_t origin)
 #ifndef VSH_TEST_BASE
 #define VSH_TEST_BASE 0x0a040f00u
 #endif
+static void check_browser_exit(void)
+{
+ unsigned *text=mmap((void *)0x09400000,0x20000,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED,-1,0);
+ assert(text!=MAP_FAILED);
+ SceModule html={0};strcpy(html.modname,"htmlviewer_plugin_module");html.version[0]=html.version[1]=1;html.modid=45;
+ html.text_addr=html.segmentaddr[0]=0x09400000;html.text_size=html.segmentsize[0]=0x1f700;html.nsegment=1;
+ text[0x296c/4]=0x27bdfff0;text[0x29fc/4]=exit_jal(html.text_addr+0x299c)^0x04000000u;text[0x2a00/4]=0x8fbf0004;
+ for(unsigned i=0;i<WIFI_EXIT_STAGES;++i){control->exit_callbacks[i]=bridge.text_addr+0x100+i*4;text[browser_exit_calls[i].call/4]=exit_jal(html.text_addr+browser_exit_calls[i].target);text[browser_exit_calls[i].call/4+1]=browser_exit_calls[i].delay;}
+ control->exit_owner=-1;
+ unsigned last=browser_exit_calls[5].call/4,first=text[browser_exit_calls[0].call/4];text[last]^=4;
+ observe_exit(&html);assert(control->exit_status<0 && text[browser_exit_calls[0].call/4]==first);
+ text[last]^=4;observe_exit(&html);assert(control->exit_status==1 && control->exit_owner==45);
+ for(unsigned i=0;i<WIFI_EXIT_STAGES;++i){assert(control->exit_originals[i]==html.text_addr+browser_exit_calls[i].target);assert(text[browser_exit_calls[i].call/4]==exit_jal(control->exit_callbacks[i]));assert(text[browser_exit_calls[i].call/4+1]==browser_exit_calls[i].delay);}
+ observe_exit(&html);assert(control->exit_status==1);
+ exit_present=1;vsh_present=0;assert(!wifi_menu_can_stop() && wifiMenuRelease()==-2 && wifi_menu_stop()==-2);exit_present=0;vsh_present=1;
+ munmap(text,0x20000);
+}
 int main(void)
 {
  void *memory=mmap((void *)(VSH_TEST_BASE&~0xfffu),0x100000,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED_NOREPLACE,-1,0);
@@ -190,6 +208,7 @@ int main(void)
  seed(text);request->active=0;request->pending=0;assert(!wifi_menu_init());
  assert(!wifiMenuRegister(0x09002000,sizeof(*request),cb[0],cb[1]) && !request->active);
  vsh_present=1;assert(handler(&vsh)==17 && request->active);
+ check_browser_exit();
  puts("XMB guards, atomic preflight, user registration, CFW chaining and unload refusal passed");
  return 0;
 }

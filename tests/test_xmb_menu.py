@@ -148,6 +148,7 @@ int sceKernelDeleteThread(int);
 int sceKernelWaitThreadEnd(int,unsigned *);
 int sceKernelDelayThread(unsigned);
 ''')
+            (tmp/'pspiofilemgr.h').write_text('#define PSP_O_WRONLY 1\n#define PSP_O_CREAT 2\n#define PSP_O_APPEND 4\nint sceIoOpen(const char *,int,int);\nint sceIoWrite(int,const void *,unsigned);\nint sceIoClose(int);\n')
             exe=tmp/'bridge'
             subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-pointer-to-int-cast',
                 '-Wno-int-to-pointer-cast','-fno-pie','-no-pie','-fsanitize=address,undefined',

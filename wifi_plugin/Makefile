@@ -7,7 +7,7 @@ PSP_FW_VERSION = 661
 PSPSDK = $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build_prx.mak
 main.o: policy.h menu_control.h menu_runtime.h
-menu_runtime.o: menu_runtime.h menu_guards.h menu_patch.h menu_control.h
+menu_runtime.o: browser_exit_patch.h menu_runtime.h menu_guards.h menu_patch.h menu_control.h
 
 package: all
 	$(MAKE) -C ../virtual_net/driver USB_LAB=1
