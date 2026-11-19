@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "../wifi_plugin/main.c"
 void wifi_thread_watch(unsigned now){(void)now;}
+int wifi_thread_watch_start(void){return 0;}
+int wifi_thread_watch_stop(void){return 0;}
 static int power_stop_allowed=1;
 int wifi_power_can_stop(void){return power_stop_allowed;}
 void wifi_menu_snapshot(wifi_menu_snapshot_t *out){memset(out,0,sizeof(*out));}

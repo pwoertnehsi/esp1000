@@ -188,3 +188,33 @@ suspension, running/ready normalization and heartbeat. Only wifi_vsh.prx changes
 bridge0.26, ESP firmware, browser launch and network/power policy remain as before.
 A hardware exit run is required. This is diagnostic instrumentation, not a
 verified browser-exit fix.
+
+## Circle result and separate Sony observer (VSH entry 0.28)
+
+The requested 0.27 run was Circle exit, not HOME/XMB exit. These are distinct
+failures: the user previously reported rail power-off with Circle, versus power
+retained with HOME/XMB. Do not use a successful Circle transport teardown to rule
+out the earlier HOME/XMB disconnect stall.
+
+The latest Circle sequence reaches facade phase40 after helper/transport cleanup
+and returns zero. The plugin workers appear alive and normally waiting in the
+thread snapshots. Sony close-trace records were not appended for this Circle
+run; the stage6..8 lines remain from earlier runs. The browser still hangs after
+Circle. The observations narrow this path only; they do not resolve either exit.
+Failure logs are archived under artifacts/browser-exit-v027-failure-*.
+
+0.28 moves observation to a separate kernel thread, ESPBrowserWatch, so it no
+longer depends on progress through the main VSH monitor. It also samples threads
+whose entry addresses belong to the live HTML plugin, HVUI, Netfront, HTTP, VSH,
+PAF, launcher or RSS browser modules. browser-sony-thread.log records a timestamped
+snapshot every two seconds while the HTML plugin exists and one final snapshot
+after disappearance. Each row names the owner index in that order, thread name,
+UID, module-relative entry, status and wait object. No stacks, page contents or
+credentials are read. Existing plugin-worker observations remain in
+browser-thread.log. Both files respect USB mass-storage ownership.
+
+17 targeted tests pass and the PSP kernel build passes warnings as errors.
+Watcher startup failure and timed-out shutdown retain safe ownership behavior.
+This is further diagnosis, with no browser lifecycle or ESP change. Next test is
+Circle again to capture Sony waits on that path; HOME/XMB needs its own separate
+run, and RSS Guide can supply a successful-close comparison.
