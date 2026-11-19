@@ -59,9 +59,34 @@ wifi-plugin:
 	$(MAKE) -C browser_local/app
 	python3 tools/package_wifi_plugin.py
 
-# Current native plugins, clean-built together; output must be a fresh directory.
-.PHONY: production debug
+# Current supported build. Python prepares upstream sources and packages binaries;
+# all compiler invocations and dependency order belong to Make.
+.DEFAULT_GOAL := production
+PSP_COMPONENTS := virtual_net/driver wifi_plugin/native_usb wifi_plugin/native_session wifi_plugin wifi_plugin/menu_bridge
+AEMU_COMPONENTS := atpro memab pspnet_adhoc_auth pspnet_adhoc pspnet_adhocctl pspnet_adhoc_matching pspnet_shims
+.PHONY: production debug current-psp install esp-production esp-debug
 production:
-	python3 tools/build_psp.py --profile production --output $(or $(OUTPUT),build/production)
+	$(MAKE) current-psp PROFILE=production DIAGNOSTICS=0 OUTPUT="$(or $(OUTPUT),build/production)"
 debug:
-	python3 tools/build_psp.py --profile debug --output $(or $(OUTPUT),build/debug)
+	$(MAKE) current-psp PROFILE=debug DIAGNOSTICS=1 OUTPUT="$(or $(OUTPUT),build/debug)"
+current-psp:
+	@test ! -e "$(OUTPUT)" || { echo 'Use a fresh OUTPUT directory; existing builds are preserved.'; exit 1; }
+	mkdir -p "$(OUTPUT)"
+	@set -e; for component in $(PSP_COMPONENTS); do \
+		$(MAKE) -C $$component clean USB_LAB=1 DIAGNOSTICS=$(DIAGNOSTICS); \
+		$(MAKE) -C $$component USB_LAB=1 DIAGNOSTICS=$(DIAGNOSTICS); \
+	done
+	python3 tools/prepare_aemu.py --output "$(OUTPUT)/aemu-build" $(if $(filter production,$(PROFILE)),--production,)
+	@set -e; for component in $(AEMU_COMPONENTS); do \
+		$(MAKE) -C "$(OUTPUT)/aemu-build/source/$$component" CONFIG_660=1 RELEASE=1; \
+	done
+	python3 tools/package_psp.py --profile $(PROFILE) --output "$(OUTPUT)" $(if $(SERVER),--server "$(SERVER)",)
+install:
+	@test -n "$(PSP)" || { echo 'Set PSP to the mounted memory-stick root.'; exit 1; }
+	python3 tools/install_psp.py --build "$(or $(BUILD),build/production/psp)" --psp "$(PSP)"
+esp-production:
+	mkdir -p esp_link/build-production
+	IDF_COMPONENT_MANAGER=0 idf.py -C esp_link -B esp_link/build-production -D SDKCONFIG=build-production/sdkconfig -D 'SDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.production' build
+esp-debug:
+	mkdir -p esp_link/build-debug
+	IDF_COMPONENT_MANAGER=0 idf.py -C esp_link -B esp_link/build-debug -D SDKCONFIG=build-debug/sdkconfig -D SDKCONFIG_DEFAULTS=sdkconfig.defaults build

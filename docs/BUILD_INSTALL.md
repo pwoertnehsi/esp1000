@@ -45,12 +45,14 @@ directories into PSP/GAME/psp-browser when the destination is absent.
 ## Build the PSP production package
 
 ```sh
-python3 tools/build_psp.py --profile production --output build/my-production
+make production OUTPUT=build/my-production
 ```
 
-Equivalent: `make production OUTPUT=build/my-production`.
+Bare `make` also selects production. Make now owns compilation and build order;
+Python is used only to prepare the pinned upstream tree, package files/manifests,
+and install with checksums/backups. It no longer orchestrates compiler calls.
 Choose a fresh output directory each time; previous builds are preserved.
-The script cleans shared PSP objects before compiling, avoiding reuse of a
+Make cleans shared PSP objects before compiling, avoiding reuse of a
 module from a different diagnostics/backend build.
 
 Output:
@@ -60,7 +62,7 @@ Output:
 - `esp1000-source.zip`: project and adapted Ad Hoc source plus bundled CFW stubs.
 - `aemu-build/`: prepared Ad Hoc tree and build provenance.
 
-For a first Ad Hoc installation you can add `--server YOUR_PC_IPV4` to the build
+For a first Ad Hoc installation you can add `SERVER=YOUR_PC_IPV4` to the Make
 command. Otherwise create `seplugins/esp-adhoc/server.txt` yourself with the
 PPSSPP server's LAN IPv4 and a newline. Do not use the ESP's address. The
 installer preserves existing server, nickname, hotspot and port-offset files.
@@ -178,7 +180,7 @@ and [build configuration guide](https://docs.espressif.com/projects/esp-idf/en/r
 
 | Setting | Production | Diagnostic build |
 | --- | --- | --- |
-| PSP package | `--profile production` | `--profile debug` |
+| PSP build | `make production` | `make debug` |
 | Individual PSP Makefiles | `DIAGNOSTICS=0` | `DIAGNOSTICS=1` (default) |
 | C macro | `ESP1000_DIAGNOSTICS=0` | `ESP1000_DIAGNOSTICS=1` |
 | Ad Hoc preparer | `--production` | omit `--production` |
@@ -196,7 +198,7 @@ and identical networking, power and callback-routing behavior.
 For a PSP problem:
 
 ```sh
-python3 tools/build_psp.py --profile debug --output build/my-debug
+make debug OUTPUT=build/my-debug
 python3 tools/install_psp.py --build build/my-debug/psp --psp MOUNT
 ```
 
@@ -266,3 +268,9 @@ original signed PRXs, kept separate from decrypted analysis copies. They now
 live under PSP/GAME/psp-browser. The fixed-length brows0: alias routes Sony's
 original short paths to that longer location through a read-only allowlist;
 no firmware string buffer is expanded or flash path globally redirected.
+
+
+The kernel/user split and runtime server/profile settings are explained in
+[PLUGIN_ARCHITECTURE.md](PLUGIN_ARCHITECTURE.md). Current supported commands are
+`make production`, `make debug`, `make install PSP=MOUNT BUILD=PACKAGE/psp`,
+`make esp-production` and `make esp-debug` (activate IDF first for ESP targets).

@@ -1,6 +1,6 @@
 # Repository cleanup map
 
-This is a dependency inventory for the production path in tools/build_psp.py and
+This is a dependency inventory for the production path in tools/package_psp.py and
 esp_link/CMakeLists.txt, not an instruction to delete files. Nothing listed here
 was removed. The root Makefile's older targets and some tests still use the
 experimental applications, so cleaning them up also means updating those targets
@@ -22,7 +22,7 @@ and tests.
 | browser_local/app/adapter.c, adapter.h, dns.c, dns.h, lookup.c, lookup.h | Shared live network facade/DNS helpers compiled into native_session |
 | browser_local/driver/path_patch.c, path_patch.h, asset_device.c, asset_device.h, browser_guards.h | Compiled/included by current VSH browser runtime |
 | analysis/browser_asset_matrix.json | Input to first-install browser-asset preparation; not just a historical report |
-| tools/build_psp.py, install_psp.py, prepare_aemu.py, package_esp.py | Current production build/install path |
+| tools/package_psp.py, install_psp.py, prepare_aemu.py, package_esp.py | Current production build/install path |
 | tools/prepare_browser_firmware.py, prepare_browser_local.py, prepare_browser_signed.py, inspect_prx.py | First-install local browser assets and firmware inspection |
 | tools/configure_adhoc_game.py | Optional per-title ARK compatibility settings |
 | tools/esp_bridge.py, esp_bridge_host.py, esp_uart.py, read_ssl_capture.py | Optional active debugging/flash/capture tools |
@@ -45,7 +45,7 @@ do not remove them because the old EBOOT launcher is no longer used.
 | virtual_net/app/main.c and standalone app packaging | Old interface/packet experiment; production uses selected native_* sources listed above, not this application |
 | browser_local/app/main.c and its EBOOT launcher | Earlier standalone diagnostic browser; production now launches Sony's native VSH entry |
 | browser_local/driver/main.c, code_patch.c and old launcher-specific guards | Earlier standalone browser PRX/patch path; production uses selected shared files, not the complete browser_paths PRX. Keep shared dependencies above |
-| tools/package_wifi_plugin.py, package_browser_code.py, package_adhoc.py | Historical candidate packages. New production packaging is tools/build_psp.py; older Makefile targets/docs still refer to these scripts |
+| tools/package_wifi_plugin.py, package_browser_code.py, package_adhoc.py | Historical candidate packages. New production packaging is tools/package_psp.py; older Makefile targets/docs still refer to these scripts |
 | tools/prepare_xmb_menu.py, collect_sdk_nids.py, make_ifhandle_guard.py, map_prx_dependencies.py | Analysis/guard generation tools; not required for a routine build with committed guards, useful for firmware-porting work |
 
 Most analysis/ reports and older milestone/investigation documents are build-time
@@ -78,3 +78,9 @@ need it, but it is not replaceable from our code-only package.
 A small buildable checkout still needs the shared portions of browser_local/ and
 virtual_net/, the pinned third_party/aemu checkout, and current tools/common/.
 Moving those shared sources into clearer directories would be a separate refactor.
+
+
+The kernel/user split and runtime server/profile settings are explained in
+[PLUGIN_ARCHITECTURE.md](PLUGIN_ARCHITECTURE.md). Current supported commands are
+`make production`, `make debug`, `make install PSP=MOUNT BUILD=PACKAGE/psp`,
+`make esp-production` and `make esp-debug` (activate IDF first for ESP targets).

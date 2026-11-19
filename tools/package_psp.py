@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Clean-build and package the native VSH and GAME plugins together."""
+"""Package already-built native VSH and GAME modules; Make owns compilation."""
 import argparse
 import hashlib
 import ipaddress
@@ -10,14 +10,8 @@ import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPONENTS = ('virtual_net/driver', 'wifi_plugin/native_usb',
-              'wifi_plugin/native_session', 'wifi_plugin', 'wifi_plugin/menu_bridge')
 AEMU_COMPONENTS = ('atpro', 'memab', 'pspnet_adhoc_auth', 'pspnet_adhoc',
                    'pspnet_adhocctl', 'pspnet_adhoc_matching', 'pspnet_shims')
-
-
-def run(*args):
-    subprocess.run(list(map(str, args)), cwd=ROOT, check=True)
 
 
 def main():
@@ -28,20 +22,10 @@ def main():
                         help='Optional PPSSPP server for a first installation; installer preserves existing config')
     args = parser.parse_args()
     out = args.output.resolve()
-    if out.exists():
-        parser.error('Use a fresh --output directory (existing builds are preserved)')
-    if not (ROOT/'third_party/aemu/.git').exists():
-        parser.error('Clone pinned third_party/aemu with its submodules first; see docs/BUILD_INSTALL.md')
-    out.mkdir(parents=True)
     diagnostics = int(args.profile == 'debug')
-    for component in COMPONENTS:
-        run('make', '-C', component, 'clean', 'USB_LAB=1', f'DIAGNOSTICS={diagnostics}')
-        run('make', '-C', component, 'USB_LAB=1', f'DIAGNOSTICS={diagnostics}')
     prepared = out/'aemu-build'
-    command = ['python3', 'tools/prepare_aemu.py', '--output', prepared, '--build']
-    if not diagnostics:
-        command.append('--production')
-    run(*command)
+    if not (prepared/'provenance.json').is_file():
+        parser.error('Prepared build is missing; use make production or make debug')
     stage = out/'psp'
     wifi = stage/'seplugins/esp-wifi'
     game = stage/'seplugins/esp-adhoc'
