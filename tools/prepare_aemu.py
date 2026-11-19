@@ -108,6 +108,15 @@ static void esp_patch_imports(SceModule2 *module)
     replace(atpro,'printk("Kernel Loader Hook: %d\\n", result);','esp_boot_log(2,result);\n    printk("Kernel Loader Hook: %d\\n", result);')
     replace(atpro,'printk("User Loader Hook: %d\\n", result);','esp_boot_log(3,result);\n    printk("User Loader Hook: %d\\n", result);')
     replace(atpro,'sctrlHENPatchSyscall((void*)sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x4AC57943), cbdeny);','if(sceKernelGetModel()!=10)sctrlHENPatchSyscall((void*)sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x4AC57943), cbdeny);')
+    # Keep the upstream diagnostic HUD entirely off the production input/display path.
+    replace(atpro, 'printk("%s: hooking hud drawing and input\\n", __func__);',
+            'if(ESP1000_DIAGNOSTICS) {\n\t\tprintk("%s: hooking hud drawing and input\\n", __func__);')
+    replace(atpro, 'hook_import_bynid((SceModule *)module, "sceCtrl", 0xC152080A, peek_buffer_negative);',
+            'hook_import_bynid((SceModule *)module, "sceCtrl", 0xC152080A, peek_buffer_negative);\n\t\t}')
+    replace(atpro, 'int ctrl = sceKernelCreateThread("atpro_input", input_thread, 0x10, 32768, 0, NULL);',
+            'int ctrl = ESP1000_DIAGNOSTICS ? sceKernelCreateThread("atpro_input", input_thread, 0x10, 32768, 0, NULL) : -1;')
+    replace(atpro, 'running = -1;\n\t\n\t// Wait for GUI Shutdown\n\twhile(running != 0) sceKernelDelayThread(10000);',
+            'if(running == 1) {\n\t\trunning = -1;\n\t\twhile(running != 0) sceKernelDelayThread(10000);\n\t}')
     replace(atpro,'scePowerLock(0);','if(sceKernelGetModel()!=10)scePowerLock(0);')
     replace(tree/'atpro/exports.exp','PSP_END_EXPORTS','PSP_EXPORT_START(esp1000_kernel, 0, 0x4001)\nPSP_EXPORT_FUNC_HASH(esp_game_switch)\nPSP_EXPORT_END\nPSP_END_EXPORTS')
     replace(tree/'atpro/exports.exp','PSP_EXPORT_FUNC_HASH(module_stop)','PSP_EXPORT_FUNC_HASH(module_stop)\nPSP_EXPORT_FUNC_HASH(module_reboot_before)')

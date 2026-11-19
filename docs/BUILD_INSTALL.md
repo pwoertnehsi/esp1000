@@ -184,6 +184,10 @@ and [build configuration guide](https://docs.espressif.com/projects/esp-idf/en/r
 | Ad Hoc preparer | `--production` | omit `--production` |
 | ESP SDK defaults | base plus sdkconfig.production | base sdkconfig.defaults only |
 
+Production also omits aemu HUD display/controller hooks and the HUD input thread.
+HOME therefore opens the stock game menu without the Ad Hoc overlay. The overlay
+remains available in the debug profile.
+
 The PSP debug profile enables project diagnostics, not upstream aemu DEBUG mode:
 upstream still builds RELEASE=1 in both profiles. Do not use an unadapted atpro
 binary or independently flip upstream flags. Both profiles retain optimization

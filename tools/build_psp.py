@@ -77,7 +77,7 @@ def main():
                      b'ms0:/ssl-capture.log', b'ms0:/psp-vnet.log',
                      b'ms0:/esp-adhoc.log', b'ms0:/esp-adhoc-power.log',
                      b'ms0:/esp-adhoc-plugin.log', b'ms0:/wifi-power.log',
-                     b'ESPBrowserWatch', b'VirtualNetLog')
+                     b'ESPBrowserWatch', b'VirtualNetLog', b'atpro_input')
         for path in stage.rglob('*.prx'):
             data = path.read_bytes()
             if any(value in data for value in forbidden):
