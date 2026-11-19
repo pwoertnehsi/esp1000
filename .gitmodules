@@ -1,0 +1,3 @@
+[submodule "third_party/aemu"]
+	path = third_party/aemu
+	url = https://github.com/Kethen/aemu.git
