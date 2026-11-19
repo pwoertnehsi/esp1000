@@ -24,7 +24,7 @@ class NativeScanTest(unittest.TestCase):
 #define NATIVE_TEST_SHIM
 #include <stdint.h>
 typedef int SceUID;
-typedef struct {char modname[28];unsigned char version[2],nsegment;unsigned attribute;int modid;unsigned text_addr,text_size,segmentaddr[4],segmentsize[4];} SceModule;
+typedef struct {char modname[28];unsigned char version[2],nsegment;unsigned attribute;int modid;unsigned text_addr,text_size,segmentaddr[4],segmentsize[4],gp_value;} SceModule;
 typedef int (*STMOD_HANDLER)(SceModule *);
 unsigned pspSdkSetK1(unsigned);
 int sceKernelCpuSuspendIntr(void);

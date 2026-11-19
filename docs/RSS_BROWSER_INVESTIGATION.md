@@ -101,3 +101,34 @@ including relocated preflight, delay preservation, user bridge forwarding and
 live-owner unload refusal. A standalone online close test using HOME then
 Settings is required after installation. RSS can then provide a comparison for
 the specific operation that stalls; copying mode12 alone is still unsupported.
+
+## Disconnect lookup change (VSH entry/bridge 0.25)
+
+The user provided two fully-loaded-page exit runs: Circle powered the ESP off
+but left the UI unresponsive; HOME/XMB exit retained ESP power until shutdown.
+Installed-file hashes and the trace marker identified 0.23, so neither run
+contained the corrected 0.24 close trace. Logs are preserved in
+artifacts/browser-exit-two-runs-20261119.
+
+The latest completed Circle disconnect reached facade phase40 after helper
+cleanup, consistent with rail power-off. The final XMB disconnect reached
+phase21 (state publication) and stopped before callback validation/invocation
+and cleanup. A user-side module-information lookup sits between these records.
+This is consistent with a ModuleMgr lock cycle during module stop; without
+thread stacks it is a candidate cause, not a proven explanation of both hangs.
+
+0.25 replaces teardown/monitor owner queries and per-event callback validation
+with guarded kernel exports using direct LoadCore UID lookups under an interrupt
+guard. Only already-registered native consumers are accepted; recorded text
+addresses, callback range/alignment and GP still have to match. Module identity
+checks are retained. Handler reservation and removal revalidation remain, so
+removal during validation cancels delivery before the callback runs.
+
+Regression tests forbid user ModuleMgr lookups during event delivery, handler
+removal and connection monitoring, including removal during validation and an
+invalid owner. Kernel tests reject dead/replaced owners, wrong GP and callbacks
+outside module text. Thirteen native/XMB/VSH tests pass under ASan/UBSan and both
+PSP modules build with warnings as errors. 0.25 includes the corrected close
+trace and its independent hook-status logging. No ESP firmware, launch mode,
+certificate policy or power timing is changed. Hardware exit verification is
+pending; Circle and XMB outcomes must still be tested separately.

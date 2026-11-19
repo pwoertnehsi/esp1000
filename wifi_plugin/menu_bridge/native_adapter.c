@@ -15,6 +15,8 @@
 #include "native_adapter.h"
 extern int wifiNativeRegister(unsigned,unsigned);
 extern int wifiNativeRefresh(void);
+extern int wifiNativeOwnerAlive(int);
+extern int wifiNativeCallbackValid(unsigned,int,unsigned);
 static unsigned owned_net_modules;
 typedef void (*event_fn)(int,int,int,int,void *);
 extern void wifiNativeInvoke(unsigned,event_fn,int,int,int,int,void *);
@@ -162,10 +164,7 @@ static int get_entry(unsigned id,unsigned field,void *out)
     leave();return 0;
 }
 static int browser_alive(void)
-{
-    SceModule m;
-    return hooks.browser_owners[0]>=0 && kuKernelFindModuleByName("htmlviewer_plugin_module",&m)>=0 && m.modid==hooks.browser_owners[0];
-}
+{return hooks.browser_owners[0]>=0 && wifiNativeOwnerAlive(hooks.browser_owners[0]);}
 static int callback_owner(int id)
 {
     if(id==hooks.owner)return 1;
@@ -197,7 +196,7 @@ static int del_handler(int id)
     while(busy && caller!=thread) {
         sceKernelDelayThread(1000);enter();busy=handlers[i].busy;leave();
     }
-    int browser=browser_alive(); /* ModuleMgr lookup must not hold our lock. */
+    int browser=browser_alive(); /* Nonblocking LoadCore check, outside our lock. */
     enter();int any=0;for(unsigned j=0;j<16;++j)any|=handlers[j].active;
     if(!any && !browser)cancel=1;
     leave();trace_event(13,i,id);return 0;
@@ -217,9 +216,7 @@ static void emit(int next,int event,int error)
         if(fn)handlers[i].busy=1; /* Reserve the slot across lookup/call. */
         leave();
         if(!fn)continue;
-        SceModule m;
-        int valid=kuKernelFindModuleByAddress((void *)fn,&m)>=0 &&
-            m.modid==owner && m.gp_value==gp;
+        int valid=wifiNativeCallbackValid((unsigned)fn,owner,gp);
         enter();
         valid=valid && handlers[i].active && handlers[i].id==id;
         if(!valid){handlers[i].active=0;handlers[i].busy=0;}
@@ -353,8 +350,7 @@ static int monitor_network(void)
     while(running && !cancel && session.alive) {
         if(!session.ready && state==4)emit(2,10,0);
         else if(session.ready && state!=4){emit(3,3,0);emit(4,4,0);}
-        SceModule m;
-        int netconf=kuKernelFindModuleByName("sceVshNetconf_Module",&m)>=0 && m.modid==hooks.owner;
+        int netconf=wifiNativeOwnerAlive(hooks.owner);
         if(!netconf && !browser_alive()){cancel=1;session.cancel=1;break;}
         sceKernelDelayThread(20000);
     }

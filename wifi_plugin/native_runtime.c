@@ -91,6 +91,33 @@ static int patch_netconf(SceModule *m,int refresh)
 }
 #include "browser_import_hooks.h"
 #include "tls_hooks.h"
+/* LoadCore list queries are nonblocking under the interrupt guard. Teardown
+ * callbacks must not use ModuleMgr's user QueryModuleInfo path: a module stop
+ * can own that lock while waiting for the disconnect event to finish. */
+static SceModule *native_callback_owner(int id)
+{
+    if(!hooks || id<0)return NULL;
+    unsigned expected=0;
+    if(id==owner)expected=owner_text;
+    for(unsigned i=0;i<WIFI_NATIVE_CONSUMERS;++i)
+        if(id==hooks->browser_owners[i])expected=browser_owner_text[i];
+    SceModule *m=expected?sceKernelFindModuleByUID(id):NULL;
+    return m && m->text_addr==expected?m:NULL;
+}
+int wifiNativeOwnerAlive(int id)
+{
+    unsigned k1=pspSdkSetK1(0);int intr=sceKernelCpuSuspendIntr();
+    int alive=native_callback_owner(id)!=NULL;
+    sceKernelCpuResumeIntr(intr);pspSdkSetK1(k1);return alive;
+}
+int wifiNativeCallbackValid(unsigned address,int id,unsigned gp)
+{
+    unsigned k1=pspSdkSetK1(0);int intr=sceKernelCpuSuspendIntr();
+    SceModule *m=native_callback_owner(id);
+    int valid=m && m->gp_value==gp && owned(m,address,4,1);
+    sceKernelCpuResumeIntr(intr);pspSdkSetK1(k1);return valid;
+}
+
 static int observe(SceModule *m)
 {
     if(m && !strcmp(m->modname,"sceNetApctl_Library")) {

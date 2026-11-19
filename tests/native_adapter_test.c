@@ -16,12 +16,15 @@ int sceUsbGetDrvState(const char *p){assert(!strcmp(p,"USBStor_Driver"));return 
 int sceIoOpen(const char *p,int f,int m){assert(!lock_depth);(void)p;(void)f;(void)m;return 7;}
 int sceIoWrite(int f,const void *p,unsigned n){assert(f==7 && n<sizeof(last_log));if(n>=7 && !memcmp(p,"FACADE ",7)){++facade_traces;return n;}memcpy(last_log,p,n);last_log[n]=0;return n;}
 int sceIoClose(int f){(void)f;return 0;}
-static int lookup_result,browser_available,profile_security=-1,lookup_cancel_id;
-int kuKernelFindModuleByAddress(void *p,SceModule *m){assert(!lock_depth);if(lookup_cancel_id){int id=lookup_cancel_id;lookup_cancel_id=0;assert(!del_handler(id));}if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;m->gp_value=0x09123450;return 0;}
-int kuKernelFindModuleByName(char *p,SceModule *m){assert(!lock_depth);
+static int lookup_result,browser_available,profile_security=-1,lookup_cancel_id,forbid_module_lookup;
+int kuKernelFindModuleByAddress(void *p,SceModule *m){assert(!lock_depth && !forbid_module_lookup);if(lookup_result)return lookup_result;m->modid=hooks.owner;m->text_addr=(unsigned)(uintptr_t)p;m->text_size=4;m->gp_value=0x09123450;return 0;}
+int kuKernelFindModuleByName(char *p,SceModule *m){assert(!lock_depth && !forbid_module_lookup);
     if(!strcmp(p,"htmlviewer_plugin_module")){if(!browser_available)return -1;m->modid=123;return 0;}
     m->modid=hooks.owner;return 0;
 }
+int wifiNativeOwnerAlive(int id){assert(!lock_depth);return id>=0 && ((id==123 && browser_available) || id==hooks.owner);}
+int wifiNativeCallbackValid(unsigned address,int id,unsigned gp)
+{assert(!lock_depth && address && id==hooks.owner && gp==0x09123450);if(lookup_cancel_id){int deleting=lookup_cancel_id;lookup_cancel_id=0;assert(!del_handler(deleting));}return lookup_result==0;}
 static unsigned callback_invocations;
 void wifiNativeInvoke(unsigned gp,event_fn fn,int old,int next,int code,int error,void *arg)
 {assert(gp==0x09123450);++callback_invocations;fn(old,next,code,error,arg);}
@@ -138,16 +141,16 @@ int main(void)
     handler=add_handler(event,(void *)1);assert(handler>0);event_count=0;
     running=1;pending=1;cancel=0;state=4;network_started=1;session.alive=1;session.ready=1;
     power_owned=rail_on=1;
-    simulate_reconnect=1;assert(!monitor_network());simulate_reconnect=0;
+    forbid_module_lookup=1;simulate_reconnect=1;assert(!monitor_network());simulate_reconnect=0;forbid_module_lookup=0;
     assert(event_count==3 && events_seen[0]==10 && events_seen[1]==3 && events_seen[2]==4);
     assert(network_started && session.alive && state==4 && power_owned && rail_on);
     network_started=0;session.alive=0;pending=0;assert(!del_handler(handler));
     handler=add_handler(event,(void *)1);assert(handler>0);
-    unsigned before=callback_invocations;lookup_cancel_id=handler;
+    unsigned before=callback_invocations;lookup_cancel_id=handler;forbid_module_lookup=1;
     emit(0,5,0);assert(callback_invocations==before && !handlers[handler&15].busy);
-    handler=add_handler(event,(void *)1);assert(handler>0);lookup_result=-1;
+    forbid_module_lookup=0;handler=add_handler(event,(void *)1);assert(handler>0);lookup_result=-1;forbid_module_lookup=1;
     emit(0,5,0);assert(callback_invocations==before && !handlers[handler&15].active && !handlers[handler&15].busy);
-    lookup_result=0;
+    lookup_result=0;forbid_module_lookup=0;
     assert(callback_invocations>=3 && facade_traces>0);
     assert(!wifi_native_adapter_stop());
     assert(!rail_on && !power_owned && power_acquires && power_releases);

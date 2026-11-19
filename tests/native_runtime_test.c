@@ -55,6 +55,7 @@ int main(void)
     unsigned saved=request->callbacks[0];request->callbacks[0]=0x88000000;
     assert(wifiNativeRegister((unsigned)(uintptr_t)request,sizeof(*request))<0 && !hooks);request->callbacks[0]=saved;
     assert(!wifiNativeRegister((unsigned)(uintptr_t)request,sizeof(*request)));
+
     seed();unsigned *last=(void *)(uintptr_t)(netconf.text_addr+entries[10].offset);*last^=4;
     unsigned char before[157640];memcpy(before,(void *)(uintptr_t)netconf.text_addr,sizeof(before));
     assert(observe(&netconf)<0 && hooks->status==-14);
@@ -62,6 +63,15 @@ int main(void)
     seed();handler=prior;assert(!wifi_native_init());assert(handler(&netconf)==17 && prior_calls==1 && caches==2 && hooks->status==1);
     assert(*(unsigned *)(uintptr_t)(netconf.text_addr+0x89e4)==jump(request->callbacks[WIFI_NATIVE_GATE]));
     for(unsigned i=0;i<sizeof(entries)/sizeof(*entries);++i)assert(*(unsigned *)(uintptr_t)(netconf.text_addr+entries[i].offset)==jump(request->callbacks[entries[i].callback]));
+    netconf.gp_value=0x09123450;
+    assert(wifiNativeOwnerAlive(netconf.modid));
+    assert(wifiNativeCallbackValid(netconf.text_addr,netconf.modid,netconf.gp_value));
+    assert(!wifiNativeCallbackValid(netconf.text_addr,netconf.modid,netconf.gp_value+4));
+    assert(!wifiNativeCallbackValid(netconf.text_addr+netconf.text_size,netconf.modid,netconf.gp_value));
+    assert(!wifiNativeOwnerAlive(-1) && !wifiNativeOwnerAlive(999));
+    unsigned previous_text=netconf.text_addr;netconf.text_addr+=0x100;
+    assert(!wifiNativeOwnerAlive(netconf.modid));netconf.text_addr=previous_text;
+    present=0;assert(!wifiNativeOwnerAlive(netconf.modid));present=1;
     assert(wifi_native_stop()==-2 && handler==on_start && hooks);
     assert(handler(&netconf)==17 && caches==2);
     /* Actual loader state absent from the previous test: syscall21/NOP weak
@@ -107,6 +117,9 @@ int main(void)
         *last_stub=0x54c;
         assert(!patch_browser_imports(&browser) && hooks->browser_owners[g]==browser.modid && (hooks->consumer_mask&(1u<<g)));
         assert(*first==jump(hooks->callbacks[b->entries[0].callback]));
+        browser.gp_value=0x09234560;
+        assert(wifiNativeOwnerAlive(browser.modid));
+        assert(wifiNativeCallbackValid(browser.text_addr,browser.modid,browser.gp_value));
         assert(wifi_native_stop()==-2);
         api_present=1;
         *first=jump(api.text_addr+b->entries[0].api_offset);
