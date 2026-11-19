@@ -15,3 +15,16 @@ class WifiPluginTest(unittest.TestCase):
                             '-fno-pie','-no-pie','-fsanitize=address,undefined','-I',str(tmp),'-I',str(ROOT/'tests'),
                             str(ROOT/'tests/wifi_plugin_test.c'),'-o',str(exe)],check=True)
             subprocess.run([str(exe)],check=True,timeout=5,env={**os.environ,'ASAN_OPTIONS':'detect_leaks=0'})
+
+    def test_thread_watch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tmp = Path(directory)
+            for header in ('pspkernel.h', 'psploadcore.h', 'pspusb.h'):
+                (tmp / header).write_text('#include "wifi_plugin_shim.h"\n')
+            exe = tmp / 'thread-watch-test'
+            subprocess.run(['cc', '-std=c11', '-Wall', '-Wextra', '-Werror',
+                            '-fsanitize=address,undefined', '-fno-pie', '-no-pie',
+                            '-I', str(tmp), '-I', str(ROOT/'tests'),
+                            str(ROOT/'tests/thread_watch_test.c'), '-o', str(exe)], check=True)
+            subprocess.run([str(exe)], check=True, timeout=5,
+                           env={**os.environ, 'ASAN_OPTIONS': 'detect_leaks=0'})

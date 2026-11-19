@@ -1,12 +1,13 @@
 TARGET = wifi_vsh
-OBJS = accessory_power.o accessory_syscon.o main.o menu_runtime.o native_runtime.o browser_runtime.o browser_paths.o browser_assets.o exports.o
+OBJS = accessory_power.o accessory_syscon.o main.o menu_runtime.o native_runtime.o browser_runtime.o browser_paths.o browser_assets.o thread_watch.o exports.o
 USE_KERNEL_LIBS = 1
 CFLAGS = -O2 -G0 -Wall -Wextra -Werror -fno-pic
 LIBS = -lpspsystemctrl_kernel -lpspsysmem_kernel_660 -lpspinit_kernel_660 -lpspctrl_driver -lpspusb_driver -lpspge_driver -lpspsdk
 PSP_FW_VERSION = 661
 PSPSDK = $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build_prx.mak
-main.o: policy.h menu_control.h menu_runtime.h
+main.o: policy.h menu_control.h menu_runtime.h thread_watch.h
+thread_watch.o: thread_watch.h
 menu_runtime.o: browser_exit_patch.h menu_runtime.h menu_guards.h menu_patch.h menu_control.h
 
 package: all

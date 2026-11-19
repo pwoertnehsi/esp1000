@@ -161,3 +161,30 @@ and lock-wait recovery in addition to existing ownership/lifecycle checks. Both
 PSP modules build with warnings as errors. No ESP update, launch-mode change or
 verified browser-exit success is claimed. Hardware XMB-exit verification remains
 pending. Previous images and logs are archived in artifacts/browser-exit-v026.
+
+## Independent thread observation (VSH entry 0.27, bridge 0.26)
+
+The 0.26 hardware run still hung. Sony shutdown stages6..8 returned again;
+facade disconnect stopped after phase21. No semaphore-timeout or dropped-log
+record was found. These records do not establish whether the facade worker was
+blocked, suspended, terminated, or whether its log consumer stopped. Failure logs
+are preserved in artifacts/browser-exit-v026-failure. APCTL GetInfo was also
+reviewed: its adapter already copies only the requested field's width.
+
+0.27 adds an independent kernel-monitor snapshot to ms0:/browser-thread.log.
+Slot0 is ESPNativeSettings; slot1 is ESPStockBrowser. Only entries inside the live ESP WiFi XMB
+Bridge module's text are accepted. Records contain timestamp, UID, status,
+wait type/object and exit status; they contain no stack contents or credentials.
+Running and ready are normalized to status3 to reduce sampling noise. Raw other
+status values are retained. A zero UID means no matching worker was enumerated;
+truncated enumerations are ignored. Sampling occurs at most twice per second,
+with a five-second heartbeat while the native worker exists. Transitions are
+written by the kernel monitor, independently of the user-side log queue.
+Storage ownership prevents file writes. No worker is resumed or forcibly stopped.
+
+The kernel build passes warnings as errors and 17 targeted tests pass, including
+storage refusal, module ownership, truncated enumeration, disappearance,
+suspension, running/ready normalization and heartbeat. Only wifi_vsh.prx changes;
+bridge0.26, ESP firmware, browser launch and network/power policy remain as before.
+A hardware exit run is required. This is diagnostic instrumentation, not a
+verified browser-exit fix.

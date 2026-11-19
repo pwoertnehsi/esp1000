@@ -15,8 +15,9 @@
 #include "native_runtime.h"
 #include "menu_control.h"
 #include "browser_runtime.h"
+#include "thread_watch.h"
 
-PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,26);
+PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,27);
 extern int wifi_power_can_stop(void);
 #define CHORD (PSP_CTRL_LTRIGGER|PSP_CTRL_RTRIGGER|PSP_CTRL_SQUARE)
 #define ROWS 64u
@@ -117,6 +118,7 @@ static int monitor(SceSize size,void *args)
         int state=sceUsbGetState(),foreign=foreign_usb();
         int flag=usb_flag?usb_flag():-1;
         unsigned now=sceKernelGetSystemTimeLow();
+        wifi_thread_watch(now);
         remember(now,state,foreign,flag);
         SceCtrlData pad;memset(&pad,0,sizeof(pad));
         int pad_result=sceCtrlPeekBufferPositive(&pad,1);
@@ -194,7 +196,7 @@ int module_start(SceSize size,void *args)
 {
     (void)size;(void)args;
     unsigned devkit=sceKernelDevkitVersion();int model=sceKernelGetModel(),context=sceKernelInitKeyConfig();
-    diagnostic("BEGIN ESP WiFi VSH Entry0.26 devkit=%08x model=%d context=%08x\n",devkit,model,context);
+    diagnostic("BEGIN ESP WiFi VSH Entry0.27 devkit=%08x model=%d context=%08x\n",devkit,model,context);
     /* ARK VSH reports 6.60 on this 6.61 installation. This plugin changes no
      * global model values; native menu changes have separate exact ABI guards. */
     if((devkit!=0x06060110 && devkit!=0x06060010) || model!=10 || context!=PSP_INIT_KEYCONFIG_VSH) {
