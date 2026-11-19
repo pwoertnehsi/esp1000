@@ -36,6 +36,12 @@ static int original_close(int fd){assert(fd>=0);++closes;return 0;}
 int main(void)
 {
     assert(wait_budget(1)==10000 && wait_budget(12000)==60000000u && wait_budget(0xffffffffu)==60000000u && wait_budget(0)==30000000u);
+    unsigned char http[12];unsigned http_count=0;
+    assert(!status_prefix(http,&http_count,"HTTP/1.",7));
+    assert(status_prefix(http,&http_count,"1 403 Forbidden",15)==403 && http_count==12);
+    assert(!status_prefix(http,&http_count,"private response body",21));
+    http_count=0;assert(status_prefix(http,&http_count,"HTTP/1.1 200 OK",15)==200);
+    http_count=0;assert(!status_prefix(http,&http_count,"not HTTP data",13));
     uint8_t *conn=mmap((void *)0x09000000,8192,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED,-1,0);assert(conn!=(void *)-1);
     char *name=(void *)(conn+4096);strcpy(name,"en.touhouwiki.net");*(char **)(conn+0x38)=name;*(unsigned *)(conn+4)=1;
     struct sockaddr_in destination={.sin_port=__builtin_bswap16(443)};int error=0,syserror=0;

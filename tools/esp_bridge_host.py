@@ -82,7 +82,7 @@ def validate_request(request):
         if (not isinstance(command, str) or not command or len(command) > 80 or
                 any(ord(ch) < 32 or ord(ch) > 126 for ch in command)):
             raise ValueError("Commands must be printable ASCII, 1..80 characters")
-        if (command not in {"help", "status", "ping", "reset", "auto on", "auto off",
+        if (command not in {"help", "status", "ping", "tlscheck", "reset", "auto on", "auto off",
                             "vbus on", "vbus off"} and
                 not command.startswith(("ping ", "say "))):
             raise ValueError("Command is outside the PSP link firmware allowlist")

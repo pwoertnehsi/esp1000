@@ -170,3 +170,32 @@ remain. Regression tests cover a one-tick deadline, delayed successful reads,
 PSP build and three TLS sanitizer programs pass; HTTPS hardware confirmation
 is still required. Evidence and previous/new binaries are archived locally in
 artifacts/tls-offload-v05. RSS and standalone launch behavior is unchanged.
+
+## Cross-signed chains: ESP24
+
+The next hardware report confirmed HTTPS Suckless loading, but Google and Touhou
+Wiki stalled. PSP logs recorded upstream X.509 fatal errors (detail 0x3000).
+ESP-IDF v6.1's full certificate bundle was already enabled; its cross-signed
+chain support was disabled. ESP24 enables
+`CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_CROSS_SIGNED_VERIFY`. Trust remains the full
+compiled root bundle, with mandatory hostname, signature and validity checks.
+No insecure verification fallback is added.
+
+The explicit UART command `tlscheck` checks three verified TLS handshakes in
+sequence: site0=Suckless, site1=en.touhouwiki.net, site2=google.com. Its config
+comes from the same helper as the tunnel. It logs numeric verification results,
+never credentials or page contents. It performs no HTTP request and does not
+start automatically. The bridge host allowlist includes this command; an
+already-running helper needs one restart to load that allowlist update.
+
+On hardware all three sites returned verified=1/detail=0/flags=0. The user then
+confirmed Google loads in RSS Browser; Touhou Wiki still does not. Its remaining
+failure is unresolved: a successful standalone handshake does not prove the
+browser's redirect/content path succeeds. XMB bridge0.23 records the first HTTP
+response status per tunnel in ssl-offload.log to distinguish HTTP errors or
+redirects from TLS errors, without logging response headers/body.
+
+ESP24 app SHA256:
+`dbc6aedbf57fe425432fa5bf067162fdcc070df76e8aa6c27628c82e9486c1a7`.
+Flash verification passed; bootloader and partition images are unchanged.
+Evidence and previous binaries are archived locally in artifacts/rss-tls-v01.

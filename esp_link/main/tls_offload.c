@@ -14,6 +14,7 @@
 #include "esp_log.h"
 #include "esp_netif_sntp.h"
 #include "tls_offload.h"
+#include "tls_upstream.h"
 static SemaphoreHandle_t capacity;
 static volatile int usb_link;
 static volatile TickType_t down_at;
@@ -43,8 +44,7 @@ static void serve(void *arg)
     if(now<1704067200 && esp_netif_sntp_sync_wait(pdMS_TO_TICKS(12000))!=ESP_OK){status=-3;goto reply;}
     time(&now);if(now<1704067200){status=-3;goto reply;}
     tls=esp_tls_init();if(!tls){status=-4;goto reply;}
-    static const char *alpn[]={"http/1.1",NULL};
-    esp_tls_cfg_t config={.crt_bundle_attach=esp_crt_bundle_attach,.timeout_ms=12000,.alpn_protos=alpn};
+    esp_tls_cfg_t config=tls_upstream_config();
     /* hostname is passed unchanged: SNI and certificate-name verification use
      * the original URL identity. No skip_common_name or insecure fallback. */
     if(esp_tls_conn_new_sync(host,length,443,&config,tls)!=1){

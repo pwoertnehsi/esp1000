@@ -10,7 +10,7 @@
 #include "../tls_control.h"
 #include "../../common/tls_offload.h"
 static wifi_tls_control_t tls={.magic=WIFI_TLS_MAGIC,.abi=WIFI_TLS_ABI,.owner=-1};
-static struct {int fd,verified,error,connecting,closing;unsigned generation,io_events;void *bio,*ssl;} slots[TLS_OFFLOAD_SLOTS];
+static struct {int fd,verified,error,connecting,closing;unsigned generation,io_events,http_count;unsigned char http_prefix[12];void *bio,*ssl;} slots[TLS_OFFLOAD_SLOTS];
 static unsigned generation;
 static SceUID mutex=-1;
 extern int wifiTlsRegister(unsigned,unsigned);
@@ -115,6 +115,16 @@ static int handshake(void *ssl)
  * 4c88/4cb4. Do not assume the two APIs round-trip the same units. */
 static unsigned wait_budget(unsigned socket_ticks)
 {return !socket_ticks?30000000u:socket_ticks>=6000u?60000000u:socket_ticks*10000u;}
+/* Only inspect the fixed status-line prefix. No HTTP headers/body are logged. */
+static int status_prefix(unsigned char prefix[12],unsigned *count,const void *data,unsigned size)
+{
+    if(*count>=12)return 0;
+    unsigned take=12-*count;if(take>size)take=size;
+    memcpy(prefix+*count,data,take);*count+=take;
+    if(*count!=12 || memcmp(prefix,"HTTP/1.",7) || (prefix[7]!='0' && prefix[7]!='1') || prefix[8]!=' ' ||
+       prefix[9]<'1' || prefix[9]>'5' || prefix[10]<'0' || prefix[10]>'9' || prefix[11]<'0' || prefix[11]>'9')return 0;
+    return 100*(prefix[9]-'0')+10*(prefix[10]-'0')+prefix[11]-'0';
+}
 static int io(void *ssl,void *data,int length,int sending)
 {
     unsigned began=sceKernelGetSystemTimeLow(),epoch,limit=30000000u;
@@ -138,11 +148,13 @@ static int io(void *ssl,void *data,int length,int sending)
         if(slots[i].generation!=epoch || slots[i].ssl!=ssl || slots[i].fd!=fd || slots[i].closing){leave();return -1;}
         n=sending?sceNetInetSend(fd,data,length,MSG_DONTWAIT):sceNetInetRecv(fd,data,length,MSG_DONTWAIT);
         error=n>0?0:n==0 && !sending?6:n<0 && would_block()?(sending?3:2):1;
+        int http_status=n>0 && !sending?status_prefix(slots[i].http_prefix,&slots[i].http_count,data,(unsigned)n):0;
         int retry=length>0 && n<0 && (error==2 || error==3) && sceKernelGetSystemTimeLow()-began<limit;
         if(!retry) {
             int trace=slots[i].io_events<12;
             if(trace)++slots[i].io_events;
             slots[i].error=error;leave();
+            if(http_status)log_result("HTTP_STATUS",http_status);
             if(trace){log_result("IO_SOCKET_NONBLOCK",nonblocking);log_result("IO_LIMIT_US",limit);log_result("IO_WAIT_US",sceKernelGetSystemTimeLow()-began);log_result(sending?"WRITE_REQUEST":"READ_REQUEST",length);log_result(sending?"WRITE_RESULT":"READ_RESULT",n);log_result("IO_SSL_ERROR",error);}
             return n;
         }

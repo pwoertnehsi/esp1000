@@ -27,6 +27,7 @@
 #include "lab_gateway.h"
 #include "host_wakeup.h"
 #include "phy_recovery.h"
+#include "tls_upstream.h"
 #include "usb_host_recovery.h"
 
 void local_tcp_start(void);
@@ -552,8 +553,9 @@ static bool host_stop(void)
 static void handle_command(const char *line)
 {
     if (!strcmp(line, "help")) {
-        ESP_LOGI(TAG, "Commands: status | ping [text] | say <text> | auto on/off | vbus on/off | reset | help");
+        ESP_LOGI(TAG, "Commands: status | tlscheck | ping [text] | say <text> | auto on/off | vbus on/off | reset | help");
     } else if (!strcmp(line, "status")) print_status();
+    else if (!strcmp(line, "tlscheck")) tls_upstream_probe();
     else if (!strcmp(line, "auto on")) automatic = true;
     else if (!strcmp(line, "auto off")) automatic = false;
     else if (!strcmp(line, "vbus off")) {

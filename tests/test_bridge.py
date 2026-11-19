@@ -28,6 +28,7 @@ class BridgeTest(unittest.TestCase):
     def test_request_limits(self):
         self.assertEqual(host.validate_request({"op": "status"}), {"op": "status"})
         self.assertEqual(host.validate_request({"op": "capture"})["seconds"], 15)
+        self.assertEqual(host.validate_request({"op":"capture","commands":["tlscheck"]})["commands"],["tlscheck"])
         for value in [
             {"op": "exec", "command": "id"},
             {"op": "flash", "port": "/dev/sda"},
