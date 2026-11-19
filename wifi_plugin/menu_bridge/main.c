@@ -1,7 +1,8 @@
+#include "../../common/esp_diagnostics.h"
 #include <pspkernel.h>
 #include "../menu_control.h"
 #include "native_adapter.h"
-PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,26);
+PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,30);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
 extern int wifi_tls_init(void);
 extern int wifi_tls_can_stop(void);
@@ -11,6 +12,7 @@ extern int wifiMenuOriginal(int,int);
 static wifi_menu_control_t control={.magic=WIFI_MENU_MAGIC,.abi=WIFI_MENU_ABI};
 static void exit_log(unsigned stage,unsigned phase,unsigned result)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     char line[112];unsigned used=0;
     const char *names[]={"BROWSER_EXIT stage="," phase="," result="," hooks="};
     unsigned values[]={stage,phase,result,(unsigned)control.exit_status};

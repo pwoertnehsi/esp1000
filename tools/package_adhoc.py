@@ -39,7 +39,7 @@ def main():
     manifest={str(p.relative_to(out)):hashlib.sha256(p.read_bytes()).hexdigest() for p in out.rglob('*') if p.is_file()}
     (out/'SHA256.json').write_text(json.dumps(manifest,indent=2)+'\n')
     with zipfile.ZipFile(out.with_name(out.name+'-source.zip'),'w',zipfile.ZIP_DEFLATED) as z:
-        files=subprocess.check_output(['git','--git-dir=.git-local','--work-tree=.','ls-files','-c','-o','--exclude-standard'],cwd=ROOT,text=True).splitlines()
+        files=subprocess.check_output(['git','ls-files','-c','-o','--exclude-standard'],cwd=ROOT,text=True).splitlines()
         for name in files:
             p=ROOT/name
             if p.is_file():z.write(p,'esp1000/'+name)

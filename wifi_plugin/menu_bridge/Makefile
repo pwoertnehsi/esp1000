@@ -4,6 +4,8 @@ CFLAGS = -O2 -G0 -Wall -Wextra -Werror -fno-pic
 ASFLAGS = $(CFLAGS)
 LIBS = -lpspkubridge -lpsputility -lpspusb -lpspnet_inet
 PSP_FW_VERSION = 661
+DIAGNOSTICS ?= 1
+CFLAGS += -DESP1000_DIAGNOSTICS=$(DIAGNOSTICS)
 PSPSDK = $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build_prx.mak
 main.o: ../menu_control.h

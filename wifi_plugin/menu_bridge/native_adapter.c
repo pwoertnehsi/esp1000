@@ -1,3 +1,4 @@
+#include "../../common/esp_diagnostics.h"
 /* Stock netconf scan facade. Only real, completed ESP transactions are listed. */
 #include <pspkernel.h>
 #include <psploadcore.h>
@@ -42,6 +43,7 @@ static volatile unsigned log_guard,log_head,log_tail,log_dropped;
 static unsigned log_reported_drops;
 static void queue_log_to(const char *line,unsigned length,unsigned kind)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     if(length>sizeof(native_logs[0].bytes) || __sync_lock_test_and_set(&log_guard,1)){__sync_add_and_fetch(&log_dropped,1);return;}
     /* Keep headroom for disconnect/exit records during verbose TLS reads. */
     unsigned capacity=kind==2?NATIVE_LOG_CAPACITY-16u:NATIVE_LOG_CAPACITY;
@@ -57,6 +59,7 @@ void wifi_native_exit_log(const char *line,unsigned length){queue_log_to(line,le
 void wifi_native_ssl_log(const char *line,unsigned length){queue_log_to(line,length,2);}
 void wifi_native_log_drain(void)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     for(unsigned n=0;n<16;++n) {
         char line[160];unsigned length,kind;
         if(__sync_lock_test_and_set(&log_guard,1))return;
@@ -83,6 +86,7 @@ void wifi_native_log_drain(void)
 }
 static void log_result(unsigned command,int result,unsigned row_count)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     /* File ownership is checked only by the independent drain. */
     char line[160];unsigned used=0;
     const char *names[]={"NATIVE_DONE cmd="," result="," rows="," phase="," detail="};
@@ -97,6 +101,7 @@ static void log_result(unsigned command,int result,unsigned row_count)
 /* Small bounded event records; never write while PC storage owns the stick. */
 static void trace_event(unsigned phase,unsigned slot,int value)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     char line[112];unsigned used=0;
     const char *names[]={"FACADE phase="," slot="," value="," thread="};
     unsigned values[]={phase,slot,(unsigned)value,(unsigned)sceKernelGetThreadId()};

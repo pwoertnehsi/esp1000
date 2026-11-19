@@ -47,3 +47,5 @@ milestones/
 
 # Upstream aemu source is pinned and adapted by tools/prepare_aemu.py.
 /third_party/aemu/
+# Independent ESP/PSP build profiles at any project depth.
+**/build-*/

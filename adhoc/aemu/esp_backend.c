@@ -1,3 +1,4 @@
+#include "../../common/esp_diagnostics.h"
 /* ESP1000's game-mode transport for the GPL-3.0-or-later aemu fork.
  * Calls run in game threads, never inside a ModuleMgr start/stop callback. */
 #include <pspkernel.h>
@@ -27,6 +28,7 @@ extern int espAdhocPowerRelease(void);
 
 static void log_result(const char *name,int value)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     char line[96];unsigned n=0;
     const char *prefix="ESP_ADHOC ";while(*prefix)line[n++]=*prefix++;
     for(unsigned i=0;name[i] && n<80;++i)line[n++]=name[i];

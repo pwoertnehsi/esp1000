@@ -12,6 +12,8 @@ CFLAGS += -DVNET_USB_LAB
 LIBS += -lpspusbbus_driver -lpspusb_driver -lpsprtc_driver
 endif
 PSP_FW_VERSION = 661
+DIAGNOSTICS ?= 1
+CFLAGS += -DESP1000_DIAGNOSTICS=$(DIAGNOSTICS)
 PSPSDK = $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build_prx.mak
 LIBS += -lpspge_driver

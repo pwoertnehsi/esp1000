@@ -1,3 +1,4 @@
+#include "../../common/esp_diagnostics.h"
 /* Owned HTTP import callbacks. Native SSL objects/BIOs retain their lifecycle;
  * modern TLS and peer verification run on the ESP, never as a success stub. */
 #include <pspkernel.h>
@@ -23,6 +24,7 @@ static int find_ssl(void *ssl){if(ssl)for(unsigned i=0;i<TLS_OFFLOAD_SLOTS;++i)i
 static void clear(unsigned i){memset(&slots[i],0,sizeof(slots[i]));slots[i].fd=-1;if(tls.active)--tls.active;}
 static void log_result(const char *stage,int result)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     char line[112];unsigned n=0;
     const char *label="TLS_OFFLOAD ";while(*label)line[n++]=*label++;
     while(*stage && n<32)line[n++]=*stage++;

@@ -110,4 +110,9 @@ def package():
     print('Private local copy folder:',destination)
 
 if __name__=='__main__':
-    guards();apctl_guards();package()
+    import argparse
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--assets-only',action='store_true',help='Stage verified runtime assets without regenerating historical utility guards')
+    args=parser.parse_args()
+    if not args.assets_only:guards();apctl_guards()
+    package()

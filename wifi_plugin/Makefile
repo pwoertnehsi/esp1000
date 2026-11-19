@@ -4,6 +4,8 @@ USE_KERNEL_LIBS = 1
 CFLAGS = -O2 -G0 -Wall -Wextra -Werror -fno-pic
 LIBS = -lpspsystemctrl_kernel -lpspsysmem_kernel_660 -lpspinit_kernel_660 -lpspctrl_driver -lpspusb_driver -lpspge_driver -lpspsdk
 PSP_FW_VERSION = 661
+DIAGNOSTICS ?= 1
+CFLAGS += -DESP1000_DIAGNOSTICS=$(DIAGNOSTICS)
 PSPSDK = $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build_prx.mak
 main.o: policy.h menu_control.h menu_runtime.h thread_watch.h

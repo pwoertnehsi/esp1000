@@ -1,3 +1,4 @@
+#include "../../common/esp_diagnostics.h"
 #include <pspkernel.h>
 #include <psploadcore.h>
 #include <pspsdk.h>
@@ -79,6 +80,7 @@ static void append_char(void *arg, int ch)
 
 static void record(const char *format, ...)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     char text[224];
     struct print_buffer b = {text, 0, sizeof(text) - 1};
     va_list args;
@@ -427,7 +429,7 @@ int module_start(SceSize size, void *args)
     memset((void *)out->remote_ip,0,4);
     record("BEGIN virtual interface v0.12 (packet lab; backend selected at build)");
 #ifdef VNET_USB_LAB
-    int ssl_flag=sceIoOpen("ms0:/ssl-capture.enable",PSP_O_RDONLY,0);
+    int ssl_flag=ESP1000_DIAGNOSTICS?sceIoOpen("ms0:/ssl-capture.enable",PSP_O_RDONLY,0):-1;
     ssl_capture_enabled=ssl_flag>=0;
     if(ssl_flag>=0)sceIoClose(ssl_flag);
     if(ssl_capture_enabled) {
@@ -462,10 +464,12 @@ int module_start(SceSize size, void *args)
     record("USB_START result=%08x; wait for ESP packet capability before SQUARE", r);
     if (r < 0) { out->result = r; return 0; }
 #endif
+    if(ESP1000_DIAGNOSTICS) {
     log_worker=sceKernelCreateThread("VirtualNetLog",log_task,0x32,0x4000,0,NULL);
     if(log_worker<0){out->result=log_worker;return 0;}
     log_running=1;r=sceKernelStartThread(log_worker,0,NULL);
     if(r<0){log_running=0;sceKernelDeleteThread(log_worker);log_worker=-1;out->result=r;return 0;}
+    }
 #ifdef VNET_USB_LAB
     native_rx_worker=sceKernelCreateThread("VirtualNetReceive",receive_native,0x25,0x4000,0,NULL);
     if(native_rx_worker<0){out->result=native_rx_worker;return 0;}

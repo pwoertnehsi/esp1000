@@ -58,3 +58,10 @@ wifi-plugin:
 	$(MAKE) -C wifi_plugin/menu_bridge
 	$(MAKE) -C browser_local/app
 	python3 tools/package_wifi_plugin.py
+
+# Current native plugins, clean-built together; output must be a fresh directory.
+.PHONY: production debug
+production:
+	python3 tools/build_psp.py --profile production --output $(or $(OUTPUT),artifacts/production)
+debug:
+	python3 tools/build_psp.py --profile debug --output $(or $(OUTPUT),artifacts/debug)

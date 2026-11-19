@@ -14,7 +14,7 @@ def replace(path,old,new):
         raise ValueError(f'{path}: expected one patch anchor, got {text.count(old)}')
     path.write_text(text.replace(old,new),encoding='latin1')
 
-def prepare(source,output):
+def prepare(source,output,diagnostics=True):
     actual=subprocess.check_output(['git','-C',str(source),'rev-parse','HEAD'],text=True).strip()
     if actual!=PIN:raise ValueError(f'Expected aemu {PIN}, got {actual}')
     if output.exists():raise ValueError('Use a fresh output directory')
@@ -28,7 +28,7 @@ def prepare(source,output):
             text=text.replace(b'@ESP_KD@',b'ms0:/seplugins/esp-adhoc/kd/')
             path.write_bytes(text)
     for makefile in tree.rglob('Makefile'):
-        with makefile.open('a') as f:f.write('\nCFLAGS += -std=gnu99\n')
+        with makefile.open('a') as f:f.write(f'\nCFLAGS += -std=gnu99 -DESP1000_DIAGNOSTICS={int(diagnostics)}\n')
     for name in ['kd','seplugins','server']:(tree/'dist'/name).mkdir(parents=True,exist_ok=True)
     shutil.copy2(ROOT/'adhoc/aemu/esp_backend.c',tree/'pspnet_shims/esp_backend.c')
     shutil.copy2(ROOT/'adhoc/aemu/esp_power_imports.S',tree/'pspnet_shims/esp_power_imports.S')
@@ -50,8 +50,10 @@ def prepare(source,output):
     replace(exports,'PSP_END_EXPORTS',text+'\nPSP_END_EXPORTS')
     # Hook only user imports in this opt-in GAME plugin; never a VSH provider.
     hook='''
+#include "esp_diagnostics.h"
 static void esp_boot_log(unsigned stage,int result)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     char line[48];const char prefix[]="ADHOC_PLUGIN ";unsigned used=sizeof(prefix)-1;
     memcpy(line,prefix,used);static const char hex[]="0123456789abcdef";
     for(unsigned j=0;j<8;++j)line[used++]=hex[(stage>>(28-4*j))&15];
@@ -116,9 +118,13 @@ static void esp_patch_imports(SceModule2 *module)
     replace(atpro,'// Module Stop Event','extern int espAdhocPowerRelease(void);\n// Module Stop Event')
     replace(atpro,'// Shutdown GUI','if(espAdhocPowerRelease()<0)return -1;\n\t// Shutdown GUI')
     replace(tree/'atpro/exports.exp','PSP_END_EXPORTS','PSP_EXPORT_START(esp1000_power, 0, 0x4001)\nPSP_EXPORT_FUNC_NID(espAdhocPowerAcquire, 0x1)\nPSP_EXPORT_FUNC_NID(espAdhocPowerRelease, 0x2)\nPSP_EXPORT_END\nPSP_END_EXPORTS')
+    for component in ('atpro', 'pspnet_shims'):
+        shutil.copy2(ROOT/'common/esp_diagnostics.h', tree/component/'esp_diagnostics.h')
+    for path in (tree/'atpro/esp_power.c', tree/'pspnet_shims/esp_backend.c'):
+        replace(path, '#include "../../common/esp_diagnostics.h"', '#include "esp_diagnostics.h"')
     # Build/install only this fork under esp-wifi; no global aemu files replaced.
     # Runtime paths retain aemu's existing kd/seplugins layout in the test package.
-    (output/'provenance.json').write_text(json.dumps({'upstream':'https://github.com/Kethen/aemu','commit':PIN,'license':'GPL-3.0-or-later'},indent=2)+'\n')
+    (output/'provenance.json').write_text(json.dumps({'upstream':'https://github.com/Kethen/aemu','commit':PIN,'license':'GPL-3.0-or-later','diagnostics':diagnostics},indent=2)+'\n')
     return tree
 
 def main():
@@ -126,7 +132,8 @@ def main():
     parser.add_argument('--source',type=Path,default=ROOT/'third_party/aemu')
     parser.add_argument('--output',type=Path,default=ROOT/'artifacts/aemu-esp')
     parser.add_argument('--build',action='store_true')
-    args=parser.parse_args();tree=prepare(args.source.resolve(),args.output.resolve())
+    parser.add_argument('--production',action='store_true',help='Disable ESP1000 diagnostics; upstream still uses RELEASE=1')
+    args=parser.parse_args();tree=prepare(args.source.resolve(),args.output.resolve(),not args.production)
     if args.build:
         for component in ['atpro','memab','pspnet_adhoc_auth','pspnet_adhoc','pspnet_adhocctl','pspnet_adhoc_matching','pspnet_shims']:
             subprocess.run(['make','-C',str(tree/component),'CONFIG_660=1','RELEASE=1'],check=True)

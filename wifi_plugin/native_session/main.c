@@ -1,3 +1,4 @@
+#include "../../common/esp_diagnostics.h"
 /* On-demand user networking session for native netconf; no graphics or LoadExec. */
 #include <pspkernel.h>
 #include <pspmodulemgr.h>
@@ -68,6 +69,7 @@ static int setup(void)
 static int cleanup_logging;
 static void cleanup_mark(unsigned step,int result)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     if(!cleanup_logging)return;
     char line[80];unsigned used=0;
     const char *names[]={"SESSION_CLEANUP step="," result="};

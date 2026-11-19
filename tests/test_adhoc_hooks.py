@@ -47,5 +47,5 @@ int main(void){
 '''
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory);(path/'test.c').write_text(prefix+hook+suffix)
-            subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-fsanitize=address,undefined',str(path/'test.c'),'-o',str(path/'test')],check=True)
+            subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-fsanitize=address,undefined','-I',str(ROOT/'common'),str(path/'test.c'),'-o',str(path/'test')],check=True)
             subprocess.run([str(path/'test')],check=True,env={**os.environ,'ASAN_OPTIONS':'detect_leaks=0'})

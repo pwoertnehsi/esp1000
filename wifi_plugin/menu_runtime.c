@@ -1,3 +1,4 @@
+#include "../common/esp_diagnostics.h"
 /* Scoped 6.61 VSH data/call-site patch. No flash or global model changes. */
 #include <pspkernel.h>
 #include <psploadcore.h>
@@ -21,6 +22,7 @@ static int user_text(SceModule *,unsigned);
 static unsigned exit_text;
 static void observe_exit(SceModule *m)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     if(!control || !m || strcmp(m->modname,"htmlviewer_plugin_module"))return;
     SceModule *bridge=sceKernelFindModuleByName("ESP WiFi XMB Bridge");
     if(m->version[0]!=1 || m->version[1]!=1 || m->text_size!=0x1f700 || !user_text(m,m->text_addr) ||

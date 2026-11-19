@@ -6,6 +6,8 @@ CFLAGS = -O2 -G0 -Wall -Wextra -Werror -std=gnu11
 ASFLAGS = $(CFLAGS)
 LIBS = -lpspusbbus_driver -lpspusb_driver -lpspsysmem_kernel_660
 PSP_FW_VERSION = 661
+DIAGNOSTICS ?= 1
+CFLAGS += -DESP1000_DIAGNOSTICS=$(DIAGNOSTICS)
 PSPSDK = $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build_prx.mak
 usb_transport.o: ../../virtual_net/driver/usb_transport.c ../../virtual_net/driver/usb_transport.h ../../common/native_wifi_scan.h

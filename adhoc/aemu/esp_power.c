@@ -1,3 +1,4 @@
+#include "../../common/esp_diagnostics.h"
 /* SPDX-License-Identifier: GPL-3.0-or-later
  * E1000 accessory power lease (GAME by default, VSH opt-in at build time). No camera function driver is started.
  * The guarded USB-local import hook retains power across USB deactivation;
@@ -76,6 +77,7 @@ static void flush(void)
 }
 static void log_power(const char *event, int result)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     char line[80];
     int n = snprintf(line, sizeof(line), "%s %s=%08x\n", ESP_POWER_TAG, event, (unsigned)result);
     int fd = sceIoOpen(ESP_POWER_LOG, PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND, 0600);

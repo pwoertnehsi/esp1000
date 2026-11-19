@@ -1,3 +1,4 @@
+#include "../common/esp_diagnostics.h"
 /* Resident native XMB browser and ESP network backend. */
 #include <pspkernel.h>
 #include <pspctrl.h>
@@ -17,7 +18,7 @@
 #include "browser_runtime.h"
 #include "thread_watch.h"
 
-PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,29);
+PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,30);
 extern int wifi_power_can_stop(void);
 #define CHORD (PSP_CTRL_LTRIGGER|PSP_CTRL_RTRIGGER|PSP_CTRL_SQUARE)
 #define ROWS 64u
@@ -37,6 +38,7 @@ static void diagnostic_char(void *unused,int ch)
 }
 static void diagnostic(const char *format,...)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     if(diagnostic_size>=sizeof(diagnostics)-1)return;
     va_list args;va_start(args,format);
     prnt(diagnostic_char,NULL,format,args);
@@ -46,6 +48,7 @@ static void diagnostic(const char *format,...)
 }
 static void flush_diagnostics(void)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     if(!diagnostic_pending)return;
     int state=sceUsbGetState();
     if(state<0 || (state&PSP_USB_ACTIVATED))return;
@@ -195,7 +198,7 @@ int module_start(SceSize size,void *args)
 {
     (void)size;(void)args;
     unsigned devkit=sceKernelDevkitVersion();int model=sceKernelGetModel(),context=sceKernelInitKeyConfig();
-    diagnostic("BEGIN ESP WiFi VSH Entry0.29 devkit=%08x model=%d context=%08x\n",devkit,model,context);
+    diagnostic("BEGIN ESP WiFi VSH Entry0.30 devkit=%08x model=%d context=%08x\n",devkit,model,context);
     /* ARK VSH reports 6.60 on this 6.61 installation. This plugin changes no
      * global model values; native menu changes have separate exact ABI guards. */
     if((devkit!=0x06060110 && devkit!=0x06060010) || model!=10 || context!=PSP_INIT_KEYCONFIG_VSH) {

@@ -1,3 +1,4 @@
+#include "../common/esp_diagnostics.h"
 /* Independent kernel observation: never wake, suspend or terminate a worker. */
 #include <pspkernel.h>
 #include <psploadcore.h>
@@ -50,6 +51,7 @@ static void sony_snapshot(unsigned now,const SceUID *ids,int count)
 
 void wifi_thread_watch(unsigned now)
 {
+    if(!ESP1000_DIAGNOSTICS)return;
     if(sampled && now-last_sample<500000u)return;
     sampled=1;last_sample=now;
     /* Accessory USB is allowed; storage ownership is not. No file stays open. */
@@ -104,6 +106,7 @@ static int watch_worker(SceSize size,void *args)
 }
 int wifi_thread_watch_start(void)
 {
+    if(!ESP1000_DIAGNOSTICS)return 0;
     if(watch_thread>=0)return -1;
     watch_thread=sceKernelCreateThread("ESPBrowserWatch",watch_worker,0x31,0x6000,0,NULL);
     if(watch_thread<0)return watch_thread;
