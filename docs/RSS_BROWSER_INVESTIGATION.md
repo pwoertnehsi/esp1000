@@ -259,3 +259,11 @@ stub in foreign-stub atomic-refusal coverage, and exercise a UI-style disconnect
 acknowledgment after deletion of a separate temporary handler. All 17 targeted
 native/XMB/VSH/TLS tests pass under ASan/UBSan; kernel compilation passes warnings
 as errors. Only the kernel PRX needs replacement, with bridge0.26 retained.
+
+## Hardware result — 0.29
+
+On 2026-11-19 the user reported: “both xmb and circle exits worked.” This confirms
+successful hardware exit for both previously distinct failure paths after commit
+8619c95. The private APCTL subscription routing fix is the successful candidate;
+earlier logging/lookup changes did not independently resolve the issue. See
+BROWSER_EXIT_MILESTONE.md for the tested configuration and validation limits.
