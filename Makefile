@@ -1,6 +1,6 @@
 .PHONY: psp esp package test probe virtual browser usb-virtual wifi-plugin
 psp:
-	$(MAKE) -C psp_link package
+	$(MAKE) -C experiments/psp_link package
 
 # Activate ESP-IDF first: source /opt/esp-idf/export.sh
 esp:
@@ -30,7 +30,7 @@ test:
 
 # Separate memory-stick diagnostic; does not overwrite the USB demo package.
 probe:
-	$(MAKE) -C net_probe package
+	$(MAKE) -C experiments/net_probe package
 
 # Separate native interface registration experiment, requiring 6.61 ARK-5.
 virtual:

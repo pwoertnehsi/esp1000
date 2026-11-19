@@ -13,7 +13,7 @@ profiles wherever their interfaces permit it. Avoid flash0 replacement and globa
 model spoofing. Keep credentials out of logs and replace the bench-only compiled
 credentials with runtime configuration before distributing a user build.
 
-The next test is the separate [compatibility probe](../net_probe/README.txt).
+The next test is the separate [compatibility probe](../experiments/net_probe/README.txt).
 Build/package with `make probe`; install `build/net-probe.zip` by copying its
 `PSP` directory onto the memory stick. It does not replace the working USB app.
 The initial inventory is read-only apart from its memory-stick log. CROSS opts

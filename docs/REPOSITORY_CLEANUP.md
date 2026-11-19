@@ -15,7 +15,7 @@ and tests.
 | esp_link/components/tinyusb/ | Actual host stack, including the race-stability FIFO correction; not a disposable download/cache |
 | adhoc/aemu/ | Current GAME transport, power lease and assembly imports; copied into pinned aemu at build time |
 | third_party/aemu/ | Ignored pinned upstream checkout and submodules; required to build GAME modules; can be re-cloned |
-| common/ | Shared protocols, profiles, packet/DNS/TLS helpers and diagnostic switch; older names do not mean unused |
+| common/ | Shared page_file and native_check helpers, protocols, profiles, packet/DNS/TLS helpers and diagnostic switch; older names do not mean unused |
 | virtual_net/driver/ | Current native virtual network driver, USB transport and accessory assembly |
 | virtual_net/app/native_config.c, native_config.h, native_config_abi.c, native_http.c, native_http.h | Shared setup/route/local HTTP implementation compiled into native_session or GAME shim; keep accompanying ABI headers |
 | virtual_net/control.h | Shared PSP driver control ABI |
@@ -39,8 +39,8 @@ do not remove them because the old EBOOT launcher is no longer used.
 | esp_unfinished/ | Early ESP-IDF USB host experiment and enumeration patch; superseded by esp_link with vendored TinyUSB. Current production never applies patch_enum.py |
 | accpower/ | Standalone accessory/camera power experiment. Current lease lives in adhoc/aemu/esp_power.c and is reused by VSH. Preserve useful hardware evidence even if archiving the app |
 | psp_acc_probe.py | Linux/PyUSB camera-handshake experiment; not part of current ESP or PSP plugins |
-| psp_link/ | Original USB demo/file-transfer applications and driver; root `make psp`/`make package` still select it. test_psp_loader.py still compiles its application |
-| net_probe/ | Standalone native networking probe. Native socket and probe tests still compile sources here; removing it breaks those tests until reorganized |
+| experiments/psp_link/ | Original USB demo/file-transfer applications and driver; root `make psp`/`make package` still select it. test_psp_loader.py still compiles its application |
+| experiments/net_probe/ | Standalone native networking probe. Native socket and probe application tests compile this frontend; the reusable native_check helper is now in common/ |
 | adhoc/peer_test/ | Optional PSP/PPSSPP packet smoke test, not installed by the production package. Useful to separate basic transport from a game's behavior |
 | virtual_net/app/main.c and standalone app packaging | Old interface/packet experiment; production uses selected native_* sources listed above, not this application |
 | browser_local/app/main.c and its EBOOT launcher | Earlier standalone diagnostic browser; production now launches Sony's native VSH entry |
@@ -84,3 +84,9 @@ The kernel/user split and runtime server/profile settings are explained in
 [PLUGIN_ARCHITECTURE.md](PLUGIN_ARCHITECTURE.md). Current supported commands are
 `make production`, `make debug`, `make install PSP=MOUNT BUILD=PACKAGE/psp`,
 `make esp-production` and `make esp-debug` (activate IDF first for ESP targets).
+
+
+The original psp_link/ and net_probe/ top-level directories have been moved to
+experiments/. Their reusable page_file.c/h and native_check.c/h files now live in
+common/. Current sources/tests no longer depend on helper files inside an
+experiment. The optional experiment application tests still need those frontends.

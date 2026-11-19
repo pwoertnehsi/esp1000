@@ -17,7 +17,7 @@ class NativeSocketTest(unittest.TestCase):
             subprocess.run(["cc", "-std=c11", "-Wall", "-Wextra", "-Werror",
                             "-I", str(tmp), "-I", str(ROOT / "tests"),
                             str(ROOT / "tests/native_socket_test.c"),
-                            str(ROOT / "net_probe/native_check.c"), "-o", str(executable)], check=True)
+                            str(ROOT / "common/native_check.c"), "-o", str(executable)], check=True)
             for scenario in range(14):
                 with self.subTest(scenario=scenario):
                     subprocess.run([str(executable), str(scenario)], check=True, timeout=3)

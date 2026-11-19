@@ -1,5 +1,5 @@
 #include "native_socket_shim.h"
-#include "../net_probe/native_check.h"
+#include "../common/native_check.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>

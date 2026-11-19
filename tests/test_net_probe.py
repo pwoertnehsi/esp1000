@@ -15,10 +15,10 @@ class NetProbeTest(unittest.TestCase):
                          "psputility_netmodules.h", "kubridge.h", "systemctrl.h"):
                 (tmp / name).write_text('#include "net_probe_shim.h"\n')
             flags = ["cc", "-std=c11", "-Wall", "-Wextra", "-Werror",
-                     "-Wno-pointer-to-int-cast", "-I", str(tmp), "-I", str(ROOT / "tests")]
+                     "-Wno-pointer-to-int-cast", "-I", str(tmp), "-I", str(ROOT / "tests"), "-I", str(ROOT / "common")]
             obj, executable = tmp / "probe.o", tmp / "probe-test"
             subprocess.run(flags + ["-Dmain=net_probe_main", "-c",
-                           str(ROOT / "net_probe/main.c"), "-o", str(obj)], check=True)
+                           str(ROOT / "experiments/net_probe/main.c"), "-o", str(obj)], check=True)
             subprocess.run(flags + [str(ROOT / "tests/net_probe_test.c"), str(obj),
                            "-o", str(executable)], check=True)
             for scenario in range(13):

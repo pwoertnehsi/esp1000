@@ -9,7 +9,7 @@
 #include "http_response.h"
 #include "lab_gateway.h"
 #define PAGE_PATH "ms0:/native-http.html"
-#include "../../psp_link/driver/page_file.h"
+#include "../../common/page_file.h"
 
 static int wait_socket(int socket,int events,unsigned deadline,
                        int (*report)(const char *,int),const char *phase)

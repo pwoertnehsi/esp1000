@@ -1,7 +1,8 @@
 TARGET = psp_link
 OBJS = main.o page_file.o accessory.o exports.o
 USE_KERNEL_LIBS = 1
-INCDIR = ../../common
+INCDIR = ../../../common
+VPATH = ../../../common
 CFLAGS = -O2 -G0 -Wall -Wextra -std=gnu11 -fno-builtin-printf
 ASFLAGS = $(CFLAGS)
 LIBS = -lpspusbbus_driver -lpspusb_driver

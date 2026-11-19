@@ -19,7 +19,7 @@ class LoaderExitTest(unittest.TestCase):
             obj = tmp / "loader.o"
             executable = tmp / "loader-test"
             subprocess.run(flags + ["-Dmain=psp_loader_main", "-c",
-                           str(ROOT / "psp_link/app/main.c"), "-o", str(obj)], check=True)
+                           str(ROOT / "experiments/psp_link/app/main.c"), "-o", str(obj)], check=True)
             subprocess.run(flags + [str(ROOT / "tests/psp_loader_test.c"), str(obj),
                            "-o", str(executable)], check=True)
             for scenario in ("0", "1", "2"):
