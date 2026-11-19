@@ -9,11 +9,12 @@ int wifiNativePowerAcquire(void)
 int wifiNativePowerRelease(void)
 {assert(!lock_depth && service<0 && !service_started && network<0 && !network_started);++power_releases;if(power_release_error)return power_release_error;rail_on=0;return 0;}
 
-static char last_log[160];
+static char last_log[160],last_path[64];
 static unsigned facade_traces;
-int sceUsbGetState(void){return 0;}
-int sceUsbGetDrvState(const char *p){assert(!strcmp(p,"USBStor_Driver"));return 2;}
-int sceIoOpen(const char *p,int f,int m){assert(!lock_depth);(void)p;(void)f;(void)m;return 7;}
+static int forbid_log_io,storage_active,wait_error_once;
+int sceUsbGetState(void){assert(!forbid_log_io);return 0;}
+int sceUsbGetDrvState(const char *p){assert(!forbid_log_io && !strcmp(p,"USBStor_Driver"));return storage_active?1:2;}
+int sceIoOpen(const char *p,int f,int m){assert(!lock_depth && !forbid_log_io);strcpy(last_path,p);(void)f;(void)m;return 7;}
 int sceIoWrite(int f,const void *p,unsigned n){assert(f==7 && n<sizeof(last_log));if(n>=7 && !memcmp(p,"FACADE ",7)){++facade_traces;return n;}memcpy(last_log,p,n);last_log[n]=0;return n;}
 int sceIoClose(int f){(void)f;return 0;}
 static int lookup_result,browser_available,profile_security=-1,lookup_cancel_id,forbid_module_lookup;
@@ -34,7 +35,7 @@ static int simulate_reconnect,reconnect_ticks,simulate_cleanup,network_stops;
 static int reply_success;
 static int loader_result=-55,start_result,start_status,reply_error,stop_error;
 static int events_seen[8],event_count;
-int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;assert(!lock_depth);++lock_depth;return 0;}
+int sceKernelWaitSema(int a,int b,void *c){(void)a;(void)b;(void)c;if(wait_error_once){wait_error_once=0;return (int)0x800201a8u;}assert(!lock_depth);++lock_depth;return 0;}
 int sceKernelSignalSema(int a,int b){(void)a;(void)b;assert(lock_depth==1);--lock_depth;return 0;}
 int sceKernelGetThreadId(void){return thread;}
 unsigned sceKernelGetSystemTimeLow(void){return clock_us;}
@@ -78,6 +79,13 @@ static int projected_info(int field,union SceNetApctlInfo *out)
 int main(void)
 {
     assert(!wifi_native_adapter_start() && running);
+    forbid_log_io=1;trace_event(99,0,0);log_result(1,0,0);
+    int snapshot=0;wait_error_once=1;assert(!get_state(&snapshot) && !lock_holder);
+    forbid_log_io=0;while(log_head!=log_tail)wifi_native_log_drain();running=1;
+    forbid_log_io=1;wifi_native_exit_log("EXIT test\n",10);forbid_log_io=0;wifi_native_log_drain();
+    assert(!strcmp(last_path,"ms0:/browser-exit.log"));
+    forbid_log_io=1;wifi_native_ssl_log("TLS test\n",9);forbid_log_io=0;wifi_native_log_drain();
+    assert(!strcmp(last_path,"ms0:/ssl-offload.log"));
     int handler=add_handler(event,(void *)1);assert(handler>0);
     state=4;network_started=1;session.ready=1;session.info_callback=(unsigned)(uintptr_t)projected_info;
     static const unsigned expected_types[]={0,1,1,2,3};
@@ -114,9 +122,9 @@ int main(void)
     assert(!get_entry(1,1,name.field) && !strcmp(name.field,"ap") && name.canary==0x5a);
     assert(get_entry(0,1,name.field)<0 && get_entry(33,1,name.field)<0);
     assert(!scan() && pending && !complete);assert(scan()<0 && connect(1)<0);
-    worker(0,NULL);assert(event_count==2 && events_seen[0]==1 && events_seen[1]==6 && !pending && !state && !complete);
+    worker(0,NULL);while(log_head!=log_tail)wifi_native_log_drain();assert(event_count==2 && events_seen[0]==1 && events_seen[1]==6 && !pending && !state && !complete);
     running=1;loader_result=10;start_result=10;start_status=0;reply_error=-4;event_count=0;
-    assert(!scan());worker(0,NULL);
+    assert(!scan());worker(0,NULL);while(log_head!=log_tail)wifi_native_log_drain();
     assert(session.stage==1007 && session.detail==4 && !complete && !count && strstr(last_log,"result=fffffffc"));
     reply_error=0;
     running=1;reply_success=1;event_count=0;assert(!scan());worker(0,NULL);
@@ -151,7 +159,13 @@ int main(void)
     forbid_module_lookup=0;handler=add_handler(event,(void *)1);assert(handler>0);lookup_result=-1;forbid_module_lookup=1;
     emit(0,5,0);assert(callback_invocations==before && !handlers[handler&15].active && !handlers[handler&15].busy);
     lookup_result=0;forbid_module_lookup=0;
+    while(log_head!=log_tail)wifi_native_log_drain();
     assert(callback_invocations>=3 && facade_traces>0);
+    unsigned dropped=log_dropped;log_guard=1;forbid_log_io=1;
+    trace_event(99,0,0);assert(log_dropped==dropped+1);log_guard=0;
+    for(unsigned i=0;i<NATIVE_LOG_CAPACITY+2;++i)trace_event(99,0,0);
+    assert(log_tail-log_head==NATIVE_LOG_CAPACITY && log_dropped==dropped+3);
+    forbid_log_io=0;storage_active=1;while(log_head!=log_tail)wifi_native_log_drain();storage_active=0;
     assert(!wifi_native_adapter_stop());
     assert(!rail_on && !power_owned && power_acquires && power_releases);
     int loads_before=usb_loads;power_error=-33;acc_owned=0;

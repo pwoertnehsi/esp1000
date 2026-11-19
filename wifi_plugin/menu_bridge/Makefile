@@ -10,4 +10,4 @@ main.o: ../menu_control.h
 
 main.o native_adapter.o: ../native_control.h native_adapter.h ../../common/native_wifi_profile.h ../../common/native_sony_profile.h
 
-tls_offload.o: ../tls_control.h ../../common/tls_offload.h
+tls_offload.o: native_adapter.h ../tls_control.h ../../common/tls_offload.h

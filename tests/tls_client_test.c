@@ -4,6 +4,7 @@
 #include "tls_client_shim.h"
 #include "../wifi_plugin/menu_bridge/tls_offload.c"
 static unsigned ticks,lock_depth,original_calls,closes,frees;
+void wifi_native_ssl_log(const char *line,unsigned size){assert(!lock_depth && line && size<112);}
 static int response_status,io_errno=11,blocked,app_mode,cancel_during_wait,recycle_bio;
 static unsigned response_flags;
 static int socket_nonblocking=1,delayed_data,cancel_io_fd;

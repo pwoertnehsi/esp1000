@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "../tls_control.h"
+#include "native_adapter.h"
 #include "../../common/tls_offload.h"
 static wifi_tls_control_t tls={.magic=WIFI_TLS_MAGIC,.abi=WIFI_TLS_ABI,.owner=-1};
 static struct {int fd,verified,error,connecting,closing;unsigned generation,io_events,http_count;unsigned char http_prefix[12];void *bio,*ssl;} slots[TLS_OFFLOAD_SLOTS];
@@ -30,8 +31,7 @@ static void log_result(const char *stage,int result)
     const char hex[]="0123456789abcdef";
     for(unsigned i=0;i<3;++i){label=names[i];while(*label)line[n++]=*label++;for(unsigned j=0;j<8;++j)line[n++]=hex[(values[i]>>(28-4*j))&15];}
     line[n++]='\n';
-    int fd=sceIoOpen("ms0:/ssl-offload.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
-    if(fd>=0){sceIoWrite(fd,line,n);sceIoClose(fd);}
+    wifi_native_ssl_log(line,n);
 }
 static int would_block(void){int error=sceNetInetGetErrno();return error==11 || error==35 || error==119;}
 static int transfer(int fd,void *buffer,unsigned size,int sending,unsigned slot,unsigned epoch)

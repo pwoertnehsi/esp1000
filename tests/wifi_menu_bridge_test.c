@@ -7,6 +7,8 @@ int sceIoWrite(int f,const void *p,unsigned n){(void)f;(void)p;return n;}
 int sceIoClose(int f){(void)f;return 0;}
 int wifi_tls_init(void){return 0;}
 int wifi_tls_can_stop(void){return 1;}
+void wifi_native_log_drain(void){}
+void wifi_native_exit_log(const char *line,unsigned size){assert(line && size<112);}
 int wifi_native_adapter_start(void){return 0;}
 int wifi_native_adapter_stop(void){return 0;}
 static int registrations,releases,original_calls,last_action,last_argument;

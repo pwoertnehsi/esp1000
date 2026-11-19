@@ -132,3 +132,32 @@ PSP modules build with warnings as errors. 0.25 includes the corrected close
 trace and its independent hook-status logging. No ESP firmware, launch mode,
 certificate policy or power timing is changed. Hardware exit verification is
 pending; Circle and XMB outcomes must still be tested separately.
+
+## Synchronous diagnostic I/O removal (VSH entry/bridge 0.26)
+
+The 0.25 XMB-exit report still failed. Hook status1 was logged; full HTML plugin
+shutdown stages6,7,8 each entered and returned. No view-close stages0..5 were
+recorded in that run. The façade again ended at disconnect state-publication
+phase21, before callback validation/invocation or transport cleanup. The durable
+line does not prove trace_event returned: its synchronous file close could also
+be the blocking operation. 0.25 therefore did not establish a lifecycle fix.
+
+0.26 removes synchronous memory-stick and USB-state operations from façade,
+exit-trace and TLS diagnostic producers. A bounded 64-record queue is drained
+by the resident browser worker, independently of disconnect delivery. Producers
+use a non-waiting try-lock and drop records if busy/full. TLS diagnostics leave
+16 queue slots available for other events. Only the drain checks mass-storage
+ownership and opens the three fixed log paths. Dropped records are counted in
+NATIVE_LOG_DROPPED records; no payloads or credentials are added to logs.
+
+Façade semaphore waits now issue bounded diagnostic waits, recording failures
+without a tight spin. Decimal phases50/51/52 (hex32/33/34 in the log) record the
+waiting source line/error, the last acquiring source line/thread, and the lock
+UID. These diagnose a remaining stall; they do not force-release a live lock.
+
+Sixteen native/XMB/VSH/TLS tests pass under ASan/UBSan. They exercise producer
+I/O exclusion, queue overflow/contention, destination routing, storage refusal
+and lock-wait recovery in addition to existing ownership/lifecycle checks. Both
+PSP modules build with warnings as errors. No ESP update, launch-mode change or
+verified browser-exit success is claimed. Hardware XMB-exit verification remains
+pending. Previous images and logs are archived in artifacts/browser-exit-v026.

@@ -34,10 +34,56 @@ static unsigned serial,count,request;
 static native_scan_row_t rows[NATIVE_SCAN_LIMIT];
 static unsigned char diagnostic_buffer[257];
 static struct {event_fn fn;void *arg;int id,active,busy,owner;unsigned gp;} handlers[16];
+/* Callback producers never do USB queries, file I/O, or wait for the logger.
+ * The resident browser worker drains this bounded MPSC queue independently. */
+#define NATIVE_LOG_CAPACITY 64u
+static struct {unsigned length,kind;char bytes[160];} native_logs[NATIVE_LOG_CAPACITY];
+static volatile unsigned log_guard,log_head,log_tail,log_dropped;
+static unsigned log_reported_drops;
+static void queue_log_to(const char *line,unsigned length,unsigned kind)
+{
+    if(length>sizeof(native_logs[0].bytes) || __sync_lock_test_and_set(&log_guard,1)){__sync_add_and_fetch(&log_dropped,1);return;}
+    /* Keep headroom for disconnect/exit records during verbose TLS reads. */
+    unsigned capacity=kind==2?NATIVE_LOG_CAPACITY-16u:NATIVE_LOG_CAPACITY;
+    if(log_tail-log_head<capacity) {
+        unsigned i=log_tail%NATIVE_LOG_CAPACITY;
+        memcpy(native_logs[i].bytes,line,length);native_logs[i].length=length;native_logs[i].kind=kind;
+        __sync_synchronize();++log_tail;
+    } else __sync_add_and_fetch(&log_dropped,1);
+    __sync_lock_release(&log_guard);
+}
+static void queue_log(const char *line,unsigned length){queue_log_to(line,length,0);}
+void wifi_native_exit_log(const char *line,unsigned length){queue_log_to(line,length,1);}
+void wifi_native_ssl_log(const char *line,unsigned length){queue_log_to(line,length,2);}
+void wifi_native_log_drain(void)
+{
+    for(unsigned n=0;n<16;++n) {
+        char line[160];unsigned length,kind;
+        if(__sync_lock_test_and_set(&log_guard,1))return;
+        if(log_head==log_tail) {
+            __sync_lock_release(&log_guard);
+            unsigned dropped=log_dropped;
+            if(dropped!=log_reported_drops && sceUsbGetDrvState("USBStor_Driver")!=1) {
+                char report[]="NATIVE_LOG_DROPPED count=00000000\n";
+                const char hex[]="0123456789abcdef";
+                for(unsigned j=0;j<8;++j)report[25+j]=hex[(dropped>>(28-4*j))&15];
+                int fd=sceIoOpen("ms0:/native-wifi.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
+                if(fd>=0){sceIoWrite(fd,report,sizeof(report)-1);sceIoClose(fd);log_reported_drops=dropped;}
+            }
+            return;
+        }
+        unsigned i=log_head%NATIVE_LOG_CAPACITY;length=native_logs[i].length;kind=native_logs[i].kind;
+        memcpy(line,native_logs[i].bytes,length);++log_head;
+        __sync_lock_release(&log_guard);
+        if(sceUsbGetDrvState("USBStor_Driver")==1){__sync_add_and_fetch(&log_dropped,1);continue;}
+        const char *path=kind==1?"ms0:/browser-exit.log":kind==2?"ms0:/ssl-offload.log":"ms0:/native-wifi.log";
+        int fd=sceIoOpen(path,PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
+        if(fd>=0){sceIoWrite(fd,line,length);sceIoClose(fd);}
+    }
+}
 static void log_result(unsigned command,int result,unsigned row_count)
 {
-    /* Write only after our USB service stops; refuse mass-storage ownership. */
-    if(sceUsbGetState()&0x200)return;
+    /* File ownership is checked only by the independent drain. */
     char line[160];unsigned used=0;
     const char *names[]={"NATIVE_DONE cmd="," result="," rows="," phase="," detail="};
     unsigned values[]={command,(unsigned)result,row_count,session.stage,(unsigned)session.detail};
@@ -46,13 +92,11 @@ static void log_result(unsigned command,int result,unsigned row_count)
         unsigned n=strlen(names[i]);memcpy(line+used,names[i],n);used+=n;
         for(unsigned j=0;j<8;++j)line[used++]=hex[(values[i]>>(28-4*j))&15];
     }
-    line[used++]='\n';int fd=sceIoOpen("ms0:/native-wifi.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0777);
-    if(fd>=0){sceIoWrite(fd,line,used);sceIoClose(fd);}
+    line[used++]='\n';queue_log(line,used);
 }
 /* Small bounded event records; never write while PC storage owns the stick. */
 static void trace_event(unsigned phase,unsigned slot,int value)
 {
-    if(sceUsbGetDrvState("USBStor_Driver")==1)return;
     char line[112];unsigned used=0;
     const char *names[]={"FACADE phase="," slot="," value="," thread="};
     unsigned values[]={phase,slot,(unsigned)value,(unsigned)sceKernelGetThreadId()};
@@ -62,11 +106,23 @@ static void trace_event(unsigned phase,unsigned slot,int value)
         for(unsigned j=0;j<8;++j)line[used++]=hex[(values[i]>>(28-4*j))&15];
     }
     line[used++]='\n';
-    int fd=sceIoOpen("ms0:/native-wifi.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
-    if(fd>=0){sceIoWrite(fd,line,used);sceIoClose(fd);}
+    queue_log(line,used);
 }
-static void enter(void){sceKernelWaitSema(lock,1,NULL);}
-static void leave(void){sceKernelSignalSema(lock,1);}
+static volatile unsigned lock_holder,lock_site;
+static void enter_line(unsigned line)
+{
+    for(;;) {
+        unsigned timeout=1000000u;
+        int result=sceKernelWaitSema(lock,1,&timeout);
+        if(result>=0)break;
+        trace_event(50,line,result);trace_event(51,lock_site,(int)lock_holder);trace_event(52,(unsigned)lock,0);
+        /* Invalid/deleted semaphore errors must not become a tight spin. */
+        sceKernelDelayThread(100000);
+    }
+    lock_holder=(unsigned)sceKernelGetThreadId();lock_site=line;
+}
+#define enter() enter_line(__LINE__)
+static void leave(void){lock_holder=lock_site=0;sceKernelSignalSema(lock,1);}
 static int gate(void){return running?0:1;}
 static int scan(void)
 {

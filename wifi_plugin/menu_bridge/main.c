@@ -1,8 +1,7 @@
 #include <pspkernel.h>
-#include <pspiofilemgr.h>
 #include "../menu_control.h"
 #include "native_adapter.h"
-PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,25);
+PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,26);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
 extern int wifi_tls_init(void);
 extern int wifi_tls_can_stop(void);
@@ -21,8 +20,7 @@ static void exit_log(unsigned stage,unsigned phase,unsigned result)
         for(unsigned j=0;j<8;++j)line[used++]=hex[(values[i]>>(28-4*j))&15];
     }
     line[used++]='\n';
-    int fd=sceIoOpen("ms0:/browser-exit.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
-    if(fd>=0){sceIoWrite(fd,line,used);sceIoClose(fd);}
+    wifi_native_exit_log(line,used);
 }
 static int trace_exit(unsigned stage,unsigned a,unsigned b)
 {
@@ -53,6 +51,7 @@ static int browser_worker(SceSize size,void *args)
             int (*original)(int,int)=(void *)control.original[0];
             if(original)original(command==WIFI_MENU_MANUAL?22:16,command==WIFI_MENU_MANUAL?2:0);
         }
+        wifi_native_log_drain();
         sceKernelDelayThread(50000);
     }
     return 0;
