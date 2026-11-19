@@ -157,7 +157,7 @@ def main():
     parser.add_argument('--inspect', action='store_true', help='List container contents only')
     parser.add_argument('--decryptor', type=Path,
                         default=Path(os.environ.get('PSPDECRYPT', shutil.which('pspdecrypt') or 'pspdecrypt')))
-    parser.add_argument('--output', type=Path, default=Path('artifacts/firmware/661-extracted'))
+    parser.add_argument('--output', type=Path, default=Path('build/firmware/661-extracted'))
     args = parser.parse_args()
     try:
         if args.stage_only:

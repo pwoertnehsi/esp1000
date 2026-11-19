@@ -24,7 +24,7 @@ def main():
     root=args.psp.resolve();settings=(root/args.ark_settings).resolve()
     if not settings.is_relative_to(root):raise ValueError('Settings must be on the selected PSP')
     stamp=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
-    backup=ROOT/'artifacts'/f'adhoc-game-{args.game}-{stamp}';backup.mkdir(parents=True)
+    backup=ROOT/'build'/f'adhoc-game-{args.game}-{stamp}';backup.mkdir(parents=True)
     files=[(settings,[f'{args.game}, highmem:auto, on',f'{args.game}, mscache, off',f'{args.game}, infernocache, off']),
            (root/'seplugins/PLUGINS.TXT',[f'{args.game}, ms0:/seplugins/esp-adhoc/atpro.prx, on'])]
     for path,lines in files:

@@ -130,7 +130,7 @@ static void esp_patch_imports(SceModule2 *module)
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source',type=Path,default=ROOT/'third_party/aemu')
-    parser.add_argument('--output',type=Path,default=ROOT/'artifacts/aemu-esp')
+    parser.add_argument('--output',type=Path,default=ROOT/'build/aemu-esp')
     parser.add_argument('--build',action='store_true')
     parser.add_argument('--production',action='store_true',help='Disable ESP1000 diagnostics; upstream still uses RELEASE=1')
     args=parser.parse_args();tree=prepare(args.source.resolve(),args.output.resolve(),not args.production)

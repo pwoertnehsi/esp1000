@@ -82,7 +82,7 @@ def package():
     matrix=json.loads((ROOT/'analysis/browser_asset_matrix.json').read_text())
     signed=signed_assets()
     wanted={f'flash0:/vsh/module/{n}' for n in MISSING}|{'flash0:/vsh/resource/htmlviewer.res'}
-    destination=ROOT/'artifacts/browser-local'
+    destination=ROOT/'build/browser-local'
     assets=[]
     for a in matrix['assets']:
         if a['firmware_path'] not in wanted:continue

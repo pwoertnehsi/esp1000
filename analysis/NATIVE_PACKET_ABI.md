@@ -102,7 +102,7 @@ without completing either. v0.4 completes those two address notifications once
 through F94BAF52; the local fixture requires no hardware programming. Wrong
 records and unsupported commands remain rejected. Host regression verifies
 completion count, command, record and result. PSP behavior remains unverified.
-The failed v0.3 files/log are preserved in artifacts/virtual-net-v03-failed.zip.
+The failed v0.3 files/log are preserved in build/virtual-net-v03-failed.zip.
 
 ## v0.4 Native Packet Path: Passed on PSP
 
@@ -115,7 +115,7 @@ all succeeded; the log ends at XMB exit and the user confirms graceful exit.
 This verifies the address-ioctl completion fix on hardware.
 
 Passed source/binaries and the isolated run log are archived in
-`artifacts/virtual-interface-packets-v04.zip`; hashes are recorded in
+`build/virtual-interface-packets-v04.zip`; hashes are recorded in
 `milestones/virtual-interface-packets-v04.json`. This remains a local fixture,
 not ESP forwarding. The next gate is carrying these native Ethernet frames over
 the existing USB link to the ESP, first with the same bounded echo test before
@@ -124,7 +124,7 @@ remain outstanding. No flash files were changed.
 
 ## USB Ethernet Lab v0.5: Awaiting PSP Test
 
-`make usb-virtual` builds a separate `artifacts/virtual-net-usb-test.zip`, installed
+`make usb-virtual` builds a separate `build/virtual-net-usb-test.zip`, installed
 as `PSP/GAME/psp-vnet-usb`. `make virtual` retains the local fixture; both targets
 clean before changing backend flags. USB EBOOT/PRX use a distinct startup magic.
 The default v0.4 proven package/archive remains available. ESP firmware v6 adds
@@ -176,7 +176,7 @@ remeasured. Timing/control sequencing is implicated; exact hardware causality
 is not isolated. Do not change wiring based on the earlier0V side-pad report.
 
 Passed source/binaries, isolated PSP run and UART evidence are frozen in
-artifacts/native-usb-packets-v06-esp08-passed.zip; hashes are recorded in
+build/native-usb-packets-v06-esp08-passed.zip; hashes are recorded in
 milestones/native-usb-packets-v06-esp08.json. The source header containing Wi-Fi
 credentials is excluded; existing private firmware artifacts remain ignored.
 This proves native PSP Ethernet buffers/sockets over USB. The ESP responder is
@@ -190,7 +190,7 @@ The user ran TRIANGLE and the console crashed. The latest logs/psp-vnet.log
 proves alias config0, default-route ACK errno0, nonblocking socket/bind0, ARP
 and two74-byte TCP SYN transmissions. It ends during HTTP_CONNECT_WAIT, before
 connect completion, HTTP request or any file write. Failure artifacts are frozen
-in artifacts/native-http-v07-failed.zip. No crash dump/exception PC is available;
+in build/native-http-v07-failed.zip. No crash dump/exception PC is available;
 the exact faulting instruction remains unproven.
 
 Static analysis found a concrete ABI mismatch with Sony WLAN RX: at4434 s6=2,
@@ -232,7 +232,7 @@ The alignment correction is now validated with UDP, local TCP and internet TCP;
 no exception dump exists to identify v0.7's exact crash instruction.
 
 Exact source, PSP/ESP binaries, isolated passed log, UART evidence and saved page
-are frozen in artifacts/native-internet-v08-esp10-passed.zip. Hashes and page
+are frozen in build/native-internet-v08-esp10-passed.zip. Hashes and page
 size are in milestones/native-internet-v08-esp10.json. Private credential source
 is excluded (firmware artifacts remain private/ignored). Preserve this baseline.
 

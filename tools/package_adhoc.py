@@ -12,9 +12,9 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--build',type=Path,default=ROOT/'artifacts/aemu-esp-v01')
+    parser.add_argument('--build',type=Path,default=ROOT/'build/aemu-esp-v01')
     parser.add_argument('--server',required=True,type=ipaddress.IPv4Address)
-    parser.add_argument('--output',type=Path,default=ROOT/'artifacts/esp-adhoc-v01')
+    parser.add_argument('--output',type=Path,default=ROOT/'build/esp-adhoc-v01')
     args=parser.parse_args();out=args.output.resolve()
     if out.exists():raise ValueError('Use a fresh package output directory')
     provenance=json.loads((args.build/'provenance.json').read_text());tree=args.build/'source'

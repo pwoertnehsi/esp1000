@@ -286,7 +286,7 @@ this setup, and the exit issue cannot be attributed solely to the newer recovery
 changes. At the user's request, restored the complete pre-rollback PSP runtime
 (PSP20, bridge0.15, session ABI3) from its saved backup, plus ESP19 from its
 verified original flash bundle. Source restored to ae4a2f6. Local before/after
-logs, manifests and flash result are under artifacts/restore-recent-after-baseline.
+logs, manifests and flash result are under build/restore-recent-after-baseline.
 This restores the newer recovery measures; Browser exit and dependable USB
 recovery remain unresolved and are not claimed stable.
 

@@ -24,7 +24,7 @@ class BrowserVshTest(unittest.TestCase):
         api=Prx(ROOT/'modules/pspnet_apctl.prx',{}).report()
         exports={int(e['nid'],16):int(e['address'],16) for lib in api['exports'] for e in lib['entries']}
         sources=[ROOT/'modules'/f'{name}.prx' for name in ('htmlviewer_plugin','htmlviewer_ui','netfront')]
-        sources.append(ROOT/'artifacts/firmware/661-extracted/decrypted/F0/kd/libhttp.prx')
+        sources.append(ROOT/'build/firmware/661-extracted/decrypted/F0/kd/libhttp.prx')
         for index,source in enumerate(sources):
             m=Prx(source,{})
             libraries=catalog.split(f'browser_libraries_{index}[]={{',1)[1].split('};',1)[0]

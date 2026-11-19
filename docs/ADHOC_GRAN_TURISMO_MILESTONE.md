@@ -13,7 +13,7 @@ was necessary. ESP20 and the existing saved native connection were retained.
 Before accessory-power changes, logs were copied to the ignored local directory
 `milestones/adhoc-granturismo-pass`, and the exact installed Ad Hoc modules and
 configuration were preserved with SHA256 hashes in
-`artifacts/adhoc-granturismo-pass`. These archives contain private configuration
+`build/adhoc-granturismo-pass`. These archives contain private configuration
 and are not release artifacts. The browser exit problem remains unresolved.
 
 After ESP22 corrected overlapping USB host FIFO storage, the user reported a

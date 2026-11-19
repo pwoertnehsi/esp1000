@@ -1,37 +1,37 @@
 [
   {
     "file": "modules/htmlviewer_ui.prx",
-    "source": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/htmlviewer_ui.prx",
+    "source": "build/firmware/661-extracted/decrypted/F0/vsh/module/htmlviewer_ui.prx",
     "sha256": "52cbe5ef27af2a2e1cf6a8bbb8cc22db8dcb992547e06dd4b99f414e7ce7f381"
   },
   {
     "file": "modules/netfront.prx",
-    "source": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/netfront.prx",
+    "source": "build/firmware/661-extracted/decrypted/F0/vsh/module/netfront.prx",
     "sha256": "89591d6d43ccf43330c715da4588850c1faf5774afc20617982f6e6b04d62a5f"
   },
   {
     "file": "modules/libslim.prx",
-    "source": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/libslim.prx",
+    "source": "build/firmware/661-extracted/decrypted/F0/vsh/module/libslim.prx",
     "sha256": "6210e3d6fd0b054a6c33030cfd7a425070ea21f7e8a066f85e65a4ba52426ff4"
   },
   {
     "file": "modules/libwww.prx",
-    "source": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/libwww.prx",
+    "source": "build/firmware/661-extracted/decrypted/F0/vsh/module/libwww.prx",
     "sha256": "30986a7489170b631b6974616db77574544d961018f509c267d9ae7c8592d2ac"
   },
   {
     "file": "modules/mm_flash.prx",
-    "source": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/mm_flash.prx",
+    "source": "build/firmware/661-extracted/decrypted/F0/vsh/module/mm_flash.prx",
     "sha256": "fd4245f064619655cfb7623bc2a8779d01bf394a005c84ea7048200ecc78b46f"
   },
   {
     "file": "modules/libfont_hv.prx",
-    "source": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/libfont_hv.prx",
+    "source": "build/firmware/661-extracted/decrypted/F0/vsh/module/libfont_hv.prx",
     "sha256": "cc2204c698759fe25b460304479f613192b46c65061a381e58e9d3a36cd03e3b"
   },
   {
     "file": "modules/hvauth_r.prx",
-    "source": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/hvauth_r.prx",
+    "source": "build/firmware/661-extracted/decrypted/F0/vsh/module/hvauth_r.prx",
     "sha256": "b46355ef263b1b0881205c0d2373044761b48bfe551d1e762bd39941538f5f2e"
   }
 ]

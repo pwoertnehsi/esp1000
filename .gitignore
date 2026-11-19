@@ -9,11 +9,11 @@ esp_link/sdkconfig
 esp_link/sdkconfig.old
 esp_link/dependencies.lock
 logs/
-artifacts/
+build/
 .uart-bridge/
 esp_link/main/wifi_credentials.h
 
-# Local decrypted installer input; firmware extraction stays under artifacts/.
+# Local decrypted installer input; firmware extraction stays under build/.
 *.PBP.dec
 
 # Local Git metadata (the session's .git mount is read-only).

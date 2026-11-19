@@ -93,7 +93,7 @@ reports RX140 / PTX140+84 / NPTX224+32 and the idle watchdog counter is zero.
 App SHA256: `874d8e4f8cff0c7a640bfd71858852edbfede4c70203a3dbbc08e0267f7332a0`.
 Bootloader and partition images are unchanged. Prior ESP22 and PSP modules,
 new binaries and build/test/flash evidence are archived in the ignored local
-`artifacts/tls-offload-v01` directory.
+`build/tls-offload-v01` directory.
 
 Install both PSP modules together and restart VSH. Test the original HTTPS URL
 with side-rail power and UART disconnected. Initial clock sync may add delay.
@@ -125,7 +125,7 @@ The three TLS sanitizer tests pass, including delayed successful read/write,
 native timeout expiry, explicit nonblocking behavior and close during a pending
 read. The PSP bridge builds with warnings as errors. Hardware confirmation of
 HTTPS pages and RSS/Browser exit is still pending. Previous logs/binary are
-archived locally in artifacts/tls-offload-v03.
+archived locally in build/tls-offload-v03.
 
 ### Follow-up: bridge 0.21
 
@@ -169,7 +169,7 @@ remain. Regression tests cover a one-tick deadline, delayed successful reads,
 12000 ticks, unsigned overflow protection, unset timeout and cancellation. The
 PSP build and three TLS sanitizer programs pass; HTTPS hardware confirmation
 is still required. Evidence and previous/new binaries are archived locally in
-artifacts/tls-offload-v05. RSS and standalone launch behavior is unchanged.
+build/tls-offload-v05. RSS and standalone launch behavior is unchanged.
 
 ## Cross-signed chains: ESP24
 
@@ -198,4 +198,4 @@ redirects from TLS errors, without logging response headers/body.
 ESP24 app SHA256:
 `dbc6aedbf57fe425432fa5bf067162fdcc070df76e8aa6c27628c82e9486c1a7`.
 Flash verification passed; bootloader and partition images are unchanged.
-Evidence and previous binaries are archived locally in artifacts/rss-tls-v01.
+Evidence and previous binaries are archived locally in build/rss-tls-v01.

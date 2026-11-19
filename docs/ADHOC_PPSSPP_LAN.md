@@ -39,13 +39,13 @@ checkout remains unmodified and ignored. With PSPSDK installed:
 ```sh
 python3 tools/prepare_aemu.py --build
 make -C adhoc/peer_test
-python3 tools/package_adhoc.py --build artifacts/aemu-esp --server 192.0.2.10
+python3 tools/package_adhoc.py --build build/aemu-esp --server 192.0.2.10
 ```
 
 Use a fresh `--output` for subsequent preparations/packages. The preparer keeps
 upstream's GPL notices, uses its bundled CFW SDK stubs without installing them
 into the system SDK, and selects GNU99 for compatibility with its older C.
-Generated code stays under `artifacts/`. The package includes GPL licensing;
+Generated code stays under `build/`. The package includes GPL licensing;
 a separate source zip contains project source and the pinned upstream checkout.
 Aemu's original automatic HOME/exit-callback suppression and power-button lock
 are disabled for the E1000 adaptation. Other upstream game/memory patches remain.

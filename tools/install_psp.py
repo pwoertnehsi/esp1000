@@ -79,7 +79,7 @@ def main():
     if not os.path.ismount(psp):
         parser.error('--psp must be the mounted PSP root')
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
-    install(args.build.resolve(), psp, ROOT/'artifacts'/f'install-backup-{stamp}')
+    install(args.build.resolve(), psp, ROOT/'build'/f'install-backup-{stamp}')
 
 
 if __name__ == '__main__':

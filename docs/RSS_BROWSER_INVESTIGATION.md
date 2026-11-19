@@ -108,7 +108,7 @@ The user provided two fully-loaded-page exit runs: Circle powered the ESP off
 but left the UI unresponsive; HOME/XMB exit retained ESP power until shutdown.
 Installed-file hashes and the trace marker identified 0.23, so neither run
 contained the corrected 0.24 close trace. Logs are preserved in
-artifacts/browser-exit-two-runs-20261119.
+build/browser-exit-two-runs-20261119.
 
 The latest completed Circle disconnect reached facade phase40 after helper
 cleanup, consistent with rail power-off. The final XMB disconnect reached
@@ -160,7 +160,7 @@ I/O exclusion, queue overflow/contention, destination routing, storage refusal
 and lock-wait recovery in addition to existing ownership/lifecycle checks. Both
 PSP modules build with warnings as errors. No ESP update, launch-mode change or
 verified browser-exit success is claimed. Hardware XMB-exit verification remains
-pending. Previous images and logs are archived in artifacts/browser-exit-v026.
+pending. Previous images and logs are archived in build/browser-exit-v026.
 
 ## Independent thread observation (VSH entry 0.27, bridge 0.26)
 
@@ -168,7 +168,7 @@ The 0.26 hardware run still hung. Sony shutdown stages6..8 returned again;
 facade disconnect stopped after phase21. No semaphore-timeout or dropped-log
 record was found. These records do not establish whether the facade worker was
 blocked, suspended, terminated, or whether its log consumer stopped. Failure logs
-are preserved in artifacts/browser-exit-v026-failure. APCTL GetInfo was also
+are preserved in build/browser-exit-v026-failure. APCTL GetInfo was also
 reviewed: its adapter already copies only the requested field's width.
 
 0.27 adds an independent kernel-monitor snapshot to ms0:/browser-thread.log.
@@ -201,7 +201,7 @@ and returns zero. The plugin workers appear alive and normally waiting in the
 thread snapshots. Sony close-trace records were not appended for this Circle
 run; the stage6..8 lines remain from earlier runs. The browser still hangs after
 Circle. The observations narrow this path only; they do not resolve either exit.
-Failure logs are archived under artifacts/browser-exit-v027-failure-*.
+Failure logs are archived under build/browser-exit-v027-failure-*.
 
 0.28 moves observation to a separate kernel thread, ESPBrowserWatch, so it no
 longer depends on progress through the main VSH monitor. It also samples threads
@@ -225,7 +225,7 @@ The 0.28 Circle capture identifies a persistent SceHtmlViewerPrepareDisconnect
 thread, entry htmlviewer_plugin+0xbdec, sleeping while helper cleanup has already
 returned successfully. Circle is distinct from the HOME/XMB failure; no inference
 that HOME/XMB cleanup succeeds is made. Logs are preserved under
-artifacts/browser-exit-v028-failure-*.
+build/browser-exit-v028-failure-*.
 
 Owned 6.61 firmware establishes a missing subscription path:
 

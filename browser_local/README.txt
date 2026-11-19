@@ -5,7 +5,7 @@ It is not a system-wide auto-start plugin or full stock Wi-Fi setup support.
 Use ESP firmware v11. Connect both ESP cables using the already-tested wiring
 and enable the configured hotspot. No additional wiring changes are needed.
 
-Copy BOTH PSP/ and b1/ from artifacts/browser-local/ to the memory-stick root.
+Copy BOTH PSP/ and b1/ from build/browser-local/ to the memory-stick root.
 Replace the three binaries in PSP/GAME/psp-browser/. Keep the existing b0/ folder:
 its htmlviewer.res is still required. b1/ contains five original encrypted Sony
 modules; v0.6 verifies their new sizes/CRCs before loading. The decrypted module

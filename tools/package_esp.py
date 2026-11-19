@@ -10,7 +10,7 @@ def main():
     root = Path(__file__).resolve().parent.parent
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build', type=Path, default=root/'esp_link/build')
-    parser.add_argument('--output', type=Path, default=root/'artifacts/esp')
+    parser.add_argument('--output', type=Path, default=root/'build/esp')
     args = parser.parse_args()
     build = args.build.resolve()
     destination = args.output.resolve()

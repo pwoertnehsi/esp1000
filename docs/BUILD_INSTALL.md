@@ -44,17 +44,17 @@ their b0/b1 assets, saved profiles and Ad Hoc config.
 ## Build the PSP production package
 
 ```sh
-python3 tools/build_psp.py --profile production --output artifacts/my-production
+python3 tools/build_psp.py --profile production --output build/my-production
 ```
 
-Equivalent: `make production OUTPUT=artifacts/my-production`.
+Equivalent: `make production OUTPUT=build/my-production`.
 Choose a fresh output directory each time; previous builds are preserved.
 The script cleans shared PSP objects before compiling, avoiding reuse of a
 module from a different diagnostics/backend build.
 
 Output:
 
-- `artifacts/my-production/psp/`: files laid out relative to the memory-stick root.
+- `build/my-production/psp/`: files laid out relative to the memory-stick root.
 - `esp1000-psp-production.zip`: the same runtime package.
 - `esp1000-source.zip`: project and adapted Ad Hoc source plus bundled CFW stubs.
 - `aemu-build/`: prepared Ad Hoc tree and build provenance.
@@ -71,12 +71,12 @@ not compiled into either firmware.
 Mount the PSP in USB storage mode, then:
 
 ```sh
-python3 tools/install_psp.py --build artifacts/my-production/psp \
+python3 tools/install_psp.py --build build/my-production/psp \
   --psp /run/media/tenshi/PLAYSTATION
 ```
 
 Replace the mount path with yours. The installer verifies package hashes before
-writing, backs up replaced files and PLUGINS.TXT under artifacts/install-backup-*,
+writing, backs up replaced files and PLUGINS.TXT under build/install-backup-*,
 and writes/fsyncs/read-verifies each replacement. It preserves personal Ad Hoc
 configuration and title-specific or disabled plugin entries. It does not remove
 old logs or change ARK memory/cache settings. Inspect its printed result.
@@ -113,17 +113,17 @@ network/gameplay acceptance of this quiet build remains a separate check.
 ### Browser assets for a first installation
 
 An existing working PSP already has these files; keep them. Obtain your own
-Sony6.61 updater, place it at `artifacts/firmware/661.PBP`, and install
+Sony6.61 updater, place it at `build/firmware/661.PBP`, and install
 [pspdecrypt](https://github.com/John-K/pspdecrypt). Then:
 
 ```sh
-python3 tools/prepare_browser_firmware.py artifacts/firmware/661.PBP
+python3 tools/prepare_browser_firmware.py build/firmware/661.PBP
 python3 tools/prepare_browser_local.py --assets-only
 ```
 
 The second command uses the committed asset matrix and verifies original signed
 PRXs against the decrypted SHA256 references. Copy **only** b0/ and b1/ from
-`artifacts/browser-local/` to the memory-stick root. No flash0 writes are needed.
+`build/browser-local/` to the memory-stick root. No flash0 writes are needed.
 This mode avoids regenerating historical utility guards from local modules/.
 Sony assets are excluded from the code package and source archive.
 
@@ -164,7 +164,7 @@ portable binary bundle:
 
 ```sh
 python3 tools/package_esp.py --build esp_link/build-production \
-  --output artifacts/esp-production
+  --output build/esp-production
 ```
 
 From that bundle directory, with IDF's Python/esptool available and the bridge
@@ -190,8 +190,8 @@ and identical networking, power and callback-routing behavior.
 For a PSP problem:
 
 ```sh
-python3 tools/build_psp.py --profile debug --output artifacts/my-debug
-python3 tools/install_psp.py --build artifacts/my-debug/psp --psp MOUNT
+python3 tools/build_psp.py --profile debug --output build/my-debug
+python3 tools/install_psp.py --build build/my-debug/psp --psp MOUNT
 ```
 
 Restart VSH, reproduce one clearly identified action (Circle exit and HOME/XMB

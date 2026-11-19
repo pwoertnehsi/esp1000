@@ -61,9 +61,9 @@ need it, but it is not replaceable from our code-only package.
   deleting a build directory requires rebuilding before flashing it.
 - `.o`, `.elf`, `.prx`, EBOOT.PBP, PARAM.SFO and generated archives are build
   outputs. Do not confuse generated PRXs with source files or installed copies.
-- `artifacts/*/aemu-build/`: generated patched aemu trees; upstream plus preparer
+- `build/*/aemu-build/`: generated patched aemu trees; upstream plus preparer
   can recreate these, while old trees also document exactly what was tested.
-- `artifacts/production*`, `artifacts/debug*`, `artifacts/esp-production*`: generated
+- `build/production*`, `build/debug*`, `build/esp-production*`: generated
   deployable packages. Keep at least the hardware-proven rollback you need.
 - `logs/`, failure-capture artifacts, pulseview/ and older milestones/: not used
   at runtime. Archive original captures and useful milestones before tidying;

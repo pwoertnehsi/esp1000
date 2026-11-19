@@ -1,6 +1,6 @@
 [
   {
-    "file": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/htmlviewer_ui.prx",
+    "file": "build/firmware/661-extracted/decrypted/F0/vsh/module/htmlviewer_ui.prx",
     "sha256": "52cbe5ef27af2a2e1cf6a8bbb8cc22db8dcb992547e06dd4b99f414e7ce7f381",
     "file_bytes": 434722,
     "module": "sceHVUI_Module",
@@ -2035,7 +2035,7 @@
     ]
   },
   {
-    "file": "artifacts/firmware/661-extracted/decrypted/F0/vsh/module/netfront.prx",
+    "file": "build/firmware/661-extracted/decrypted/F0/vsh/module/netfront.prx",
     "sha256": "89591d6d43ccf43330c715da4588850c1faf5774afc20617982f6e6b04d62a5f",
     "file_bytes": 1285524,
     "module": "sceHVNetfront_Module",

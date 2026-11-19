@@ -25,7 +25,7 @@ RemoteJoyLite entry was disabled before testing.
 
 Raw logs and private configuration are retained locally in
 milestones/adhoc-first-peer-pass. Exact runtime binaries, ESP flash images and
-SHA256/source manifests are preserved in artifacts/adhoc-first-peer-pass. These
+SHA256/source manifests are preserved in build/adhoc-first-peer-pass. These
 ignored archives may contain user identifiers and are not release packages.
 
 The next hardware target is Gran Turismo lobby discovery and a race between the

@@ -23,7 +23,7 @@ def run(*args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=('production', 'debug'), default='production')
-    parser.add_argument('--output', type=Path, default=ROOT/'artifacts/production')
+    parser.add_argument('--output', type=Path, default=ROOT/'build/production')
     parser.add_argument('--server', type=ipaddress.IPv4Address,
                         help='Optional PPSSPP server for a first installation; installer preserves existing config')
     args = parser.parse_args()

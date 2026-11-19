@@ -16,13 +16,13 @@ ROOT=Path(__file__).resolve().parents[1]
 NAMES=['htmlviewer_ui.prx','netfront.prx','libslim.prx','libwww.prx','mm_flash.prx']
 
 def signed_assets():
-    firmware=ROOT/'artifacts/firmware/661.PBP'
+    firmware=ROOT/'build/firmware/661.PBP'
     if hashlib.md5(firmware.read_bytes()).hexdigest()!=SONY_661_MD5:
         raise ValueError('Firmware provenance mismatch')
     decryptor=Path(os.environ.get('PSPDECRYPT', shutil.which('pspdecrypt') or 'pspdecrypt'))
-    folder=ROOT/'artifacts/firmware/661-encrypted'
+    folder=ROOT/'build/firmware/661-encrypted'
     if not folder.exists():
-        with (ROOT/'artifacts/firmware/661-encrypted-extract.log').open('w') as log:
+        with (ROOT/'build/firmware/661-encrypted-extract.log').open('w') as log:
             subprocess.run([str(decryptor),'-A','-e','-O',str(folder),str(firmware)],stdout=log,stderr=subprocess.STDOUT,check=True)
     matrix=json.loads((ROOT/'analysis/browser_asset_matrix.json').read_text())
     expected={Path(a['firmware_path']).name:a['sha256'] for a in matrix['assets'] if a['firmware_path'].endswith('.prx')}

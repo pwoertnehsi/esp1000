@@ -14,7 +14,7 @@ model spoofing. Keep credentials out of logs and replace the bench-only compiled
 credentials with runtime configuration before distributing a user build.
 
 The next test is the separate [compatibility probe](../net_probe/README.txt).
-Build/package with `make probe`; install `artifacts/net-probe.zip` by copying its
+Build/package with `make probe`; install `build/net-probe.zip` by copying its
 `PSP` directory onto the memory stick. It does not replace the working USB app.
 The initial inventory is read-only apart from its memory-stick log. CROSS opts
 into stock COMMON/INET loading, whose own startup code may touch absent hardware.
@@ -98,12 +98,12 @@ termination and module unloading all passed. See the appended v2 run in
 ## Local Firmware Source and Recovered Browser Assets
 
 A verified full standard Sony 6.61 update is now available at
-`artifacts/firmware/661.PBP` and extracted under
-`artifacts/firmware/661-extracted/decrypted/`. Obtain further stock dependencies
+`build/firmware/661.PBP` and extracted under
+`build/firmware/661-extracted/decrypted/`. Obtain further stock dependencies
 from this local source instead of asking the user for individual files.
 
 The six browser files omitted from the E1000's update table are recovered and
-staged at `artifacts/firmware/browser-runtime/`: `htmlviewer_ui.prx`, `netfront.prx`,
+staged at `build/firmware/browser-runtime/`: `htmlviewer_ui.prx`, `netfront.prx`,
 `libslim.prx`, `libwww.prx`, `mm_flash.prx` and `htmlviewer.res`. Ten overlapping
 modules match the user's dump byte for byte. All browser-specific function
 imports resolve in the local analysis set. This establishes a coherent asset

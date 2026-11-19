@@ -42,9 +42,9 @@ usb-virtual:
 	$(MAKE) -C virtual_net USB_LAB=1 clean
 	$(MAKE) -C virtual_net clean
 	$(MAKE) -C virtual_net USB_LAB=1 all
-	mkdir -p artifacts/virtual-net-usb/PSP/GAME/psp-vnet-usb
-	cp virtual_net/app/EBOOT.PBP virtual_net/driver/psp_vnet.prx virtual_net/USB_README.txt artifacts/virtual-net-usb/PSP/GAME/psp-vnet-usb/
-	cd artifacts/virtual-net-usb && python3 -m zipfile -c ../virtual-net-usb-test.zip PSP
+	mkdir -p build/virtual-net-usb/PSP/GAME/psp-vnet-usb
+	cp virtual_net/app/EBOOT.PBP virtual_net/driver/psp_vnet.prx virtual_net/USB_README.txt build/virtual-net-usb/PSP/GAME/psp-vnet-usb/
+	cd build/virtual-net-usb && python3 -m zipfile -c ../virtual-net-usb-test.zip PSP
 
 # Personal firmware stays in ignored staging; ZIP contains only our code/page.
 browser:
@@ -62,6 +62,6 @@ wifi-plugin:
 # Current native plugins, clean-built together; output must be a fresh directory.
 .PHONY: production debug
 production:
-	python3 tools/build_psp.py --profile production --output $(or $(OUTPUT),artifacts/production)
+	python3 tools/build_psp.py --profile production --output $(or $(OUTPUT),build/production)
 debug:
-	python3 tools/build_psp.py --profile debug --output $(or $(OUTPUT),artifacts/debug)
+	python3 tools/build_psp.py --profile debug --output $(or $(OUTPUT),build/debug)

@@ -31,7 +31,7 @@ buffer ownership. `make test` passes eight standalone C sanitizer programs and
 55 Python tests. The ESP-IDF build succeeds without new warnings.
 
 The prior ESP21 images and new ESP22 images are preserved in the ignored local
-`artifacts/esp22-fifo-layout` directory, together with failing/passing test and
+`build/esp22-fifo-layout` directory, together with failing/passing test and
 build/flash logs. Bootloader and partition table are unchanged. ESP22 app SHA256:
 `5bca49d4070687e9d454c5eb3d8e26f0bdcccce201b37824beb46fa1c6d70662`.
 The `FIFO_LAYOUT` status record reports actual programmed registers so the

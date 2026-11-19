@@ -12,6 +12,6 @@ include $(PSPSDK)/lib/build.mak
 
 .PHONY: package
 package: all
-	mkdir -p ../artifacts/net-probe/PSP/GAME/net-probe
-	cp EBOOT.PBP README.txt ../artifacts/net-probe/PSP/GAME/net-probe/
-	cd ../artifacts/net-probe && python3 -m zipfile -c ../net-probe.zip PSP
+	mkdir -p ../build/net-probe/PSP/GAME/net-probe
+	cp EBOOT.PBP README.txt ../build/net-probe/PSP/GAME/net-probe/
+	cd ../build/net-probe && python3 -m zipfile -c ../net-probe.zip PSP
