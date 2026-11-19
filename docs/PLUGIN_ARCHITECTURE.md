@@ -52,9 +52,9 @@ current PSP/ESP build.
 
 ## Browser asset layout
 
-Sony's updater uses F0/vsh/module and F0/vsh/resource. The project's b0/b1 split
-is its own local staging convention: b0 holds the resource file and b1 holds
-original signed modules, verified against decrypted references. Both directories
-now live under ms0:/PSP/GAME/psp-browser/. The read-only brows0: device maps only
-its allowlisted module/resource paths to those files, preserving Sony's loader
-and its allocation/decryption bookkeeping.
+Sony's updater uses F0/vsh/module and F0/vsh/resource. Our private copies live
+under ms0:/PSP/GAME/psp-browser/modules/ (five original signed PRXs) and
+resources/ (htmlviewer.res). The read-only brows0: device maps only its
+allowlisted module/resource paths to those files, preserving Sony's loader
+and its allocation/decryption bookkeeping. Legacy b0/b1 trees are migrated
+by the installer with complete backups and conflict checks.

@@ -29,7 +29,7 @@ and tests.
 | tests/, docs/ | Validation and technical history; some tests intentionally cover old probes |
 
 On the PSP, **PSP/GAME/psp-browser/psp_vnet.prx is still used by both plugins**.
-The directory name is historical. b0/ and b1/ are current native-browser assets;
+The directory name is historical. modules/ and resources/ hold current native-browser assets;
 do not remove them because the old EBOOT launcher is no longer used.
 
 ## Outside the current production path: archive candidates

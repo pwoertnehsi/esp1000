@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate scoped path guards and a private, local memory-stick browser folder.
 Sony assets come exclusively from this user's verified 6.61 extraction. The
-code-only ZIP excludes them; never distribute the generated b0 directory.
+code-only ZIP excludes them; never distribute the generated private asset directories.
 """
 from pathlib import Path
 import hashlib
@@ -90,7 +90,7 @@ def package():
         record=signed[name] if name in signed else a
         source=ROOT/record['source'];data=source.read_bytes()
         if hashlib.sha256(data).hexdigest()!=record['sha256']:raise ValueError('Asset provenance mismatch')
-        relative=Path('PSP/GAME/psp-browser')/('b1' if name in signed else 'b0')/a['firmware_path'][len('flash0:/'):]
+        relative=Path('PSP/GAME/psp-browser')/('modules' if name in signed else 'resources')/name
         target=destination/relative
         if target.exists() and target.read_bytes()!=data:raise ValueError('Refusing to overwrite different runtime asset')
         target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)

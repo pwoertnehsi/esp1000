@@ -43,9 +43,7 @@ def install(build, psp, backup):
                 continue
             payload.append((relative, target, data))
     browser = psp/'PSP/GAME/psp-browser'
-    for name in ('b0', 'b1'):
-        if (psp/name).is_symlink() or (browser/name).is_symlink():
-            raise ValueError('Browser asset directories must not be symlinks')
+    asset_copies,old_asset_trees=browser_asset_migration(psp)
     # Verify everything before writing, and back up every file being replaced.
     backup.mkdir(parents=True, exist_ok=False)
     for relative, target, _ in payload:
@@ -64,22 +62,53 @@ def install(build, psp, backup):
                [part.strip() for existing in active_lines for part in existing.split(b',')[1:2]]]
     for _, target, data in payload:
         write_verified(target, data)
-    # These are our historical staging names, not Sony's firmware layout.
-    # Move only a complete old directory when the new destination is absent.
-    for name in ('b0', 'b1'):
-        old_assets = psp/name
-        new_assets = browser/name
-        if old_assets.is_dir() and not new_assets.exists():
-            browser.mkdir(parents=True, exist_ok=True)
-            old_assets.rename(new_assets)
+    # Copy and verify canonical assets before retiring their backed-up trees.
+    for old_tree in old_asset_trees:
+        shutil.copytree(old_tree,backup/'legacy-assets'/old_tree.relative_to(psp))
+    for target,data in asset_copies.items():
+        write_verified(target,data)
+        if target.read_bytes()!=data:raise ValueError(f'Asset readback failed: {target}')
+    for old_tree in old_asset_trees:
+        shutil.rmtree(old_tree)
     if missing:
         write_verified(plugins, old.rstrip()+b'\n'+b'\n'.join(missing)+b'\n')
     print(f'Installed {manifest["profile"]} PSP modules; backup: {backup}')
     print('Safely eject, leave USB mode and restart VSH. GAME changes apply on the next game launch.')
     if not (psp/'seplugins/esp-adhoc/server.txt').exists():
         print('Set seplugins/esp-adhoc/server.txt to your PPSSPP server IPv4 before using Ad Hoc.')
-    if not (browser/'b0').exists() or not (browser/'b1').exists():
-        print('Native browser assets b0/b1 are missing; see docs/BUILD_INSTALL.md.')
+    if not (browser/'resources/htmlviewer.res').is_file() or not all((browser/'modules'/name).is_file() for name in ('htmlviewer_ui.prx','netfront.prx','libslim.prx','libwww.prx','mm_flash.prx')):
+        print('Native browser modules/resources are missing; see docs/BUILD_INSTALL.md.')
+
+
+def browser_asset_migration(psp):
+    """Preflight old layouts; preserve complete old trees in the install backup."""
+    browser=psp/'PSP/GAME/psp-browser'
+    copies={};old_trees=[]
+    for name in ('modules','resources'):
+        target=browser/name
+        if target.is_symlink() or not target.resolve().is_relative_to(psp):
+            raise ValueError('Browser asset directories must stay on the PSP')
+    for base in (psp,browser):
+        for old_name,new_name,subdir,names in (
+            ('b0','resources','vsh/resource',('htmlviewer.res',)),
+            ('b1','modules','vsh/module',('htmlviewer_ui.prx','netfront.prx','libslim.prx','libwww.prx','mm_flash.prx'))):
+            old=base/old_name
+            if old.is_symlink():raise ValueError('Browser asset directories must not be symlinks')
+            if not old.exists():continue
+            if not old.is_dir():raise ValueError(f'Expected asset directory: {old}')
+            if any(p.is_symlink() for p in old.rglob('*')):
+                raise ValueError('Legacy browser asset trees must not contain symlinks')
+            old_trees.append(old)
+            for name in names:
+                source=old/subdir/name
+                if not source.is_file():continue
+                target=browser/new_name/name
+                if target.is_symlink():raise ValueError('Browser assets must not be symlinks')
+                data=source.read_bytes()
+                if (target.exists() and target.read_bytes()!=data) or (target in copies and copies[target]!=data):
+                    raise ValueError(f'Conflicting browser assets: {target}')
+                copies[target]=data
+    return copies,old_trees
 
 
 def main():

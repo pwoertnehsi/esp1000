@@ -9,8 +9,8 @@ backend and is not implemented. Browser exit was hardware-verified with 0.29;
 Commands below run from the repository root in Linux. Production PSP output
 contains our modules, GPL Ad Hoc components and a matching source archive; Sony
 browser assets remain a separate local preparation. Existing installations keep
-their saved profiles and Ad Hoc config. The installer moves legacy root b0/b1
-directories into PSP/GAME/psp-browser when the destination is absent.
+their saved profiles and Ad Hoc config. The installer migrates legacy b0/b1 assets into
+PSP/GAME/psp-browser/modules and resources, preserving the old trees in its backup.
 
 ## Prerequisites
 
@@ -125,7 +125,7 @@ python3 tools/prepare_browser_local.py --assets-only
 ```
 
 The second command uses the committed asset matrix and verifies original signed
-PRXs against the decrypted SHA256 references. Copy b0/ and b1/ from
+PRXs against the decrypted SHA256 references. Copy modules/ and resources/ from
 `build/browser-local/PSP/GAME/psp-browser/` into
 `ms0:/PSP/GAME/psp-browser/`. No flash0 writes are needed.
 This mode avoids regenerating historical utility guards from local modules/.
@@ -263,9 +263,9 @@ ESP build again. Keep prior raw captures and known-good binaries locally.
 ### Why two browser asset directories?
 
 Sony's updater stores these files under F0/vsh/module and F0/vsh/resource.
-b0 and b1 are project staging names: b0 holds htmlviewer.res; b1 holds five
-original signed PRXs, kept separate from decrypted analysis copies. They now
-live under PSP/GAME/psp-browser. The fixed-length brows0: alias routes Sony's
+resources/ holds htmlviewer.res; modules/ holds five original signed PRXs,
+kept separate from decrypted analysis copies. Both live directly under
+PSP/GAME/psp-browser, with no extra vsh/ nesting. The fixed-length brows0: alias routes Sony's
 original short paths to that longer location through a read-only allowlist;
 no firmware string buffer is expanded or flash path globally redirected.
 

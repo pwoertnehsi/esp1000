@@ -5,12 +5,9 @@ It is not a system-wide auto-start plugin or full stock Wi-Fi setup support.
 Use ESP firmware v11. Connect both ESP cables using the already-tested wiring
 and enable the configured hotspot. No additional wiring changes are needed.
 
-Copy BOTH PSP/ and b1/ from build/browser-local/ to the memory-stick root.
-Replace the three binaries in PSP/GAME/psp-browser/. Keep the existing b0/ folder:
-its htmlviewer.res is still required. b1/ contains five original encrypted Sony
-modules; v0.6 verifies their new sizes/CRCs before loading. The decrypted module
-copies in b0/ are retained but unused. browser-test-code.zip excludes Sony files,
-so that ZIP alone is insufficient for this update. Do not redistribute b0/b1.
+Copy PSP/ from build/browser-local/ to the memory-stick root. Private browser
+assets live in PSP/GAME/psp-browser/modules/ and resources/. The code-only ZIP
+excludes Sony files, so it alone is insufficient. Do not redistribute those assets.
 
 1. Launch ESP Browser Test v0.8. CROSS verifies assets and connects the adapter.
    It checks native TCP both with explicit and automatic source addressing,
@@ -35,9 +32,9 @@ logged and a restart may be needed. No running thread is force-killed.
 
 Saved profile keys are never read or changed. The helper temporarily redirects
 six APCTL entry points to a real-link-backed test session and redirects missing
-browser module assets through brows0:/ and resources to b0/. Exact firmware guards and transactional restoration
+browser module assets through brows0:/ and resources to resources/. Exact firmware guards and transactional restoration
 protect these RAM changes. The read-only brows0: device exposes only the five
-original module assets from b1/ and supports their native load-to-block checks; the
+original module assets from modules/ and supports their native load-to-block checks; the
 resource remains on ms0:. Global memory-stick loading rules are unchanged. No flash files, XMB icons or PSP model are changed.
 The helper also bypasses four exact E1000 rejection branches inside the browser
 wrapper. It preserves the actual PSP model and leaves all other modules alone.
@@ -47,7 +44,7 @@ The hook is scoped to this launcher, not ready for use in arbitrary applications
 CIRCLE/HOME cancels startup between operations. If a native call does not return
 or shutdown cannot complete, resources are retained; a restart may be required.
 No live thread is force-killed. Exit the app to disable; no seplugins entry is
-needed. Remove PSP/GAME/psp-browser/ and its b0/b1 assets to uninstall.
+needed. Remove PSP/GAME/psp-browser/ and its modules/resources assets to uninstall.
 
 v0.6 rendered the browser/file page, but Close Internet Browser stalled and
 internet pages timed out. v0.7 passed clean close, file rendering and ESP HTTP on hardware. Internet
@@ -55,7 +52,7 @@ stalled when the ESP USB transfer watchdog reset the link. v0.8 separates USB
 servicing from native RX injection and TX draining using bounded byte queues.
 It preserves the native memory pool until all workers finish. PIPE diagnostics
 show queue occupancy and native call stages. Internet recovery needs testing.
-ESP firmware v11, b0/b1 assets and wiring are unchanged from v0.6.
+ESP firmware v11, modules/resources assets and wiring are unchanged from v0.6.
 
 For v0.8, copy updated PSP/ only. Start with CROSS then SQUARE (Suckless FAQ),
 then try http://suckless.org/ from its home link or address bar. Return both logs.

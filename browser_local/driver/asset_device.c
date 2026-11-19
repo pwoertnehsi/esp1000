@@ -17,11 +17,11 @@ static int path(const char *name,char out[96])
     const char prefix[]="/vsh/module/";
     if(!name)return -1;
     if(!strcmp(name,"/vsh/resource/htmlviewer.res")) {
-        strcpy(out,"ms0:/PSP/GAME/psp-browser/b0");strcat(out,name);return 0;
+        strcpy(out,"ms0:/PSP/GAME/psp-browser/resources/htmlviewer.res");return 0;
     }
     if(strncmp(name,prefix,sizeof(prefix)-1))return -1;
     for(unsigned i=0;i<5;++i)if(!strcmp(name+sizeof(prefix)-1,files[i])) {
-        strcpy(out,"ms0:/PSP/GAME/psp-browser/b1");strcat(out,name);return 0;
+        strcpy(out,"ms0:/PSP/GAME/psp-browser/modules/");strcat(out,files[i]);return 0;
     }
     return -1;
 }

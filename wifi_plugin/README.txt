@@ -75,7 +75,7 @@ confirmed on a real router without an ARK WPA2 extension.
 The standalone browser EBOOT is retained as a separate diagnostic fallback.
 
 Install wifi_vsh.prx and wifi_menu.prx together (shared control ABI changed).
-Keep the existing native helpers, virtual driver and private ms0:/b0 + b1 assets.
+Keep the existing native helpers, virtual driver and private PSP/GAME/psp-browser/modules + resources assets.
 The connection-status fix also works with ESP15. ESP16 adds bounded known-PSP
 enumeration recovery (15 seconds, up to three attempts); this does not establish
 the cause of every failure requiring a reset. After leaving PC USB mode, restart VSH.
