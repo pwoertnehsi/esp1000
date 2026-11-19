@@ -117,6 +117,17 @@ int main(void)
         *last_stub=0x54c;
         assert(!patch_browser_imports(&browser) && hooks->browser_owners[g]==browser.modid && (hooks->consumer_mask&(1u<<g)));
         assert(*first==jump(hooks->callbacks[b->entries[0].callback]));
+        /* This must include HVUI's private type2 subscription pair, not just
+         * its Disconnect/GetState imports. Otherwise its close event is lost. */
+        for(unsigned i=0;i<b->entry_count;++i) {
+            const browser_import_entry_t *e=&b->entries[i];
+            assert(*(unsigned *)(uintptr_t)(browser.text_addr+e->stub)==jump(hooks->callbacks[e->callback]));
+        }
+        if(g==1) {
+            assert(b->entry_count==5);
+            assert(*(unsigned *)(uintptr_t)(browser.text_addr+0x5bb44)==jump(hooks->callbacks[WIFI_NATIVE_ADD]));
+            assert(*(unsigned *)(uintptr_t)(browser.text_addr+0x5bb4c)==jump(hooks->callbacks[WIFI_NATIVE_DEL]));
+        }
         browser.gp_value=0x09234560;
         assert(wifiNativeOwnerAlive(browser.modid));
         assert(wifiNativeCallbackValid(browser.text_addr,browser.modid,browser.gp_value));

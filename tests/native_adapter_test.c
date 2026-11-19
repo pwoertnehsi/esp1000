@@ -76,6 +76,11 @@ static void __attribute__((aligned(4))) event(int old,int next,int code,int erro
 {(void)old;(void)next;(void)error;assert(arg==(void *)1);assert(event_count<8);events_seen[event_count++]=code;}
 static int projected_info(int field,union SceNetApctlInfo *out)
 {assert(!lock_depth && field==4 && session.info_users==1);int state_value;assert(!get_state(&state_value));unsigned value=2;memcpy(out,&value,4);return 0;}
+static void __attribute__((aligned(4))) ui_disconnect(int old,int next,int code,int error,void *arg)
+{
+    assert(old==4 && next==0 && !error);
+    if(code==5)*(unsigned *)arg|=2; /* HVUI's exit acknowledgment condition. */
+}
 int main(void)
 {
     assert(!wifi_native_adapter_start() && running);
@@ -159,6 +164,15 @@ int main(void)
     forbid_module_lookup=0;handler=add_handler(event,(void *)1);assert(handler>0);lookup_result=-1;forbid_module_lookup=1;
     emit(0,5,0);assert(callback_invocations==before && !handlers[handler&15].active && !handlers[handler&15].busy);
     lookup_result=0;forbid_module_lookup=0;
+    /* Deleting the temporary settings handler must not remove HVUI's
+     * separate subscription: its event5 acknowledgment releases close. */
+    unsigned ui_flags=0;event_count=0;
+    int transient=add_handler(event,(void *)1);
+    int ui=add_handler(ui_disconnect,&ui_flags);
+    assert(transient>0 && ui>0 && transient!=ui);
+    assert(!del_handler(transient));state=4;
+    emit(0,5,0);assert(ui_flags==2 && !event_count);
+    assert(!del_handler(ui));
     while(log_head!=log_tail)wifi_native_log_drain();
     assert(callback_invocations>=3 && facade_traces>0);
     unsigned dropped=log_dropped;log_guard=1;forbid_log_io=1;

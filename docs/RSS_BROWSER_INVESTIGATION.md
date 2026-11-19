@@ -218,3 +218,44 @@ Watcher startup failure and timed-out shutdown retain safe ownership behavior.
 This is further diagnosis, with no browser lifecycle or ESP change. Next test is
 Circle again to capture Sony waits on that path; HOME/XMB needs its own separate
 run, and RSS Guide can supply a successful-close comparison.
+
+## Route HVUI's private APCTL subscriptions (VSH entry 0.29)
+
+The 0.28 Circle capture identifies a persistent SceHtmlViewerPrepareDisconnect
+thread, entry htmlviewer_plugin+0xbdec, sleeping while helper cleanup has already
+returned successfully. Circle is distinct from the HOME/XMB failure; no inference
+that HOME/XMB cleanup succeeds is made. Logs are preserved under
+artifacts/browser-exit-v028-failure-*.
+
+Owned 6.61 firmware establishes a missing subscription path:
+
+- PrepareDisconnect calls htmlviewer_plugin+0xbf80 with (0,0), which dispatches
+  through the HVUI export 0x51684f2f (HVUI+0x1c64).
+- That routine requests APCTL disconnect through HVUI+0x4e08 and, on success,
+  waits at 0x1db4 for bit2 of its context+0x1c14 (while handler ID+0x1c08 >=0).
+- The APCTL callback HVUI+0x2c20 sets that bit at 0x2ca8 when nextState==0 and
+  event==5. Registration at HVUI+0x3154 uses private NID 0xa7bb73df, deletion
+  at +0x316c uses private NID 0x6f5d2981.
+- pspnet_apctl exports these at +0xe2c/+0xeac. The registration forwards the
+  function and argument to its ordinary shared registration implementation
+  (+0x2718), selecting handler class2. Its returned ID is stored by HVUI.
+  The delete export selects the matching class2 pool. The callback is the same
+  five-argument APCTL event ABI, not a descriptor or a different event format.
+- Our HVUI guard covered GetInfo, Disconnect and GetState but omitted those two
+  subscription imports. Thus Disconnect targeted ESP while the UI acknowledgment
+  subscription remained on the real PSP WLAN backend.
+
+0.29 adds the two exact owned imports to the existing atomic preflight/patch set,
+using the facade's existing validated AddHandler/DelHandler callbacks. No shared
+ABI, callback lifetime policy, launch mode or power sequence changes. Facade IDs
+are opaque to this HVUI path; registration/deletion remain paired in its own
+backend. No live callback is force-released and no UI completion flag is forged.
+This directly addresses a demonstrated backend mismatch and the wait seen on the
+Circle path. It does not establish hardware success or resolve the separate
+HOME/XMB symptom yet.
+
+Tests assert both private imports are patched, include the final private-delete
+stub in foreign-stub atomic-refusal coverage, and exercise a UI-style disconnect
+acknowledgment after deletion of a separate temporary handler. All 17 targeted
+native/XMB/VSH/TLS tests pass under ASan/UBSan; kernel compilation passes warnings
+as errors. Only the kernel PRX needs replacement, with bridge0.26 retained.

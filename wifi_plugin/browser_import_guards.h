@@ -22,6 +22,10 @@ static const browser_import_entry_t browser_entries_1[]={
     {0x5bb2c,0x5c50c,0x2befdf23,0x9e4,WIFI_NATIVE_INFO,"sceNetApctl"},
     {0x5bb34,0x5c510,0x24fe91a1,0x64c,WIFI_NATIVE_DISCONNECT,"sceNetApctl"},
     {0x5bb3c,0x5c514,0x5deac81b,0xb7c,WIFI_NATIVE_STATE,"sceNetApctl"},
+    /* HVUI's private type2 handlers receive the disconnect acknowledgment.
+     * Leaving these on real APCTL strands PrepareDisconnect's event wait. */
+    {0x5bb44,0x5c518,0xa7bb73df,0xe2c,WIFI_NATIVE_ADD,"sceNetApctl"},
+    {0x5bb4c,0x5c51c,0x6f5d2981,0xeac,WIFI_NATIVE_DEL,"sceNetApctl"},
 };
 static const browser_import_guard_t browser_guard_1={"sceHVUI_Module",1,1,0x5fa84,browser_libraries_1,sizeof(browser_libraries_1)/sizeof(browser_libraries_1[0]),browser_entries_1,sizeof(browser_entries_1)/sizeof(browser_entries_1[0])};
 static const browser_import_library_t browser_libraries_2[]={
