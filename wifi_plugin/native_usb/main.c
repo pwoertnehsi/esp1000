@@ -1,5 +1,5 @@
 /* USB-only native settings service. It does not initialize or replace Sony NET.
- * Runs only for an explicit scan; releases USB after DONE/error/timeout. */
+ * Runs only for an explicit scan/profile request; releases USB on completion. */
 #include <pspkernel.h>
 #include <psploadcore.h>
 #include <string.h>
@@ -38,7 +38,7 @@ static int close_usb(void)
 }
 static int worker(SceSize size,void *args)
 {
-    (void)size;(void)args;unsigned seen=0;
+    (void)size;(void)args;unsigned seen=0,scan_sequence=0;
     unsigned char ignored[PACKET_MAX];
     while(running && owner_alive()) {
         unsigned request=control->request;
@@ -65,8 +65,13 @@ static int worker(SceSize size,void *args)
                     sceKernelDelayThread(1000);continue;
                 }
                 if(!started) {
+                    unsigned transaction=request;
+                    if(command==WIFI_NATIVE_SCAN_COMMAND) {
+                        if(!++scan_sequence)++scan_sequence;
+                        transaction=scan_sequence;
+                    }
                     int r=command==WIFI_NATIVE_CONNECT_COMMAND?vnet_usb_profile_begin(request,&profile):
-                        command==WIFI_NATIVE_SCAN_COMMAND?vnet_usb_scan_begin(request,NATIVE_SCAN_LIMIT):-1;
+                        command==WIFI_NATIVE_SCAN_COMMAND?vnet_usb_scan_begin(transaction,NATIVE_SCAN_LIMIT):-1;
                     control->phase=6;control->detail=r;
                     if(r<0)break;
                     started=1;
@@ -74,6 +79,13 @@ static int worker(SceSize size,void *args)
                 if(started) {
                     if(command==WIFI_NATIVE_SCAN_COMMAND) {
                         int state=vnet_usb_scan_snapshot(&scan);
+                        if(state<0 && scan.error==NATIVE_SCAN_NOT_READY) {
+                            /* Boot/radio readiness and USB epoch changes are
+                             * transient. Retain the service/power lease and
+                             * retry with a fresh wire ID under the same deadline. */
+                            started=0;control->phase=5;control->detail=scan.error;
+                            sceKernelDelayThread(250000);continue;
+                        }
                         if(state){control->phase=7;control->detail=scan.error;result=state>0?0:-(int)scan.error;break;}
                     } else {
                         int applied=vnet_usb_profile_status();unsigned char ip[4],radio[48];

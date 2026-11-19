@@ -7,7 +7,7 @@
 #include "native_usb_shim.h"
 #include "../wifi_plugin/native_usb/main.c"
 static unsigned now;
-static int mode,alive=1,starts,stops,deleted,polls,submitted;
+static int mode,alive=1,starts,stops,deleted,polls,submitted,scans;
 static SceModule bridge={.modid=1,.text_addr=0x09000000,.nsegment=2,.segmentaddr={0x09000000,0x09001000},.segmentsize={0x1000,0x3000}};
 SceModule *sceKernelFindModuleByUID(int id){return id==1 && alive?&bridge:NULL;}
 unsigned sceKernelDevkitVersion(void){return 0x06060010;}
@@ -23,9 +23,9 @@ unsigned vnet_usb_start_step(void){return mode==5?3:0;}
 int vnet_usb_start(void){++starts;return mode==5?-1:0;}
 int vnet_usb_stop(void){++stops;return mode==2 || (mode==9 && stops<=2)?-1:0;}
 int vnet_usb_poll(void *p,unsigned n){assert(p && n==PACKET_MAX);++polls;return 0;}
-int vnet_usb_ready(void){return mode!=1 && mode!=4 && mode!=6 && !(mode==8 && polls==2);}
-int vnet_usb_scan_begin(unsigned request,unsigned limit){assert(request==1 && limit==32);return 0;}
-int vnet_usb_scan_snapshot(native_scan_session_t *p){memset(p,0,sizeof(*p));if(mode==7){p->error=NATIVE_SCAN_BAD_WIRE;return -1;}p->complete=1;p->count=1;p->rows[0].ssid_length=2;memcpy(p->rows[0].ssid,"ap",2);return 1;}
+int vnet_usb_ready(void){return mode!=1 && mode!=4 && mode!=6 && !((mode==8 || mode==12) && polls==2);}
+int vnet_usb_scan_begin(unsigned request,unsigned limit){assert(request==(unsigned)++scans && limit==32);return 0;}
+int vnet_usb_scan_snapshot(native_scan_session_t *p){memset(p,0,sizeof(*p));if(mode==11 || (mode==10 && scans==1)){p->error=NATIVE_SCAN_NOT_READY;return -1;}if(mode==12 && scans==1)return 0;if(mode==7){p->error=NATIVE_SCAN_BAD_WIRE;return -1;}p->complete=1;p->count=1;p->rows[0].ssid_length=2;memcpy(p->rows[0].ssid,"ap",2);return 1;}
 int vnet_usb_profile_begin(unsigned request,const native_wifi_profile_t *p){++submitted;assert(request==1 && native_profile_valid(p) && !memcmp(p->ssid,"ap",2));return 0;}
 int vnet_usb_profile_status(void){return mode==8 && submitted<2?0:1;}
 unsigned vnet_usb_uplink(unsigned char ip[4]){memset(ip,0,4);return 1;}
@@ -41,12 +41,14 @@ int main(int argc,char **argv)
     args.address=0x88000000;assert(module_start(sizeof(args),&args)<0 && !starts);args.address=0x09001000;
     assert(!module_start(sizeof(args),&args));worker(0,NULL);
     assert(starts==1 && stops>=1);
-    if(mode==0 || mode==3 || mode==8)assert(shared->completed==1 && !shared->result);
+    if(mode==0 || mode==3 || mode==8 || mode==10 || mode==12)assert(shared->completed==1 && !shared->result);
     else if(mode!=4)assert(shared->completed==1 && shared->result<0);
     if(mode==4)assert(!shared->completed);
     if(mode==7)assert(shared->result==-(int)NATIVE_SCAN_BAD_WIRE && shared->phase==7 && shared->detail==NATIVE_SCAN_BAD_WIRE);
     for(unsigned i=0;i<sizeof(shared->profile);++i)assert(!((unsigned char *)&shared->profile)[i]);
     if(mode==8)assert(submitted==2);
+    if(mode==10 || mode==12)assert(scans==2 && starts==1 && stops==1);
+    if(mode==11)assert(now>=20000000u && scans>1 && starts==1 && stops==1);
     if(mode==9)assert(unsafe && opened && stops==2);
     if(mode==2)assert(module_stop(0,NULL)==-2 && !deleted && opened && unsafe);
     else assert(!module_stop(0,NULL) && deleted==1 && !opened);
