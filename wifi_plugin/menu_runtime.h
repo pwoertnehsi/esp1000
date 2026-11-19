@@ -15,6 +15,7 @@ int wifi_menu_can_stop(void);
 unsigned wifi_menu_poll(void);
 int wifi_menu_launch(unsigned command);
 int wifi_menu_status(void);
+int wifi_menu_exit_status(void);
 int wifi_menu_verify(void);
 int wifi_menu_activity(unsigned out[3]);
 #endif

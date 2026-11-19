@@ -16,7 +16,7 @@
 #include "menu_control.h"
 #include "browser_runtime.h"
 
-PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,23);
+PSP_MODULE_INFO("ESP WiFi VSH Entry",PSP_MODULE_KERNEL,0,24);
 extern int wifi_power_can_stop(void);
 #define CHORD (PSP_CTRL_LTRIGGER|PSP_CTRL_RTRIGGER|PSP_CTRL_SQUARE)
 #define ROWS 64u
@@ -132,6 +132,9 @@ static int monitor(SceSize size,void *args)
         if(chord && !previous_chord)
             diagnostic("SHORTCUT USB=%08x foreign_index=%d allowed=%d buttons=%08x\n",state,foreign,allowed,pad.Buttons);
         previous_chord=chord;
+        static int previous_exit_status=-999;
+        int exit_status=wifi_menu_exit_status();
+        if(exit_status!=previous_exit_status){diagnostic("BROWSER_EXIT_HOOK status=%d\n",exit_status);previous_exit_status=exit_status;}
         static int previous_tls_status=-999;
         int tls_status=wifi_native_tls_status();
         if(tls_status!=previous_tls_status){diagnostic("TLS_OFFLOAD_HOOKS status=%d\n",tls_status);previous_tls_status=tls_status;}
@@ -191,7 +194,7 @@ int module_start(SceSize size,void *args)
 {
     (void)size;(void)args;
     unsigned devkit=sceKernelDevkitVersion();int model=sceKernelGetModel(),context=sceKernelInitKeyConfig();
-    diagnostic("BEGIN ESP WiFi VSH Entry0.22 devkit=%08x model=%d context=%08x\n",devkit,model,context);
+    diagnostic("BEGIN ESP WiFi VSH Entry0.24 devkit=%08x model=%d context=%08x\n",devkit,model,context);
     /* ARK VSH reports 6.60 on this 6.61 installation. This plugin changes no
      * global model values; native menu changes have separate exact ABI guards. */
     if((devkit!=0x06060110 && devkit!=0x06060010) || model!=10 || context!=PSP_INIT_KEYCONFIG_VSH) {

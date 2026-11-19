@@ -24,13 +24,15 @@ static void observe_exit(SceModule *m)
     if(!control || !m || strcmp(m->modname,"htmlviewer_plugin_module"))return;
     SceModule *bridge=sceKernelFindModuleByName("ESP WiFi XMB Bridge");
     if(m->version[0]!=1 || m->version[1]!=1 || m->text_size!=0x1f700 || !user_text(m,m->text_addr) ||
-       !m->nsegment || m->segmentaddr[0]!=m->text_addr || m->segmentsize[0]<m->text_size) {control->exit_status=-1;return;}
+       m->nsegment!=2 || m->segmentaddr[0]!=m->text_addr || m->segmentsize[0]<m->text_size ||
+       m->segmentaddr[1]!=m->text_addr+m->text_size || m->segmentsize[1]<0x6c0) {control->exit_status=-1;return;}
     for(unsigned i=0;i<WIFI_EXIT_STAGES;++i)
         if(!bridge || !user_text(bridge,control->exit_callbacks[i])){control->exit_status=-2;return;}
     int ours=control->exit_owner==m->modid && exit_text==m->text_addr;
     if(control->exit_owner>=0 && !ours && sceKernelFindModuleByUID(control->exit_owner)){control->exit_status=-3;return;}
     unsigned *text=(void *)m->text_addr;
-    if(browser_exit_preflight(text,m->text_addr,control->exit_callbacks,ours)){control->exit_status=-4;return;}
+    int check=browser_exit_preflight(text,m->text_addr,m->segmentaddr[1],control->exit_callbacks,ours);
+    if(check){control->exit_status=-100+check;return;}
     for(unsigned i=0;i<WIFI_EXIT_STAGES;++i)control->exit_originals[i]=m->text_addr+browser_exit_calls[i].target;
     __sync_synchronize();
     for(unsigned i=0;i<WIFI_EXIT_STAGES;++i)text[browser_exit_calls[i].call/4]=exit_jal(control->exit_callbacks[i]);
@@ -186,6 +188,7 @@ unsigned wifi_menu_poll(void)
     return value<WIFI_MENU_COUNT?value:0;
 }
 int wifi_menu_status(void){return status;}
+int wifi_menu_exit_status(void){return control?control->exit_status:-20;}
 int wifi_menu_activity(unsigned out[3])
 {
     if(!control || control->calls==activity_calls)return 0;

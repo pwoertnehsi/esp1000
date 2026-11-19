@@ -59,20 +59,23 @@ static void check_trampoline(const uint32_t code[4],uint32_t origin)
 #endif
 static void check_browser_exit(void)
 {
- unsigned *text=mmap((void *)0x09400000,0x20000,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED,-1,0);
+ unsigned *text=mmap((void *)0x09400000,0x26000,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED,-1,0);
  assert(text!=MAP_FAILED);
  SceModule html={0};strcpy(html.modname,"htmlviewer_plugin_module");html.version[0]=html.version[1]=1;html.modid=45;
- html.text_addr=html.segmentaddr[0]=0x09400000;html.text_size=html.segmentsize[0]=0x1f700;html.nsegment=1;
+ html.text_addr=html.segmentaddr[0]=0x09400000;html.text_size=html.segmentsize[0]=0x1f700;html.nsegment=2;html.segmentaddr[1]=html.text_addr+html.text_size;html.segmentsize[1]=21484;
  text[0x296c/4]=0x27bdfff0;text[0x29fc/4]=exit_jal(html.text_addr+0x299c)^0x04000000u;text[0x2a00/4]=0x8fbf0004;
- for(unsigned i=0;i<WIFI_EXIT_STAGES;++i){control->exit_callbacks[i]=bridge.text_addr+0x100+i*4;text[browser_exit_calls[i].call/4]=exit_jal(html.text_addr+browser_exit_calls[i].target);text[browser_exit_calls[i].call/4+1]=browser_exit_calls[i].delay;}
+ for(unsigned i=0;i<WIFI_EXIT_STAGES;++i){control->exit_callbacks[i]=bridge.text_addr+0x100+i*4;text[browser_exit_calls[i].call/4]=exit_jal(html.text_addr+browser_exit_calls[i].target);text[browser_exit_calls[i].call/4+1]=browser_exit_delay(i,html.segmentaddr[1]);}
  control->exit_owner=-1;
- unsigned last=browser_exit_calls[5].call/4,first=text[browser_exit_calls[0].call/4];text[last]^=4;
+ assert(browser_exit_delay(0,html.segmentaddr[1])==0xa045fd80u);
+ text[0x29c8/4]=0xa0450680;observe_exit(&html);assert(control->exit_status==-120);
+ text[0x29c8/4]=browser_exit_delay(0,html.segmentaddr[1]);
+ unsigned last=browser_exit_calls[WIFI_EXIT_STAGES-1].call/4,first=text[browser_exit_calls[0].call/4];text[last]^=4;
  observe_exit(&html);assert(control->exit_status<0 && text[browser_exit_calls[0].call/4]==first);
  text[last]^=4;observe_exit(&html);assert(control->exit_status==1 && control->exit_owner==45);
- for(unsigned i=0;i<WIFI_EXIT_STAGES;++i){assert(control->exit_originals[i]==html.text_addr+browser_exit_calls[i].target);assert(text[browser_exit_calls[i].call/4]==exit_jal(control->exit_callbacks[i]));assert(text[browser_exit_calls[i].call/4+1]==browser_exit_calls[i].delay);}
+ for(unsigned i=0;i<WIFI_EXIT_STAGES;++i){assert(control->exit_originals[i]==html.text_addr+browser_exit_calls[i].target);assert(text[browser_exit_calls[i].call/4]==exit_jal(control->exit_callbacks[i]));assert(text[browser_exit_calls[i].call/4+1]==browser_exit_delay(i,html.segmentaddr[1]));}
  observe_exit(&html);assert(control->exit_status==1);
  exit_present=1;vsh_present=0;assert(!wifi_menu_can_stop() && wifiMenuRelease()==-2 && wifi_menu_stop()==-2);exit_present=0;vsh_present=1;
- munmap(text,0x20000);
+ munmap(text,0x26000);
 }
 int main(void)
 {

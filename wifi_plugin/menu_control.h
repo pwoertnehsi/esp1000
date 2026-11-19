@@ -2,8 +2,8 @@
 #define ESP_WIFI_MENU_CONTROL_H
 #include <stdint.h>
 #define WIFI_MENU_MAGIC 0x574d4e31u
-#define WIFI_MENU_ABI 4u
-#define WIFI_EXIT_STAGES 6u
+#define WIFI_MENU_ABI 5u
+#define WIFI_EXIT_STAGES 9u
 /* Commands are bounded integers, never user-supplied paths or strings. */
 enum {WIFI_MENU_NONE=0,WIFI_MENU_BROWSER=1,WIFI_MENU_SETTINGS=2,WIFI_MENU_RSS_SETTINGS=3,
       WIFI_MENU_GAME_SHARING=4,WIFI_MENU_MANUAL=5,WIFI_MENU_LOCATIONFREE=6,WIFI_MENU_SKYPE=7,

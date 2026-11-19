@@ -73,3 +73,31 @@ The targeted 15 tests pass under ASan/UBSan, including foreign-call refusal,
 atomic preflight, delay-slot preservation, idempotency, live-owner unload refusal
 and forwarding the original exit arguments/return. Both PSP modules build with
 warnings as errors. Hardware comparison remains pending.
+
+## Relocated guard correction (VSH entry/bridge 0.24)
+
+The first device trace contained only its build marker. Code review found the
+stage0 delay-slot guard compared an unrelocated SB instruction (a0450680).
+That instruction references data+0x680 and its LO16 immediate changes when the
+loader relocates the data segment. The guard can therefore reject valid loaded
+code before any instrumentation is installed. This was a diagnostic defect;
+it is not evidence that the original browser teardown itself was corrected.
+
+The guard now derives this word from the registered data-segment address and
+requires the owned two-segment layout. The VSH monitor logs BROWSER_EXIT_HOOK
+status independently of the exit callback, including precise preflight failure
+codes. Status1 means installed; -120 identifies the stage0 delay mismatch.
+The regression rejects the old on-disk word at a relocated address and accepts
+the corresponding loaded instruction.
+
+The trace also covers full plugin shutdown separately from view close: stages
+6..8 are calls at d9c4,d9cc,d9d4 to d834,d804,11fc. This includes the wait for
+the shutdown event. Stage0..5 still cover the earlier view-close function.
+The diagnostic now uses menu ABI5; install the two 0.24 modules together.
+The actual launch/exit sequence remains unchanged pending a valid device trace.
+
+Both PSP modules build with warnings as errors. The six XMB/VSH tests pass,
+including relocated preflight, delay preservation, user bridge forwarding and
+live-owner unload refusal. A standalone online close test using HOME then
+Settings is required after installation. RSS can then provide a comparison for
+the specific operation that stalls; copying mode12 alone is still unsupported.

@@ -14,7 +14,7 @@ int wifiMenuOriginal(int action,int argument){++original_calls;last_action=actio
 int wifiMenuRegister(unsigned address,unsigned size,unsigned first,unsigned second)
 {
  assert(address==(unsigned)(uintptr_t)&control && size==sizeof(control));
- assert(control.abi==4 && control.original[0]==(unsigned)(uintptr_t)wifiMenuOriginal && control.original[1]==control.original[0]);
+ assert(control.abi==5 && control.original[0]==(unsigned)(uintptr_t)wifiMenuOriginal && control.original[1]==control.original[0]);
  assert(first==(unsigned)(uintptr_t)execute0 && second==(unsigned)(uintptr_t)execute1);
  ++registrations;return 0;
 }

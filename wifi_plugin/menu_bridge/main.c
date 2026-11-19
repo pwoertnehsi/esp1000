@@ -2,7 +2,7 @@
 #include <pspiofilemgr.h>
 #include "../menu_control.h"
 #include "native_adapter.h"
-PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,23);
+PSP_MODULE_INFO("ESP WiFi XMB Bridge",0,0,24);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
 extern int wifi_tls_init(void);
 extern int wifi_tls_can_stop(void);
@@ -32,7 +32,7 @@ static int trace_exit(unsigned stage,unsigned a,unsigned b)
     exit_log(stage,1,(unsigned)r);return r;
 }
 #define EXIT_CALLBACK(n) static int exit_##n(unsigned a,unsigned b){return trace_exit(n,a,b);}
-EXIT_CALLBACK(0) EXIT_CALLBACK(1) EXIT_CALLBACK(2) EXIT_CALLBACK(3) EXIT_CALLBACK(4) EXIT_CALLBACK(5)
+EXIT_CALLBACK(0) EXIT_CALLBACK(1) EXIT_CALLBACK(2) EXIT_CALLBACK(3) EXIT_CALLBACK(4) EXIT_CALLBACK(5) EXIT_CALLBACK(6) EXIT_CALLBACK(7) EXIT_CALLBACK(8)
 static int execute(unsigned index,int action,int argument)
 {
     control.last_action=action;control.last_argument=argument;
@@ -60,7 +60,7 @@ static int browser_worker(SceSize size,void *args)
 int module_start(SceSize size,void *args)
 {(void)size;(void)args;
  control.original[0]=control.original[1]=(unsigned)wifiMenuOriginal;
- unsigned exits[]={(unsigned)exit_0,(unsigned)exit_1,(unsigned)exit_2,(unsigned)exit_3,(unsigned)exit_4,(unsigned)exit_5};
+ unsigned exits[]={(unsigned)exit_0,(unsigned)exit_1,(unsigned)exit_2,(unsigned)exit_3,(unsigned)exit_4,(unsigned)exit_5,(unsigned)exit_6,(unsigned)exit_7,(unsigned)exit_8};
  for(unsigned i=0;i<WIFI_EXIT_STAGES;++i)control.exit_callbacks[i]=exits[i];
  control.exit_owner=-1;
  int r=wifiMenuRegister((unsigned)&control,sizeof(control),(unsigned)execute0,(unsigned)execute1);

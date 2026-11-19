@@ -9,6 +9,7 @@ int wifi_menu_can_stop(void){return 1;}
 int wifi_menu_stop(void){return 0;}
 unsigned wifi_menu_poll(void){return 0;}
 int wifi_menu_status(void){return 0;}
+int wifi_menu_exit_status(void){return 0;}
 int wifi_menu_verify(void){return 0;}
 int wifi_menu_activity(unsigned out[3]){(void)out;return 0;}
 void wifi_native_observed(unsigned out[4]){memset(out,0,16);}
