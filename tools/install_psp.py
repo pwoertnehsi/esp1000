@@ -42,6 +42,10 @@ def install(build, psp, backup):
             if relative.name in CONFIG_NAMES and target.exists():
                 continue
             payload.append((relative, target, data))
+    browser = psp/'PSP/GAME/psp-browser'
+    for name in ('b0', 'b1'):
+        if (psp/name).is_symlink() or (browser/name).is_symlink():
+            raise ValueError('Browser asset directories must not be symlinks')
     # Verify everything before writing, and back up every file being replaced.
     backup.mkdir(parents=True, exist_ok=False)
     for relative, target, _ in payload:
@@ -60,13 +64,21 @@ def install(build, psp, backup):
                [part.strip() for existing in active_lines for part in existing.split(b',')[1:2]]]
     for _, target, data in payload:
         write_verified(target, data)
+    # These are our historical staging names, not Sony's firmware layout.
+    # Move only a complete old directory when the new destination is absent.
+    for name in ('b0', 'b1'):
+        old_assets = psp/name
+        new_assets = browser/name
+        if old_assets.is_dir() and not new_assets.exists():
+            browser.mkdir(parents=True, exist_ok=True)
+            old_assets.rename(new_assets)
     if missing:
         write_verified(plugins, old.rstrip()+b'\n'+b'\n'.join(missing)+b'\n')
     print(f'Installed {manifest["profile"]} PSP modules; backup: {backup}')
     print('Safely eject, leave USB mode and restart VSH. GAME changes apply on the next game launch.')
     if not (psp/'seplugins/esp-adhoc/server.txt').exists():
         print('Set seplugins/esp-adhoc/server.txt to your PPSSPP server IPv4 before using Ad Hoc.')
-    if not (psp/'b0').exists() or not (psp/'b1').exists():
+    if not (browser/'b0').exists() or not (browser/'b1').exists():
         print('Native browser assets b0/b1 are missing; see docs/BUILD_INSTALL.md.')
 
 

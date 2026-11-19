@@ -7,11 +7,11 @@ static int exists,opens,closes,fail_open,fail_close;
 int sceKernelCpuSuspendIntr(void){return 0;}
 void sceKernelCpuResumeIntr(int n){(void)n;}
 int sceIoOpen(const char *path,int flags,SceMode mode)
-{assert(!strcmp(path,"ms0:/b1/vsh/module/netfront.prx") && flags==1 && mode==0);++opens;return fail_open?-7:0;}
+{assert((!strcmp(path,"ms0:/PSP/GAME/psp-browser/b1/vsh/module/netfront.prx") || !strcmp(path,"ms0:/PSP/GAME/psp-browser/b0/vsh/resource/htmlviewer.res")) && flags==1 && mode==0);++opens;return fail_open?-7:0;}
 int sceIoClose(int fd){assert(fd==0);if(fail_close)return -8;++closes;return 0;}
 int sceIoRead(int fd,void *data,unsigned n){assert(fd==0);memset(data,0x33,n);return n;}
 SceOff sceIoLseek(int fd,SceOff offset,int whence){assert(fd==0 && whence==0);return offset;}
-int sceIoGetstat(const char *path,SceIoStat *stat){assert(!strcmp(path,"ms0:/b1/vsh/module/netfront.prx"));stat->value=123;return 0;}
+int sceIoGetstat(const char *path,SceIoStat *stat){assert((!strcmp(path,"ms0:/PSP/GAME/psp-browser/b1/vsh/module/netfront.prx") || !strcmp(path,"ms0:/PSP/GAME/psp-browser/b0/vsh/resource/htmlviewer.res")));stat->value=123;return 0;}
 int sceIoAddDrv(PspIoDrv *drv){assert(!strcmp(drv->name,"brows"));if(exists)return -1;exists=1;return 0;}
 int sceIoDelDrv(const char *name){assert(!strcmp(name,"brows") && !active);exists=0;return 0;}
 int main(void)
@@ -35,5 +35,12 @@ int main(void)
     assert(!close_file(&arg) && !active && closes==1);
     assert(close_file(&arg)<0 && read_file(&arg,data,8)<0 && ioctl_file(&arg,0x208007,NULL,0,NULL,0)<0);
     assert(!browser_asset_device_stop() && !exists && !installed);
+    assert(!browser_asset_device_start(NULL));
+    PspIoDrvFileArg resource={0};
+    assert(!open_file(&resource,"/vsh/resource/htmlviewer.res",1,0));
+    assert(open_file(&arg,"/vsh/resource/../module/netfront.prx",1,0)<0);
+    assert(open_file(&arg,"/vsh/resource/other.res",1,0)<0);
+    assert(!stat_file(&resource,"/vsh/resource/htmlviewer.res",&stat));
+    assert(!close_file(&resource));assert(!browser_asset_device_stop());
     puts("PASS: browser asset allowlist, read-only flags, fd0, read/seek, scoped load ioctls, foreign driver and live-file unload refusal");
 }

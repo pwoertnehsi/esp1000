@@ -15,7 +15,7 @@ static const browser_anchor_t browser_anchors_0[] = {
     {0x238cu,0xafb10004u},
 };
 static const browser_path_t browser_paths_1[] = {
-    {0xd040u, "flash0:/vsh/resource/", "ms0:/b0/vsh/resource/"},
+    {0xd040u, "flash0:/vsh/resource/", "brows0:/vsh/resource/"},
 };
 static const browser_anchor_t browser_anchors_1[] = {
     {0x23e0u,0x27bdfff0u},

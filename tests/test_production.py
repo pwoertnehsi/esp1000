@@ -53,7 +53,11 @@ int main(void) {
             (psp/'seplugins/esp-adhoc/server.txt').write_bytes(b'keep mine\n')
             entries = b'TITLE1234, ms0:/seplugins/esp-adhoc/atpro.prx, on\n'
             (psp/'seplugins/PLUGINS.TXT').write_bytes(entries)
+            (psp/'b0').mkdir();(psp/'b0/htmlviewer.res').write_bytes(b'private resource')
+            (psp/'b1').mkdir();(psp/'b1/module.prx').write_bytes(b'private module')
             install(build.resolve(), psp.resolve(), root/'backup')
+            self.assertFalse((psp/'b0').exists())
+            self.assertEqual((psp/'PSP/GAME/psp-browser/b1/module.prx').read_bytes(), b'private module')
             self.assertEqual((psp/'seplugins/esp-adhoc/server.txt').read_bytes(), b'keep mine\n')
             text = (psp/'seplugins/PLUGINS.TXT').read_bytes()
             self.assertTrue(text.startswith(entries))

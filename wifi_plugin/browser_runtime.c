@@ -15,7 +15,7 @@ typedef struct {
 } browser_guard_t;
 #include "../browser_local/driver/browser_guards.h"
 static const browser_path_t plugin_paths[]={
-    {0x1c534,"flash0:/vsh/resource/","ms0:/b0/vsh/resource/"}
+    {0x1c534,"flash0:/vsh/resource/","brows0:/vsh/resource/"}
 };
 static const browser_anchor_t plugin_anchors[]={
     {0,0x27bdffe0},{0x133e8,0x27bdfee0},{0x18b88,0x27bdfff0}
