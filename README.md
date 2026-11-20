@@ -18,7 +18,7 @@ Modern SSL and WPA2-PSK are handled by the ESP32-S3 - there's no need to install
 |Network settings  |Fully implemented Ad Hoc Mode, Infrastructure Mode and RSS Channel Settings|
 |Game Sharing      |**Not implemented** and not tested|
 |Remote Play       |**Not implemented** and not tested|
-|Internet Radio    |Fully implemented and working as intended|
+|Internet Radio    |**Not implemented:** opens .prs radio pages but does not start playing|
 
 ## ESP32-S3 and hardware setup
 
