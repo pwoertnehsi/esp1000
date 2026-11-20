@@ -48,9 +48,7 @@ PSP/GAME/psp-browser/modules and resources, preserving the old trees in its back
 make production OUTPUT=build/my-production
 ```
 
-Bare `make` also selects production. Make now owns compilation and build order;
-Python is used only to prepare the pinned upstream tree, package files/manifests,
-and install with checksums/backups. It no longer orchestrates compiler calls.
+Bare `make` also selects production.
 Choose a fresh output directory each time; previous builds are preserved.
 Make cleans shared PSP objects before compiling, avoiding reuse of a
 module from a different diagnostics/backend build.
