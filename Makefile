@@ -90,3 +90,21 @@ esp-production:
 esp-debug:
 	mkdir -p esp_link/build-debug
 	IDF_COMPONENT_MANAGER=0 idf.py -C esp_link -B esp_link/build-debug -D SDKCONFIG=build-debug/sdkconfig -D SDKCONFIG_DEFAULTS=sdkconfig.defaults build
+
+# pspdecrypt is only needed to extract Sony's browser files.
+PSPDECRYPT := third_party/pspdecrypt/pspdecrypt
+PSPDECRYPT_CC ?= clang
+PSPDECRYPT_CXX ?= clang++
+FW_MANIFEST := build/firmware/661-extracted/browser-assets.json
+.PHONY: pspdecrypt browser-firmware
+
+$(PSPDECRYPT):
+	git submodule update --init --recursive third_party/pspdecrypt
+	$(MAKE) -C third_party/pspdecrypt CC=$(PSPDECRYPT_CC) CXX=$(PSPDECRYPT_CXX)
+
+pspdecrypt: $(PSPDECRYPT)
+
+$(FW_MANIFEST): $(PSPDECRYPT)
+	python3 tools/prepare_browser_firmware.py --download
+
+browser-firmware: $(FW_MANIFEST)
