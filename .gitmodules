@@ -1,3 +1,6 @@
 [submodule "third_party/aemu"]
 	path = third_party/aemu
 	url = https://github.com/Kethen/aemu.git
+[submodule "third_party/pspdecrypt"]
+	path = third_party/pspdecrypt
+	url = https://github.com/John-K/pspdecrypt.git
