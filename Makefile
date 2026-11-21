@@ -96,7 +96,8 @@ PSPDECRYPT := third_party/pspdecrypt/pspdecrypt
 PSPDECRYPT_CC ?= clang
 PSPDECRYPT_CXX ?= clang++
 FW_MANIFEST := build/firmware/661-extracted/browser-assets.json
-.PHONY: pspdecrypt browser-firmware
+BROWSER_OUT := build/browser-local/PSP/GAME/psp-browser
+.PHONY: pspdecrypt browser-firmware browser-assets browser-install
 
 $(PSPDECRYPT):
 	git submodule update --init --recursive third_party/pspdecrypt
@@ -108,3 +109,13 @@ $(FW_MANIFEST): $(PSPDECRYPT)
 	python3 tools/prepare_browser_firmware.py --download
 
 browser-firmware: $(FW_MANIFEST)
+
+browser-assets: $(FW_MANIFEST)
+	python3 tools/prepare_browser_local.py --assets-only
+
+browser-install: browser-assets
+	@test -n "$(PSP)" || { echo 'Set PSP to the mounted memory-stick root.'; exit 1; }
+	@mountpoint -q "$(PSP)" || { echo '$(PSP) is not a mounted PSP root'; exit 1; }
+	mkdir -p "$(PSP)/PSP/GAME/psp-browser"
+	cp -r $(BROWSER_OUT)/modules $(BROWSER_OUT)/resources "$(PSP)/PSP/GAME/psp-browser/"
+	sync
