@@ -16,9 +16,11 @@ import os
 import sys
 import urllib.request
 
-DEFAULT_INPUT = Path('build/firmware/661.PBP')
-MAX_BYTES = 64 * 1024 * 1024
+ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_INPUT = ROOT / 'build/firmware/661.PBP'
+LOCAL_DECRYPTOR = ROOT / 'third_party/pspdecrypt/pspdecrypt'
 
+MAX_BYTES = 64 * 1024 * 1024
 SONY_661_MD5 = '6be8878f475ac5b1a499b95ab2f7d301'
 SONY_661_URL = ('http://du01.psp.update.playstation.org/update/psp/image/us/'
                 '2014_1212_6be8878f475ac5b1a499b95ab2f7d301/EBOOT.PBP')
@@ -178,11 +180,13 @@ def main():
                         help='Fetch the update if the input file is missing')
     parser.add_argument('--stage-only', action='store_true',
                         help='Stage missing browser files from an existing extraction')
-    parser.add_argument('--listing', type=Path, default=Path('module_listings.txt'))
+    parser.add_argument('--listing', type=Path, default=ROOT / 'module_listings.txt')
     parser.add_argument('--inspect', action='store_true', help='List container contents only')
     parser.add_argument('--decryptor', type=Path,
-                        default=Path(os.environ.get('PSPDECRYPT', shutil.which('pspdecrypt') or 'pspdecrypt')))
-    parser.add_argument('--output', type=Path, default=Path('build/firmware/661-extracted'))
+                        default=Path(os.environ.get('PSPDECRYPT')
+                            or (LOCAL_DECRYPTOR if LOCAL_DECRYPTOR.exists() else None)
+                            or shutil.which('pspdecrypt') or 'pspdecrypt'))
+    parser.add_argument('--output', type=Path, default=ROOT / 'build/firmware/661-extracted')
     args = parser.parse_args()
     if args.download and not args.stage_only and not args.input.exists():
         download(SONY_661_URL, args.input)
