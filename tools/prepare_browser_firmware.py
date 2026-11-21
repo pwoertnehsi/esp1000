@@ -93,7 +93,7 @@ def download(url, dest):
         tmp.unlink(missing_ok=True)
 
 def extract(source, output, decryptor):
-    if source.stat().st_size > 64 * 1024 * 1024:
+    if source.stat().st_size > MAX_BYTES:
         raise ValueError('Input exceeds the expected firmware size limit')
     data = source.read_bytes()
     info = inspect(data)
@@ -101,6 +101,8 @@ def extract(source, output, decryptor):
         raise ValueError(f"Not a Sony update: {info.get('archive', info['kind'])}")
     if hashlib.md5(data).hexdigest() != SONY_661_MD5:
         raise ValueError('Input does not match the expected standard PSP 6.61 update MD5')
+    if not decryptor.exists():
+        raise ValueError(f'pspdecrypt not found ({decryptor}); build third_party/pspdecrypt first')
     output.mkdir(parents=True, exist_ok=False)
     dump = output / 'decrypted'
     with (output / 'extraction.log').open('w') as log:
@@ -188,13 +190,13 @@ def main():
                             or shutil.which('pspdecrypt') or 'pspdecrypt'))
     parser.add_argument('--output', type=Path, default=ROOT / 'build/firmware/661-extracted')
     args = parser.parse_args()
-    if args.download and not args.stage_only and not args.input.exists():
-        download(SONY_661_URL, args.input)
     try:
+        if args.download and not args.stage_only and not args.input.exists():
+            download(SONY_661_URL, args.input)
         if args.stage_only:
             result = stage_browser_assets(args.output, args.listing)
         elif args.inspect:
-            if args.input.stat().st_size > 64 * 1024 * 1024:
+            if args.input.stat().st_size > MAX_BYTES:
                 raise ValueError('Input exceeds size limit')
             result = inspect(args.input.read_bytes())
         else:
