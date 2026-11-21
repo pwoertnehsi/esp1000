@@ -14,6 +14,10 @@ import subprocess
 import shutil
 import os
 import sys
+import urllib.request
+
+DEFAULT_INPUT = Path('build/firmware/661.PBP')
+MAX_BYTES = 64 * 1024 * 1024
 
 SONY_661_MD5 = '6be8878f475ac5b1a499b95ab2f7d301'
 SONY_661_URL = ('http://du01.psp.update.playstation.org/update/psp/image/us/'
@@ -66,6 +70,25 @@ def inspect(data):
         result['archive'] = 'empty'
     return result
 
+
+def download(url, dest):
+    """Fetch the update, verify its MD5, then move to target location."""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix('.part')
+    md5, size = hashlib.md5(), 0
+    try:
+        with urllib.request.urlopen(url, timeout=30) as response, tmp.open('wb') as out:
+            while chunk := response.read(1 << 20):
+                size += len(chunk)
+                if size > MAX_BYTES:
+                    raise ValueError('Download exceeds the expected firmware size limit')
+                md5.update(chunk)
+                out.write(chunk)
+        if md5.hexdigest() != SONY_661_MD5:
+            raise ValueError('Downloaded file does not match the expected 6.61 MD5')
+        tmp.replace(dest)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 def extract(source, output, decryptor):
     if source.stat().st_size > 64 * 1024 * 1024:
@@ -150,7 +173,9 @@ def stage_browser_assets(extracted, listing):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('input', type=Path)
+    parser.add_argument('input', type=Path, nargs='?', default=DEFAULT_INPUT)
+    parser.add_argument('--download', action='store_true',
+                        help='Fetch the update if the input file is missing')
     parser.add_argument('--stage-only', action='store_true',
                         help='Stage missing browser files from an existing extraction')
     parser.add_argument('--listing', type=Path, default=Path('module_listings.txt'))
@@ -159,6 +184,8 @@ def main():
                         default=Path(os.environ.get('PSPDECRYPT', shutil.which('pspdecrypt') or 'pspdecrypt')))
     parser.add_argument('--output', type=Path, default=Path('build/firmware/661-extracted'))
     args = parser.parse_args()
+    if args.download and not args.stage_only and not args.input.exists():
+        download(SONY_661_URL, args.input)
     try:
         if args.stage_only:
             result = stage_browser_assets(args.output, args.listing)
