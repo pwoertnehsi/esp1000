@@ -11,7 +11,7 @@ import subprocess
 import shutil
 import os
 import tempfile
-from prepare_browser_firmware import SONY_661_MD5
+from prepare_browser_firmware import SONY_661_MD5, LOCAL_DECRYPTOR
 ROOT=Path(__file__).resolve().parents[1]
 NAMES=['htmlviewer_ui.prx','netfront.prx','libslim.prx','libwww.prx','mm_flash.prx']
 
@@ -19,7 +19,9 @@ def signed_assets():
     firmware=ROOT/'build/firmware/661.PBP'
     if hashlib.md5(firmware.read_bytes()).hexdigest()!=SONY_661_MD5:
         raise ValueError('Firmware provenance mismatch')
-    decryptor=Path(os.environ.get('PSPDECRYPT', shutil.which('pspdecrypt') or 'pspdecrypt'))
+    decryptor=Path(os.environ.get('PSPDECRYPT')
+        or (LOCAL_DECRYPTOR if LOCAL_DECRYPTOR.exists() else None)
+        or shutil.which('pspdecrypt') or 'pspdecrypt')
     folder=ROOT/'build/firmware/661-encrypted'
     if not folder.exists():
         with (ROOT/'build/firmware/661-encrypted-extract.log').open('w') as log:
