@@ -43,3 +43,13 @@ wifiTlsConnectThunk:
     j wifiTlsConnect
     move $t2,$s0
     .end wifiTlsConnectThunk
+
+    # radioshack+ffa8 originally JALR v0; its delay slot still loads a0.
+    # Preserve the actual callback target instead of assuming one callback.
+    .align 4
+    .globl wifiRadioRequestThunk
+    .ent wifiRadioRequestThunk
+wifiRadioRequestThunk:
+    j wifiRadioRequest
+    move $a1,$v0
+    .end wifiRadioRequestThunk

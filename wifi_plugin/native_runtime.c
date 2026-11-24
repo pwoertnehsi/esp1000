@@ -1,4 +1,5 @@
 /* Owned 6.61 netconf import hooks only. No model or physical WLAN spoofing. */
+#include "../common/esp_diagnostics.h"
 #include <pspkernel.h>
 #include <psploadcore.h>
 #include <pspsdk.h>

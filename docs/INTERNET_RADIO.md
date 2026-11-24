@@ -158,3 +158,27 @@ SONY lines record scheduling state and wait object. This is passive observation,
 not a worker restart or a playback fix. The trace runs during a radio-only
 session as well as an ordinary browser session, and stops writing during USB
 storage mode. It records no stream URLs or credentials.
+
+### Trace the actual failing radio operation
+
+The UART-powered reproduction remained idle with Wi-Fi connected and no further
+Ethernet packets after the 14 setup packets. Dispatcher and audio workers were
+present. The stopped HTTP workers' exitStatus 0x800200D2 is **not** proof of an
+invalid HTTP argument: PSP thread exit handling normalizes negative exit values
+to that code. The owned worker passes its generic -1 failure result to ExitThread.
+[PPSSPP's thread implementation](https://github.com/hrydgard/ppsspp/blob/master/Core/HLE/sceKernelThread.cpp)
+also documents this behavior. Earlier interpretation of that status was incorrect.
+
+Hook ABI 5 adds debug-only observation of radioshack's indirect pre-send callback
+at text+0xffa8 and its sceHttpSendRequest import at text+0x1dd10. Preflight checks
+the owned 6.61 module, all five surrounding callback instructions, HTTP import
+metadata/NID, and the exact libhttp export before any writes. The callback thunk
+forwards the actual original v0 target; it does not substitute an assumed network
+callback. Both wrappers preserve arguments and return values and queue numeric
+records without file I/O on the radio worker.
+
+In native-wifi.log FACADE phase 0x3e/0x3f means callback enter/return (slot is
+original target address); 0x40/0x41 means HTTP send enter/return (slot is request
+ID). These complement RADIO_STATE without assuming a queued command connected.
+No URL, user agent, payload, or credentials are recorded. This tracing does not
+repair playback; production builds do not redirect those radio call sites.

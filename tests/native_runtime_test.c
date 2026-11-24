@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "../wifi_plugin/native_runtime.c"
-static SceModule netconf,bridge,api,browser;
+static SceModule netconf,bridge,api,browser,http;
 static STMOD_HANDLER handler;
 static int present=1,caches,prior_calls,api_present=1,browser_present;
 unsigned pspSdkSetK1(unsigned k){return k;}
@@ -14,10 +14,11 @@ void sceKernelDcacheWritebackInvalidateAll(void){++caches;}
 void sceKernelIcacheInvalidateAll(void){++caches;}
 SceModule *sceKernelFindModuleByUID(int id){return browser_present && id==browser.modid?&browser:id==bridge.modid?&bridge:id==netconf.modid && present?&netconf:NULL;}
 SceModule *sceKernelFindModuleByName(const char *name)
-{return browser_present && !strcmp(name,browser.modname)?&browser:!strcmp(name,"ESP WiFi XMB Bridge")?&bridge:!strcmp(name,"sceNetApctl_Library") && api_present?&api:NULL;}
+{return !strcmp(name,"SceHttp_Library")?&http:browser_present && !strcmp(name,browser.modname)?&browser:!strcmp(name,"ESP WiFi XMB Bridge")?&bridge:!strcmp(name,"sceNetApctl_Library") && api_present?&api:NULL;}
 STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER next){STMOD_HANDLER old=handler;handler=next;return old;}
 unsigned sctrlHENFindFunction(const char *mod,const char *lib,unsigned nid)
 {
+    if(!strcmp(mod,"SceHttp_Library")){assert(!strcmp(lib,"sceHttp") && nid==0xbb70706fu);return http.text_addr+0x1e28;}
     assert(!strcmp(mod,"sceNetApctl_Library"));if(!api_present)return 0;
     for(unsigned i=0;i<sizeof(entries)/sizeof(*entries);++i)if(entries[i].nid==nid){assert(!strcmp(lib,entries[i].library));return api.text_addr+entries[i].api_offset;}
     for(unsigned g=0;g<WIFI_NATIVE_CONSUMERS;++g)for(unsigned i=0;i<browser_import_guards[g]->entry_count;++i) {
@@ -50,6 +51,7 @@ int main(void)
     bridge=(SceModule){.modid=1,.text_addr=0x09000000,.text_size=0x1000,.nsegment=2,.segmentaddr={0x09000000,0x09001000},.segmentsize={0x1000,0x3000}};
     netconf=(SceModule){.modid=2,.version={1,1},.text_addr=0x09010000,.text_size=157640};strcpy(netconf.modname,"sceVshNetconf_Module");
     api=(SceModule){.version={3,1},.text_addr=0x09080000,.text_size=0x11e9c};
+    http=(SceModule){.version={1,2},.text_addr=0x09200000,.text_size=0x18d1c};
     wifi_native_hooks_t *request=(void *)0x09001000;request->magic=WIFI_NATIVE_HOOK_MAGIC;request->abi=WIFI_NATIVE_HOOK_ABI;
     for(unsigned i=0;i<WIFI_NATIVE_CALLBACKS;++i)request->callbacks[i]=bridge.text_addr+16*i;
     unsigned saved=request->callbacks[0];request->callbacks[0]=0x88000000;
@@ -112,6 +114,20 @@ int main(void)
             *(unsigned *)(uintptr_t)(browser.text_addr+e->stub)=0x54c;
             *(unsigned *)(uintptr_t)(browser.text_addr+e->nid_offset)=e->nid;
         }
+        if(g==WIFI_NATIVE_RADIO) {
+            unsigned *p=(void *)(uintptr_t)(browser.text_addr+0x1e41c);
+            p[0]=browser.text_addr+0x1e5bc;p[1]=0x90011;p[2]=0x170005;
+            p[3]=browser.text_addr+0x1e720;p[4]=browser.text_addr+0x1dc98;
+            strcpy((char *)(uintptr_t)(browser.text_addr+0x1e5bc),"sceHttp");
+            *(unsigned *)(uintptr_t)(browser.text_addr+0x1e75c)=0xbb70706fu;
+            *(unsigned *)(uintptr_t)(browser.text_addr+0x1dd10)=jump(http.text_addr+0x1e28);
+            p=(void *)(uintptr_t)(browser.text_addr+0xff9c);
+            p[0]=0x8c820844;p[1]=0x10400005;p[2]=0x00808021;p[3]=0x0040f809;p[4]=0x8c84084c;
+            p[3]^=4;
+            assert(patch_browser_imports(&browser)<0 && hooks->browser_status==-39);
+            assert(*(unsigned *)(uintptr_t)(browser.text_addr+b->entries[0].stub)==0x54c);
+            p[3]^=4;
+        }
         unsigned *first=(void *)(uintptr_t)(browser.text_addr+b->entries[0].stub);
         unsigned *last_stub=(void *)(uintptr_t)(browser.text_addr+b->entries[b->entry_count-1].stub);
         *last_stub=0x08012345;
@@ -129,6 +145,10 @@ int main(void)
             assert(b->entry_count==5);
             assert(*(unsigned *)(uintptr_t)(browser.text_addr+0x5bb44)==jump(hooks->callbacks[WIFI_NATIVE_ADD]));
             assert(*(unsigned *)(uintptr_t)(browser.text_addr+0x5bb4c)==jump(hooks->callbacks[WIFI_NATIVE_DEL]));
+        }
+        if(g==WIFI_NATIVE_RADIO) {
+            assert(hooks->radio_send_original==http.text_addr+0x1e28);
+            assert(*(unsigned *)(uintptr_t)(browser.text_addr+0x1dd10)==jump(request->callbacks[WIFI_NATIVE_RADIO_SEND]));
         }
         browser.gp_value=0x09234560;
         assert(wifiNativeOwnerAlive(browser.modid));

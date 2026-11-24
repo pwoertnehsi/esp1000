@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include "native_adapter_shim.h"
 #include "../wifi_plugin/menu_bridge/native_adapter.c"
+void wifiRadioRequestThunk(void){}
+static int radio_request_calls,radio_send_calls;
+static int mock_radio_request(void *context)
+{assert(context==(void *)0x1234);++radio_request_calls;return -71;}
+static int mock_radio_send(int request,const void *data,unsigned size)
+{assert(request==17 && data==(void *)0x5678 && size==23);++radio_send_calls;return (int)0x80431063u;}
 static int lock_depth;
 static int power_error,power_release_error,rail_on,power_acquires,power_releases,usb_loads;
 int wifiNativePowerAcquire(void)
@@ -112,6 +118,10 @@ int main(void)
     struct {int value;unsigned canary;} radio={-1,0xabcdef01};
     assert(!radio_get_state(&radio.value) && radio.value==4 && radio.canary==0xabcdef01);
     assert(radio_get_state(NULL)==(int)0x80410a03u);
+    hooks.radio_send_original=(unsigned)(uintptr_t)mock_radio_send;
+    assert(wifiRadioRequest((void *)0x1234,(unsigned)(uintptr_t)mock_radio_request)==-71 && radio_request_calls==1);
+    assert(radio_send(17,(void *)0x5678,23)==(int)0x80431063u && radio_send_calls==1);
+
     state=0;assert(!radio_get_state(&radio.value) && !radio.value);forbid_log_io=0;
     hooks.browser_owners[WIFI_NATIVE_RADIO]=123;browser_available=1;
     assert(browser_alive());owned_net_modules=3;

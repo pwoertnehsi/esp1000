@@ -196,6 +196,25 @@ static int radio_get_state(int *out)
     }
     return result;
 }
+/* Radio diagnostics retain Sony's functions and arguments. The kernel publishes
+ * originals only after checking the exact owned 6.61 module and call sites. */
+extern void wifiRadioRequestThunk(void);
+int wifiRadioRequest(void *context,unsigned target)
+{
+    trace_event(62,target,0);
+    int (*original)(void *)=(void *)target;
+    int result=original(context);
+    trace_event(63,target,result);
+    return result;
+}
+static int radio_send(int request,const void *data,unsigned size)
+{
+    trace_event(64,(unsigned)request,0);
+    int (*original)(int,const void *,unsigned)=(void *)hooks.radio_send_original;
+    int result=original(request,data,size);
+    trace_event(65,(unsigned)request,result);
+    return result;
+}
 static int get_list(unsigned *size,unsigned *buffer)
 {
     if(!size)return (int)0x80410a03u;
@@ -504,7 +523,8 @@ int wifi_native_adapter_start(void)
     if(r<0){running=0;sceKernelDeleteThread(thread);thread=-1;sceKernelDeleteSema(lock);lock=-1;return r;}
     unsigned callbacks[]={ (unsigned)gate,(unsigned)scan,(unsigned)get_list,(unsigned)get_entry,
         (unsigned)add_handler,(unsigned)del_handler,(unsigned)get_state,(unsigned)log_pointer,(unsigned)log_setting,
-        (unsigned)connect,(unsigned)disconnect,(unsigned)get_info,(unsigned)radio_get_state};
+        (unsigned)connect,(unsigned)disconnect,(unsigned)get_info,(unsigned)radio_get_state,
+        (unsigned)wifiRadioRequestThunk,(unsigned)radio_send};
     memcpy(hooks.callbacks,callbacks,sizeof(callbacks));
     r=wifiNativeRegister((unsigned)&hooks,sizeof(hooks));
     if(r<0)wifi_native_adapter_stop();
