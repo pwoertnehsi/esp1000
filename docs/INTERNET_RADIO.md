@@ -105,3 +105,20 @@ are running. The local page now includes a noscript message and a standalone
 Test JavaScript button that updates its own label without touching the radio
 API or the player's DOM status helper. This separates disabled scripting from
 player initialization/reporting failures; it is not a claim about stream access.
+
+The user confirmed JavaScript is On and the native-plugin prompt appeared, yet
+Play/Stop did not change the initial page. The local page now uses named form
+control values for all inputs/status, rather than DOM node creation and ID
+lookup. It binds Sony's global psp object directly, removes method-type
+introspection, and uses the documented deferred initialization pattern (1500 ms).
+The form exists before the bootstrap script writes its JavaScript-running marker.
+An Initialize button retries native binding after permission; failures clear the
+binding and show an explicit error. Play/Stop handlers use prefixed names and
+report that the click was received before calling native APIs. Optional stream
+metadata failure no longer hides the basic native status.
+
+This addresses compatibility assumptions in the test UI; it does not establish
+that a DOM method caused the hardware failure or that audio now works. Its host
+JavaScript test deliberately supplies neither getElementById/createTextNode nor
+document.psp, and covers missing-plugin failure, retry and title-query failure.
+No firmware or browser preference change is required for this page update.

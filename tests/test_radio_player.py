@@ -63,28 +63,35 @@ class RadioPlayerTest(unittest.TestCase):
         js.duk_safe_to_lstring.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_size_t)]
         js.duk_safe_to_lstring.restype = ctypes.c_char_p
         js.duk_destroy_heap.argtypes = [ctypes.c_void_p]
-        script = re.search(r'<script[^>]*>(.*?)</script>', (ROOT/'radio_player/index.html').read_text(), re.S).group(1)
+        script = '\n'.join(re.findall(r'<script[^>]*>(.*?)</script>', (ROOT/'radio_player/index.html').read_text(), re.S))
         harness = '''
-var calls=[],nodes={};
+var calls=[];var fields={statusText:{value:''},detailsText:{value:''},streamUrl:{value:'http://example.invalid/test.mp3'},source:{value:'https://example.invalid/alternate'}};
 function assert(x){if(!x)throw Error('radio control assertion');}
 var api={sysRadioSetMasterVolume:function(v){calls.push(['master',v]);},sysRadioSetSubVolume:function(v){calls.push(['sub',v]);},
 sysRadioPlayStream:function(url,agent){calls.push(['play',url,agent]);return 0;},sysRadioStop:function(){calls.push(['stop']);},
 sysRadioGetPlayerStatus:function(){return 7;},sysRadioGetStreamTitle:function(){return '<test title>';}};
-function node(id){if(!nodes[id])nodes[id]={firstChild:null,value:'',removeChild:function(){this.firstChild=null;},appendChild:function(t){this.firstChild=t;}};return nodes[id];}
-var document={psp:api,getElementById:node,createTextNode:function(t){return {nodeValue:t};}};
+var psp=api;
+// Deliberately no getElementById, createTextNode, appendChild or document.psp.
+var document={radioControls:{elements:fields}};
 var window={};function setTimeout(){return 1;}function setInterval(){return 2;}function clearInterval(){}
 '''
         checks = '''
-init();assert(nodes.status.firstChild.nodeValue.indexOf('Ready')==0);
-nodes.url={value:'http://example.invalid/test.mp3'};play();
+assert(fields.statusText.value.indexOf('JavaScript is running')==0);
+assert(espRadioInit() && fields.statusText.value.indexOf('Ready')==0);
+espRadioPlay();
 assert(calls[0][0]=='master' && calls[0][1]==255 && calls[1][1]==255);
-assert(calls[2][0]=='play' && calls[2][1]==nodes.url.value && timer==2);
-update();assert(nodes.details.firstChild.nodeValue=='Native status: 7 | <test title>');
-stop();assert(timer===null && calls[3][0]=='stop');
-nodes.url.value='javascript:alert(1)';play();assert(calls.length==4);
-assert(nodes.status.firstChild.nodeValue.indexOf('Enter an HTTP')>=0);
-api.sysRadioPlayStream=function(){throw Error('plugin refused');};nodes.url.value='https://example.invalid/live';play();
-assert(nodes.status.firstChild.nodeValue.indexOf('plugin refused')>=0);
+assert(calls[2][0]=='play' && calls[2][1]==fields.streamUrl.value && espRadioTimer==2);
+espRadioUpdate();assert(fields.detailsText.value=='Native status: 7 | <test title>');
+espRadioStop();assert(espRadioTimer===null && calls[3][0]=='stop');
+fields.streamUrl.value='javascript:alert(1)';espRadioPlay();assert(calls.length==4);
+assert(fields.statusText.value.indexOf('Enter an HTTP')>=0);
+api.sysRadioPlayStream=function(){throw Error('plugin refused');};fields.streamUrl.value='https://example.invalid/live';espRadioPlay();
+assert(fields.statusText.value.indexOf('plugin refused')>=0);
+espRadioPreset();assert(fields.streamUrl.value==fields.source.value);
+psp=null;assert(!espRadioInit() && espRadio===null && fields.statusText.value.indexOf('Initialize: ')==0);
+espRadioPlay();assert(fields.statusText.value.indexOf('Initialize: ')==0);
+psp=api;assert(espRadioInit());
+api.sysRadioGetStreamTitle=function(){throw Error('title unavailable');};espRadioUpdate();assert(fields.detailsText.value=='Native status: 7');
 '''
         context = js.duk_create_heap(None, None, None, None, None)
         self.assertTrue(context)

@@ -7,43 +7,67 @@ h1{font-size:22px;margin:0 0 8px} p{margin:6px 0} a{color:#9edaff}
 input{width:430px}button,select{font-size:14px;margin:5px 3px 5px 0}
 .small{font-size:12px;color:#b8cde0}.status{background:#203b50;padding:8px}
 </style>
-<script type="text/javascript">
-var radio=null,timer=null;
-function text(id,value){var node=document.getElementById(id);while(node.firstChild)node.removeChild(node.firstChild);node.appendChild(document.createTextNode(String(value)));}
-function init(){
- try{radio=document.psp||document.getElementById('psp');
- if(!radio||typeof radio.sysRadioPlayStream=='undefined')throw 'Native radio plugin unavailable. Launch the PRS entry and allow its embedded plugin.';
- text('status','Ready. Select a source and press Play.');
- }catch(e){text('status',e);}
+<script language="JavaScript" type="text/javascript">
+var espRadio=null,espRadioTimer=null;
+function espRadioText(name,value){document.radioControls.elements[name].value=String(value);}
+function espRadioInit(){
+ espRadioText('statusText','Initializing native plugin...');
+ try{
+  espRadio=psp;
+  espRadio.sysRadioSetMasterVolume(255);
+  espRadio.sysRadioSetSubVolume(255);
+  espRadioText('statusText','Ready. Select a source and press Play.');return true;
+ }catch(e){espRadio=null;espRadioText('statusText','Initialize: '+e);return false;}
 }
-function preset(){document.getElementById('url').value=document.getElementById('preset').value;}
-function play(){
- try{if(!radio)init();if(!radio)return;
- var url=document.getElementById('url').value;
- if(!/^https?:\/\//i.test(url))throw 'Enter an HTTP or HTTPS stream URL.';
- radio.sysRadioSetMasterVolume(255);radio.sysRadioSetSubVolume(255);
- var result=radio.sysRadioPlayStream(url,'ESP1000Radio/1.0');
- text('status','Play request returned '+result+'.');
- if(timer)clearInterval(timer);timer=setInterval('update()',1000);
- }catch(e){text('status','Play: '+e);}
+function espRadioPreset(){var f=document.radioControls;f.elements['streamUrl'].value=f.elements['source'].value;}
+function espRadioPlay(){
+ espRadioText('statusText','Play button received.');
+ try{
+  var url=document.radioControls.elements['streamUrl'].value;
+  if(!/^https?:\/\//i.test(url))throw 'Enter an HTTP or HTTPS stream URL.';
+  if(!espRadio&&!espRadioInit())return;
+  var result=espRadio.sysRadioPlayStream(url,'ESP1000Radio/1.0');
+  espRadioText('statusText','Play request returned '+result+'.');
+  if(espRadioTimer)clearInterval(espRadioTimer);espRadioTimer=setInterval('espRadioUpdate()',1000);
+ }catch(e){espRadioText('statusText','Play: '+e);}
 }
-function stop(){try{if(timer){clearInterval(timer);timer=null;}if(radio)radio.sysRadioStop();text('status','Stopped.');text('details','');}catch(e){text('status','Stop: '+e);}}
-function update(){try{var status=radio.sysRadioGetPlayerStatus();var title=radio.sysRadioGetStreamTitle();text('details','Native status: '+status+(title?' | '+title:''));}catch(e){text('details','Status: '+e);}}
-window.onload=function(){setTimeout('init()',500);};
+function espRadioStop(){
+ espRadioText('statusText','Stop button received.');
+ try{
+  if(espRadioTimer){clearInterval(espRadioTimer);espRadioTimer=null;}
+  if(espRadio)espRadio.sysRadioStop();
+  espRadioText('statusText','Stopped.');espRadioText('detailsText','');
+ }catch(e){espRadioText('statusText','Stop: '+e);}
+}
+function espRadioUpdate(){
+ try{
+  var status=espRadio.sysRadioGetPlayerStatus(),title='';
+  try{title=espRadio.sysRadioGetStreamTitle();}catch(ignored){}
+  espRadioText('detailsText','Native status: '+status+(title?' | '+title:''));
+ }catch(e){espRadioText('detailsText','Status: '+e);}
+}
 </script></head><body>
 <h1>ESP1000 Direct Radio</h1>
-<noscript><p class="status">JavaScript is disabled. Enable Tools &gt; Settings &gt; View Settings &gt; JavaScript, then reload this player.</p></noscript>
+<noscript><p class="status">JavaScript is disabled. Enable JavaScript in the ordinary browser settings, then reopen this player.</p></noscript>
 <input type="button" value="Test JavaScript" onclick="this.value='JavaScript is running';">
 <p>Direct MP3 playback. No station-directory service.</p>
-<select id="preset" onchange="preset()">
+<form name="radioControls" onsubmit="return false;">
+<select name="source" onchange="espRadioPreset()">
 <option value="http://ice5.somafm.com/groovesalad-128-mp3">Groove Salad MP3 - HTTP test</option>
 <option value="https://ice5.somafm.com/groovesalad-128-mp3">Groove Salad MP3 - HTTPS</option>
 <option value="http://ice2.somafm.com/groovesalad-128-mp3">Groove Salad MP3 - alternate HTTP test</option>
 </select>
-<p><input id="url" type="text" value="http://ice5.somafm.com/groovesalad-128-mp3"></p>
-<button onclick="play()">Play</button><button onclick="stop()">Stop</button>
-<p id="status" class="status">Waiting for JavaScript initialization...</p>
-<p id="details" class="small"></p>
+<p><input name="streamUrl" type="text" value="http://ice5.somafm.com/groovesalad-128-mp3"></p>
+<input type="button" value="Initialize" onclick="espRadioInit()" style="width:100px;">
+<input type="button" value="Play" onclick="espRadioPlay()" style="width:100px;">
+<input type="button" value="Stop" onclick="espRadioStop()" style="width:100px;">
+<p><textarea name="statusText" rows="2" cols="52" readonly="readonly">JavaScript has not initialized.</textarea></p>
+<p><textarea name="detailsText" rows="2" cols="52" readonly="readonly"></textarea></p>
+</form>
 <p class="small">If HTTP fails, try HTTPS. Stream availability and native codec support still apply.<br>System volume controls listening volume. Close the radio normally when finished.</p>
-<object id="psp" name="psp" type="application/x-psp-extplugin"></object>
+<object name="psp" type="application/x-psp-extplugin"></object>
+<script language="JavaScript" type="text/javascript">
+espRadioText('statusText','JavaScript is running. Waiting for native plugin...');
+setTimeout('espRadioInit()',1500);
+</script>
 </body></html>
