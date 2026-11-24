@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>ESP1000 Direct Radio</title>
+<style type="text/css">
+body{margin:12px;background:#132333;color:#eef4ff;font:14px sans-serif}
+h1{font-size:22px;margin:0 0 8px} p{margin:6px 0} a{color:#9edaff}
+input{width:430px}button,select{font-size:14px;margin:5px 3px 5px 0}
+.small{font-size:12px;color:#b8cde0}.status{background:#203b50;padding:8px}
+</style>
+<script type="text/javascript">
+var radio=null,timer=null;
+function text(id,value){var node=document.getElementById(id);while(node.firstChild)node.removeChild(node.firstChild);node.appendChild(document.createTextNode(String(value)));}
+function init(){
+ try{radio=document.psp||document.getElementById('psp');
+ if(!radio||typeof radio.sysRadioPlayStream=='undefined')throw 'Native radio plugin unavailable. Launch the PRS entry and allow its embedded plugin.';
+ text('status','Ready. Select a source and press Play.');
+ }catch(e){text('status',e);}
+}
+function preset(){document.getElementById('url').value=document.getElementById('preset').value;}
+function play(){
+ try{if(!radio)init();if(!radio)return;
+ var url=document.getElementById('url').value;
+ if(!/^https?:\/\//i.test(url))throw 'Enter an HTTP or HTTPS stream URL.';
+ radio.sysRadioSetMasterVolume(255);radio.sysRadioSetSubVolume(255);
+ var result=radio.sysRadioPlayStream(url,'ESP1000Radio/1.0');
+ text('status','Play request returned '+result+'.');
+ if(timer)clearInterval(timer);timer=setInterval('update()',1000);
+ }catch(e){text('status','Play: '+e);}
+}
+function stop(){try{if(timer){clearInterval(timer);timer=null;}if(radio)radio.sysRadioStop();text('status','Stopped.');text('details','');}catch(e){text('status','Stop: '+e);}}
+function update(){try{var status=radio.sysRadioGetPlayerStatus();var title=radio.sysRadioGetStreamTitle();text('details','Native status: '+status+(title?' | '+title:''));}catch(e){text('details','Status: '+e);}}
+window.onload=function(){setTimeout('init()',500);};
+</script></head><body>
+<h1>ESP1000 Direct Radio</h1>
+<p>Direct MP3 playback. No station-directory service.</p>
+<select id="preset" onchange="preset()">
+<option value="http://ice5.somafm.com/groovesalad-128-mp3">Groove Salad MP3 - HTTP test</option>
+<option value="https://ice5.somafm.com/groovesalad-128-mp3">Groove Salad MP3 - HTTPS</option>
+<option value="http://ice2.somafm.com/groovesalad-128-mp3">Groove Salad MP3 - alternate HTTP test</option>
+</select>
+<p><input id="url" type="text" value="http://ice5.somafm.com/groovesalad-128-mp3"></p>
+<button onclick="play()">Play</button><button onclick="stop()">Stop</button>
+<p id="status" class="status">Loading native radio plugin...</p>
+<p id="details" class="small"></p>
+<p class="small">If HTTP fails, try HTTPS. Stream availability and native codec support still apply.<br>System volume controls listening volume. Close the radio normally when finished.</p>
+<object id="psp" name="psp" type="application/x-psp-extplugin"></object>
+</body></html>

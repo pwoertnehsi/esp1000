@@ -53,3 +53,46 @@ build or host test is not evidence that a particular live station plays.
 - [ticky/psp-radio](https://github.com/ticky/psp-radio) documents the special browser
   mode and application/x-psp-extplugin API; its browser emulator is not installed
   or used by this PSP implementation.
+
+## Directory-independent test player
+
+The first hardware capture recorded RADIO_STATE slot 4/value 0 and the patched
+radio consumer bit. The ESP state integration was exercised, but neither Sony
+player produced audio: Player II kept scanning and Jazz did not respond to its
+switch. This does not establish the condition of their directory services.
+An ordinary PC browser cannot validate PSP plugin-dependent controls.
+
+Two community alternatives with primary project pages are
+[PSPRadio.ru](https://pspradio.ru/player.html) (lists a 2025 release) and
+[My Playlist](https://github.com/Vasniktel/My-Playlist) (older, supports editing
+stations). No live playback through either project has been verified here.
+
+For a controlled stream test, the original radio_player/index.html uses Sony's
+native radio object with direct URLs. It is ES3-style HTML/JavaScript with no
+external UI assets or station directory. Play and Stop call the native APIs;
+status is displayed as returned, without invented interpretations of its codes.
+The default and alternate HTTP presets are transport tests, not verified live
+endpoints. The HTTPS MP3 URLs are listed on
+[SomaFM's official Groove Salad stream page](https://somafm.com/groovesalad/directstreamlinks.html).
+Direct server addresses can change; the URL input permits replacement.
+
+Prepare a private launcher from an existing owner-supplied Sony PRS:
+
+```sh
+python3 tools/prepare_radio_player.py \
+  --template /run/media/tenshi/PLAYSTATION/PSP/RADIOPLAYER/InternetRadioPlayerII.prs \
+  --output build/direct-radio
+```
+
+Copy the generated PSP/RADIOPLAYER contents to the same directory on the PSP.
+Launch ESP1000 Direct Radio from XMB Internet Radio, allow its embedded plugin,
+then select a preset and press Play. If HTTP fails, try HTTPS and report both the
+Play return and native status. Report whether a connection chooser appears too.
+This player has not yet been hardware-validated; file-origin plugin/network
+behavior is part of this test, not an assumed success.
+
+The preparation tool changes only bounded metadata strings in a copy, preserving
+container offsets, lengths of unrelated sections and the original private icon.
+It refuses malformed tables, duplicate properties and replacements that do not
+fit. The original PRS is never edited. Its Sony icon/container are not distributed
+in the repository: generated private packages stay under ignored build/.
