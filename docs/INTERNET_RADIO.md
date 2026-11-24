@@ -96,3 +96,12 @@ container offsets, lengths of unrelated sections and the original private icon.
 It refuses malformed tables, duplicate properties and replacements that do not
 fit. The original PRS is never edited. Its Sony icon/container are not distributed
 in the repository: generated private packages stay under ignored build/.
+
+If a player stays on its initial text and Play/Stop do not respond, first check
+browser Tools > Settings > View Settings > JavaScript is On, then reload. Sony
+lists this setting in its [browser settings manual](https://manuals.playstation.net/document/en/psp/current/network/browser/settings.html).
+The embedded-plugin permission prompt alone does not confirm that page scripts
+are running. The local page now includes a noscript message and a standalone
+Test JavaScript button that updates its own label without touching the radio
+API or the player's DOM status helper. This separates disabled scripting from
+player initialization/reporting failures; it is not a claim about stream access.

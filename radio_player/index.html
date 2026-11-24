@@ -32,6 +32,8 @@ function update(){try{var status=radio.sysRadioGetPlayerStatus();var title=radio
 window.onload=function(){setTimeout('init()',500);};
 </script></head><body>
 <h1>ESP1000 Direct Radio</h1>
+<noscript><p class="status">JavaScript is disabled. Enable Tools &gt; Settings &gt; View Settings &gt; JavaScript, then reload this player.</p></noscript>
+<input type="button" value="Test JavaScript" onclick="this.value='JavaScript is running';">
 <p>Direct MP3 playback. No station-directory service.</p>
 <select id="preset" onchange="preset()">
 <option value="http://ice5.somafm.com/groovesalad-128-mp3">Groove Salad MP3 - HTTP test</option>
@@ -40,7 +42,7 @@ window.onload=function(){setTimeout('init()',500);};
 </select>
 <p><input id="url" type="text" value="http://ice5.somafm.com/groovesalad-128-mp3"></p>
 <button onclick="play()">Play</button><button onclick="stop()">Stop</button>
-<p id="status" class="status">Loading native radio plugin...</p>
+<p id="status" class="status">Waiting for JavaScript initialization...</p>
 <p id="details" class="small"></p>
 <p class="small">If HTTP fails, try HTTPS. Stream availability and native codec support still apply.<br>System volume controls listening volume. Close the radio normally when finished.</p>
 <object id="psp" name="psp" type="application/x-psp-extplugin"></object>
