@@ -84,7 +84,7 @@ assert(calls[2][0]=='play' && calls[2][1]==fields.streamUrl.value && espRadioTim
 assert(calls[3][0]=='sub' && calls[3][1]==255);
 assert(fields.statusText.value.indexOf('Request queued (0)')==0);
 assert(fields.detailsText.value.indexOf('Native: 1 (playing) | Buffer: 45')==0);
-espRadioUpdate();assert(fields.detailsText.value=='Native: 1 (playing) | Buffer: 45 | <test title>');
+espRadioUpdate();assert(fields.detailsText.value=='Native: 1 (playing) | Buffer: 45 | <test title> | Sample: 2');
 espRadioStop();assert(espRadioTimer===null && calls[4][0]=='stop');
 fields.streamUrl.value='javascript:alert(1)';espRadioPlay();assert(calls.length==5);
 assert(fields.statusText.value.indexOf('Enter an HTTP')>=0);
@@ -98,7 +98,7 @@ api.sysRadioGetPlayerStatus=function(){return 1;};api.sysRadioGetStreamBufferLev
 psp=null;assert(!espRadioInit() && espRadio===null && fields.statusText.value.indexOf('Initialize: ')==0);
 espRadioPlay();assert(fields.statusText.value.indexOf('Initialize: ')==0);
 psp=api;assert(espRadioInit());
-api.sysRadioGetStreamTitle=function(){throw Error('title unavailable');};espRadioUpdate();assert(fields.detailsText.value=='Native: 1 (playing) | Buffer: 45');
+api.sysRadioGetStreamTitle=function(){throw Error('title unavailable');};espRadioUpdate();assert(fields.detailsText.value.indexOf('Native: 1 (playing) | Buffer: 45 | Sample: ')==0);
 '''
         context = js.duk_create_heap(None, None, None, None, None)
         self.assertTrue(context)

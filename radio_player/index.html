@@ -8,7 +8,7 @@ input{width:430px}button,select{font-size:12px;margin:2px 3px 2px 0}textarea{fon
 .small{font-size:12px;color:#b8cde0}.status{background:#203b50;padding:8px}
 </style>
 <script language="JavaScript" type="text/javascript">
-var espRadio=null,espRadioTimer=null;
+var espRadio=null,espRadioTimer=null,espRadioSamples=0;
 function espRadioText(name,value){document.radioControls.elements[name].value=String(value);}
 function espRadioInit(){
  espRadioText('statusText','Initializing native plugin...');
@@ -47,7 +47,7 @@ function espRadioUpdate(){
   var labels={'0':'idle','1':'playing','2':'fetching playlist','3':'parsing playlist','4':'connecting','-1':'error'};
   try{buffer=espRadio.sysRadioGetStreamBufferLevel();}catch(ignoredBuffer){}
   try{title=espRadio.sysRadioGetStreamTitle();}catch(ignoredTitle){}
-  espRadioText('detailsText','Native: '+status+' ('+(labels[String(status)]||'unknown')+') | Buffer: '+buffer+(title?' | '+title:''));
+  espRadioText('detailsText','Native: '+status+' ('+(labels[String(status)]||'unknown')+') | Buffer: '+buffer+(title?' | '+title:'')+' | Sample: '+(++espRadioSamples));
  }catch(e){espRadioText('detailsText','Status: '+e);}
 }
 </script></head><body>

@@ -17,36 +17,51 @@ static SceUID watch_thread=-1;
 static volatile int watch_running;
 static const char *const sony_modules[]={"htmlviewer_plugin_module",
     "sceHVUI_Module","sceHVNetfront_Module","SceHttp_Library",
-    "vsh_module","scePaf_Module","launcher_plugin_module","rss_browser_module"};
+    "vsh_module","scePaf_Module","launcher_plugin_module","rss_browser_module",
+    "radioshack_plugin_module"};
+#define SONY_MODULE_COUNT (sizeof(sony_modules)/sizeof(sony_modules[0]))
+#define RADIO_OWNER 8
 static unsigned sony_report;
 static int sony_seen;
 static void sony_snapshot(unsigned now,const SceUID *ids,int count)
 {
-    unsigned bases[8]={0},lengths[8]={0};
-    for(unsigned i=0;i<8;++i) {
+    unsigned bases[SONY_MODULE_COUNT]={0},lengths[SONY_MODULE_COUNT]={0};
+    for(unsigned i=0;i<SONY_MODULE_COUNT;++i) {
         SceModule *m=sceKernelFindModuleByName(sony_modules[i]);
         if(m){bases[i]=m->text_addr;lengths[i]=m->text_size;}
     }
-    if(!bases[0] && !sony_seen)return;
+    int active=bases[0]!=0 || bases[RADIO_OWNER]!=0;
+    if(!active && !sony_seen)return;
     if(sony_seen && now-sony_report<2000000u)return;
     SceUID fd=sceIoOpen("ms0:/browser-sony-thread.log",PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND,0600);
     if(fd<0)return;
     char line[224];
     int n=snprintf(line,sizeof(line),"SNAPSHOT v=28 time=%08x html=%08x count=%d\n",now,bases[0],count);
     sceIoWrite(fd,line,(unsigned)n);
+    unsigned radio_threads=0,dispatcher=0,audio=0;
     for(int i=0;i<count;++i) {
         SceKernelThreadInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);
         if(sceKernelReferThreadStatus(ids[i],&info)<0)continue;
         unsigned entry=(unsigned)(unsigned long)info.entry,owner;
-        for(owner=0;owner<8;++owner)
+        for(owner=0;owner<SONY_MODULE_COUNT;++owner)
             if(bases[owner] && entry>=bases[owner] && entry-bases[owner]<lengths[owner])break;
-        if(owner==8)continue;
+        if(owner==SONY_MODULE_COUNT)continue;
+        if(owner==RADIO_OWNER) {
+            ++radio_threads;
+            if(!strcmp(info.name,"SceRsJsDispatcherBg"))dispatcher=(unsigned)ids[i];
+            if(!strcmp(info.name,"SceRsAudioThread"))audio=(unsigned)ids[i];
+        }
         /* Only firmware-owned thread names and numeric scheduling metadata. */
         n=snprintf(line,sizeof(line),"SONY owner=%u name=%.31s uid=%08x entry=%08x status=%08x wait=%08x object=%08x exit=%08x\n",
             owner,info.name,ids[i],entry-bases[owner],info.status,info.waitType,info.waitId,info.exitStatus);
         if(n>0 && (unsigned)n<sizeof(line))sceIoWrite(fd,line,(unsigned)n);
     }
-    sceIoClose(fd);sony_report=now;sony_seen=bases[0]!=0;
+    if(bases[RADIO_OWNER]) {
+        n=snprintf(line,sizeof(line),"RADIO_WORKERS time=%08x threads=%u dispatcher=%08x audio=%08x\n",
+            now,radio_threads,dispatcher,audio);
+        if(n>0 && (unsigned)n<sizeof(line))sceIoWrite(fd,line,(unsigned)n);
+    }
+    sceIoClose(fd);sony_report=now;sony_seen=active;
 }
 
 void wifi_thread_watch(unsigned now)

@@ -12,11 +12,12 @@ int sceKernelReferThreadStatus(SceUID,SceKernelThreadInfo *);
 #include "../wifi_plugin/thread_watch.c"
 static SceModule bridge={.text_addr=0x10000,.text_size=0x1000};
 static int storage,present=1,full,foreign_entry,thread_status=4,wait_id=42,opens;
-static int sony_present,sony_opens,create_result=77,start_result,wait_result,deletes;
+static int radio_present,sony_present,sony_opens,create_result=77,start_result,wait_result,deletes;
 static char output[8192];static unsigned bytes;
 SceModule *sceKernelFindModuleByName(const char *name)
 {if(!strcmp(name,"ESP WiFi XMB Bridge"))return &bridge;
  if(!strcmp(name,"htmlviewer_plugin_module") && sony_present)return &bridge;
+ if(!strcmp(name,"radioshack_plugin_module") && radio_present)return &bridge;
  return NULL;}
 int sceUsbGetState(void){return PSP_USB_ACTIVATED;}
 int sceUsbGetDrvState(const char *name)
@@ -24,7 +25,7 @@ int sceUsbGetDrvState(const char *name)
 int sceKernelGetThreadmanIdList(int type,SceUID *ids,int capacity,int *count)
 {assert(type==1 && capacity==128);*count=full?128:present;ids[0]=99;return 0;}
 int sceKernelReferThreadStatus(SceUID uid,SceKernelThreadInfo *info)
-{assert(uid==99 && info->size==sizeof(*info));strcpy(info->name,"ESPNativeSettings");
+{assert(uid==99 && info->size==sizeof(*info));strcpy(info->name,radio_present?"SceRsJsDispatcherBg":"ESPNativeSettings");
  info->entry=(void *)(uintptr_t)(foreign_entry?0x20000:0x10040);
  info->status=thread_status;info->waitType=3;info->waitId=wait_id;return 0;}
 int sceIoOpen(const char *name,int flags,int mode)
@@ -60,6 +61,11 @@ int main(void)
  storage=1;wifi_thread_watch(11000000);assert(sony_opens==1);
  storage=0;sony_present=0;wifi_thread_watch(11500000);assert(sony_opens==2);
  wifi_thread_watch(14000000);assert(sony_opens==2);
+ radio_present=1;wifi_thread_watch(16000000);
+ assert(sony_opens==3 && strstr(output,"SONY owner=8 name=SceRsJsDispatcherBg"));
+ assert(strstr(output,"threads=1 dispatcher=00000063 audio=00000000"));
+ radio_present=0;wifi_thread_watch(18500000);assert(sony_opens==4);
+ wifi_thread_watch(21000000);assert(sony_opens==4);
  assert(!wifi_thread_watch_stop());create_result=-7;assert(wifi_thread_watch_start()==-7);
  create_result=77;start_result=-8;assert(wifi_thread_watch_start()==-8 && deletes==1);
  start_result=0;assert(!wifi_thread_watch_start());assert(wifi_thread_watch_start()==-1);

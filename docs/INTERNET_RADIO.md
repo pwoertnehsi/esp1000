@@ -141,3 +141,20 @@ The control test checks Play-then-volume ordering and status/error labels.
 
 Source: Sony-authored [Internet Radio Player Development Guide](https://manuals.plus/m/9afcb4ba41412facb1e1f5882b9432a60f208da3632938ae3282dd313391e4c4),
 sysRadioPlayStream, sysRadioGetPlayerStatus and sysRadioGetStreamBufferLevel.
+
+### Queued request stays idle
+
+The hardware test accepted `sysRadioPlayStream` (return 0) but continued reporting
+player state 0 and stream buffer 0. This is not evidence of a successful stream
+connection. The player now includes a monotonically increasing Sample number so
+manual Status presses and timer updates are visible even when native values stay
+unchanged.
+
+Debug builds include `radioshack_plugin_module` as owner 8 in
+`browser-sony-thread.log`. `RADIO_WORKERS` explicitly records the native command
+dispatcher (`SceRsJsDispatcherBg`) and audio worker (`SceRsAudioThread`) UIDs;
+zero means no matching thread was present in that complete enumeration. Their
+SONY lines record scheduling state and wait object. This is passive observation,
+not a worker restart or a playback fix. The trace runs during a radio-only
+session as well as an ordinary browser session, and stops writing during USB
+storage mode. It records no stream URLs or credentials.
