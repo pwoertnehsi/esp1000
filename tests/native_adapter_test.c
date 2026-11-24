@@ -118,6 +118,14 @@ int main(void)
     struct {int value;unsigned canary;} radio={-1,0xabcdef01};
     assert(!radio_get_state(&radio.value) && radio.value==4 && radio.canary==0xabcdef01);
     assert(radio_get_state(NULL)==(int)0x80410a03u);
+    assert(!radio_switch());
+    network_started=1;session.ready=1;session.finished=0;
+    assert(radio_switch()==1);
+    session.finished=1;assert(!radio_switch());session.finished=0;
+    session.ready=0;assert(!radio_switch());session.ready=1;
+    state=0;assert(!radio_switch());state=4;
+    network_started=0;session.ready=0;
+
     hooks.radio_send_original=(unsigned)(uintptr_t)mock_radio_send;
     assert(wifiRadioRequest((void *)0x1234,(unsigned)(uintptr_t)mock_radio_request)==-71 && radio_request_calls==1);
     assert(radio_send(17,(void *)0x5678,23)==(int)0x80431063u && radio_send_calls==1);

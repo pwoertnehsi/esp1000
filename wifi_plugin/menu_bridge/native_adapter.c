@@ -196,6 +196,19 @@ static int radio_get_state(int *out)
     }
     return result;
 }
+/* The E1000 has no physical WLAN switch. Radio's one switch query follows
+ * its active ESP session, without changing the real WLAN driver or other apps. */
+static int radio_switch(void)
+{
+    enter();
+    int enabled=state==4 && network_started && session.ready && !session.finished;
+    leave();
+    if(ESP1000_DIAGNOSTICS) {
+        static int previous=-1;
+        if(previous!=enabled){previous=enabled;trace_event(66,(unsigned)enabled,0);}
+    }
+    return enabled;
+}
 /* Radio diagnostics retain Sony's functions and arguments. The kernel publishes
  * originals only after checking the exact owned 6.61 module and call sites. */
 extern void wifiRadioRequestThunk(void);
@@ -524,7 +537,7 @@ int wifi_native_adapter_start(void)
     unsigned callbacks[]={ (unsigned)gate,(unsigned)scan,(unsigned)get_list,(unsigned)get_entry,
         (unsigned)add_handler,(unsigned)del_handler,(unsigned)get_state,(unsigned)log_pointer,(unsigned)log_setting,
         (unsigned)connect,(unsigned)disconnect,(unsigned)get_info,(unsigned)radio_get_state,
-        (unsigned)wifiRadioRequestThunk,(unsigned)radio_send};
+        (unsigned)wifiRadioRequestThunk,(unsigned)radio_send,(unsigned)radio_switch};
     memcpy(hooks.callbacks,callbacks,sizeof(callbacks));
     r=wifiNativeRegister((unsigned)&hooks,sizeof(hooks));
     if(r<0)wifi_native_adapter_stop();

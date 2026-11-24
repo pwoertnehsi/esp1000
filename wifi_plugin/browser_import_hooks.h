@@ -9,6 +9,21 @@ typedef struct {
 } browser_import_guard_t;
 #include "browser_import_guards.h"
 static unsigned browser_owner_text[WIFI_NATIVE_CONSUMERS];
+static unsigned radio_call(unsigned target){return 0x0c000000u|((target>>2)&0x03ffffffu);}
+/* This sole physical-switch query vetoes playback before HTTP sends anything. */
+static int radio_switch_preflight(SceModule *m,int current)
+{
+    const unsigned *p=(const void *)(m->text_addr+0x1e320);
+    if(p[0]!=m->text_addr+0x1e4f8 || p[1]!=0x40010011 || p[2]!=0x10005 ||
+        p[3]!=m->text_addr+0x1ea2c || p[4]!=m->text_addr+0x1e2b0 ||
+        strcmp((const char *)(m->text_addr+0x1e4f8),"sceWlanDrv") ||
+        *(unsigned *)(m->text_addr+0x1ea2c)!=0xd7763699u)return -40;
+    p=(const void *)(m->text_addr+0x7610);
+    int ours=current && p[0]==radio_call(hooks->callbacks[WIFI_NATIVE_RADIO_SWITCH]);
+    if((p[0]!=radio_call(m->text_addr+0x1e2b0) && !ours) || p[1] ||
+        p[2]!=radio_call(m->text_addr+0x77f0) || p[3]!=0x00408021u)return -41;
+    return 0;
+}
 /* Debug-only radio tracing: all guards precede the normal import writes too. */
 static int radio_trace_preflight(SceModule *m,int current,unsigned *send)
 {
@@ -59,6 +74,11 @@ static int patch_browser_imports(SceModule *m)
         int linked=api && function==api->text_addr+e->api_offset && owned(api,function,8,1) && p[0]==jump(function) && !p[1];
         if(!owned(bridge,target,4,1) || *(unsigned *)(m->text_addr+e->nid_offset)!=e->nid || (!ours && !unlinked && !linked))return hooks->browser_status=-35;
     }
+    if(index==WIFI_NATIVE_RADIO) {
+        int r=radio_switch_preflight(m,current);
+        if(r<0)return hooks->browser_status=r;
+        if(!owned(bridge,hooks->callbacks[WIFI_NATIVE_RADIO_SWITCH],4,1))return hooks->browser_status=-35;
+    }
     unsigned radio_send=0;
     if(ESP1000_DIAGNOSTICS && index==WIFI_NATIVE_RADIO) {
         int r=radio_trace_preflight(m,current,&radio_send);
@@ -70,6 +90,8 @@ static int patch_browser_imports(SceModule *m)
         const browser_import_entry_t *e=&g->entries[i];unsigned *p=(void *)(m->text_addr+e->stub);
         p[0]=jump(hooks->callbacks[e->callback]);p[1]=0;
     }
+    if(index==WIFI_NATIVE_RADIO)
+        *(unsigned *)(m->text_addr+0x7610)=radio_call(hooks->callbacks[WIFI_NATIVE_RADIO_SWITCH]);
     if(radio_send) {
         hooks->radio_send_original=radio_send;
         unsigned *p=(void *)(m->text_addr+0x1dd10);

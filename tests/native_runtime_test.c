@@ -115,7 +115,19 @@ int main(void)
             *(unsigned *)(uintptr_t)(browser.text_addr+e->nid_offset)=e->nid;
         }
         if(g==WIFI_NATIVE_RADIO) {
-            unsigned *p=(void *)(uintptr_t)(browser.text_addr+0x1e41c);
+            unsigned *p=(void *)(uintptr_t)(browser.text_addr+0x1e320);
+            p[0]=browser.text_addr+0x1e4f8;p[1]=0x40010011;p[2]=0x10005;
+            p[3]=browser.text_addr+0x1ea2c;p[4]=browser.text_addr+0x1e2b0;
+            strcpy((char *)(uintptr_t)(browser.text_addr+0x1e4f8),"sceWlanDrv");
+            *(unsigned *)(uintptr_t)(browser.text_addr+0x1ea2c)=0xd7763699u;
+            p=(void *)(uintptr_t)(browser.text_addr+0x7610);
+            p[0]=radio_call(browser.text_addr+0x1e2b0);p[1]=0;
+            p[2]=radio_call(browser.text_addr+0x77f0);p[3]=0x00408021;
+            p[3]^=4;
+            assert(patch_browser_imports(&browser)<0 && hooks->browser_status==-41);
+            assert(*(unsigned *)(uintptr_t)(browser.text_addr+b->entries[0].stub)==0x54c);
+            p[3]^=4;
+            p=(void *)(uintptr_t)(browser.text_addr+0x1e41c);
             p[0]=browser.text_addr+0x1e5bc;p[1]=0x90011;p[2]=0x170005;
             p[3]=browser.text_addr+0x1e720;p[4]=browser.text_addr+0x1dc98;
             strcpy((char *)(uintptr_t)(browser.text_addr+0x1e5bc),"sceHttp");
@@ -147,6 +159,7 @@ int main(void)
             assert(*(unsigned *)(uintptr_t)(browser.text_addr+0x5bb4c)==jump(hooks->callbacks[WIFI_NATIVE_DEL]));
         }
         if(g==WIFI_NATIVE_RADIO) {
+            assert(*(unsigned *)(uintptr_t)(browser.text_addr+0x7610)==radio_call(request->callbacks[WIFI_NATIVE_RADIO_SWITCH]));
             assert(hooks->radio_send_original==http.text_addr+0x1e28);
             assert(*(unsigned *)(uintptr_t)(browser.text_addr+0x1dd10)==jump(request->callbacks[WIFI_NATIVE_RADIO_SEND]));
         }

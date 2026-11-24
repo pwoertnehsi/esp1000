@@ -19,7 +19,7 @@ size 0x21358. Its APCTL table at +0x1e334 imports GetState (NID 5DEAC81B) throug
 APCTL imports. Previously it queried the physical APCTL provider, which the ESP
 backend does not connect. Now only this consumer's guarded import is redirected
 to the live ESP facade. Other clients and the physical APCTL provider remain
-unchanged. Kernel/user hook ABI 4 requires matched wifi_vsh/wifi_menu modules.
+unchanged. Kernel/user hook ABI 6 requires matched wifi_vsh/wifi_menu modules.
 
 A live browser or radio client retains the network/module/accessory-power lease;
 shared HTTP alone does not. Explicit disconnect still uses the normal cleanup
@@ -182,3 +182,25 @@ original target address); 0x40/0x41 means HTTP send enter/return (slot is reques
 ID). These complement RADIO_STATE without assuming a queued command connected.
 No URL, user agent, payload, or credentials are recorded. This tracing does not
 repair playback; production builds do not redirect those radio call sites.
+
+
+### Radio WLAN switch compatibility
+
+Sony radioshack's network-request callback at +0x7594 obtains the physical
+sceWlanGetSwitchState result via the single call at +0x7610. At +0x763c it
+returns failure when that result is zero, even if its APCTL check reports a live
+connection. That is an explicit blocker on E1000, which has no WLAN switch.
+
+Only that radio call is redirected to an ESP-session switch adapter. It returns
+on when APCTL facade state is GOT_IP, the network helper has started, and its
+session is ready and unfinished; it returns off otherwise. The real WLAN driver
+and all other callers remain unchanged. The exact radio version/text size,
+WLAN import metadata and NID D7763699, original call target, delay slot and
+following GetState call are checked before writing. Foreign instructions reject
+the complete patch without partial writes. This fix applies to production too;
+debug phase 0x42 logs adapter transitions (slot 1 = on, 0 = off).
+
+The native playback result still needs a hardware test. Host tests cover the
+connected/not-started/not-ready/finished/disconnected cases, call-site refusal,
+matching hook ABI and repeated hook refresh. The separate trace-only commit
+249f486 is not the switch fix.
