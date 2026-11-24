@@ -21,7 +21,7 @@ extern int wifiNativeCallbackValid(unsigned,int,unsigned);
 static unsigned owned_net_modules;
 typedef void (*event_fn)(int,int,int,int,void *);
 extern void wifiNativeInvoke(unsigned,event_fn,int,int,int,int,void *);
-static wifi_native_hooks_t hooks={.magic=WIFI_NATIVE_HOOK_MAGIC,.abi=3};
+static wifi_native_hooks_t hooks={.magic=WIFI_NATIVE_HOOK_MAGIC,.abi=WIFI_NATIVE_HOOK_ABI};
 static wifi_native_usb_control_t usb={.magic=WIFI_NATIVE_USB_MAGIC,.abi=WIFI_NATIVE_USB_ABI};
 static SceUID lock=-1,thread=-1,service=-1;
 static int service_started,acc_owned,service_failed;
@@ -103,7 +103,7 @@ static void trace_event(unsigned phase,unsigned slot,int value)
 {
     if(!ESP1000_DIAGNOSTICS)return;
     char line[112];unsigned used=0;
-    const char *names[]={"FACADE phase="," slot="," value="," thread="};
+    const char *names[]={phase==61?"RADIO_STATE phase=":"FACADE phase="," slot="," value="," thread="};
     unsigned values[]={phase,slot,(unsigned)value,(unsigned)sceKernelGetThreadId()};
     static const char hex[]="0123456789abcdef";
     for(unsigned i=0;i<4;++i) {
@@ -184,6 +184,18 @@ static int get_info(int field,union SceNetApctlInfo *out)
 }
 static int get_state(int *out)
 {if(!out)return (int)0x80410a03u;enter();*out=state;leave();return 0;}
+/* Radio's own state check must see the same ESP session as its browser.
+ * Log transitions only: the audio worker may query this on every tick. */
+static int radio_get_state(int *out)
+{
+    int result=get_state(out);
+    if(ESP1000_DIAGNOSTICS) {
+        static int previous=-1;
+        int current=result<0?-1:*out;
+        if(current!=previous || result<0){previous=current;trace_event(61,(unsigned)current,result);}
+    }
+    return result;
+}
 static int get_list(unsigned *size,unsigned *buffer)
 {
     if(!size)return (int)0x80410a03u;
@@ -225,7 +237,16 @@ static int get_entry(unsigned id,unsigned field,void *out)
     leave();return 0;
 }
 static int browser_alive(void)
-{return hooks.browser_owners[0]>=0 && wifiNativeOwnerAlive(hooks.browser_owners[0]);}
+{
+    /* Shared HTTP alone does not own power. A live radio player can retain
+     * its session even while the browser view is hidden. */
+    static const unsigned clients[]={0,WIFI_NATIVE_RADIO};
+    for(unsigned i=0;i<sizeof(clients)/sizeof(*clients);++i) {
+        int id=hooks.browser_owners[clients[i]];
+        if(id>=0 && wifiNativeOwnerAlive(id))return 1;
+    }
+    return 0;
+}
 static int callback_owner(int id)
 {
     if(id==hooks.owner)return 1;
@@ -483,7 +504,7 @@ int wifi_native_adapter_start(void)
     if(r<0){running=0;sceKernelDeleteThread(thread);thread=-1;sceKernelDeleteSema(lock);lock=-1;return r;}
     unsigned callbacks[]={ (unsigned)gate,(unsigned)scan,(unsigned)get_list,(unsigned)get_entry,
         (unsigned)add_handler,(unsigned)del_handler,(unsigned)get_state,(unsigned)log_pointer,(unsigned)log_setting,
-        (unsigned)connect,(unsigned)disconnect,(unsigned)get_info};
+        (unsigned)connect,(unsigned)disconnect,(unsigned)get_info,(unsigned)radio_get_state};
     memcpy(hooks.callbacks,callbacks,sizeof(callbacks));
     r=wifiNativeRegister((unsigned)&hooks,sizeof(hooks));
     if(r<0)wifi_native_adapter_stop();

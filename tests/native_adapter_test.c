@@ -106,6 +106,17 @@ int main(void)
     profile_security=5;unsigned invalid=0;assert(get_info(4,(void *)&invalid)<0);
     profile_security=-1;state=0;network_started=0;session.ready=0;session.info_callback=0;
     assert(!callback_owner(123) && !browser_alive());
+    /* Radio retains the session without a visible browser; shared helpers
+     * and stale module IDs do not. The state call never touches real APCTL. */
+    state=4;forbid_log_io=1;
+    struct {int value;unsigned canary;} radio={-1,0xabcdef01};
+    assert(!radio_get_state(&radio.value) && radio.value==4 && radio.canary==0xabcdef01);
+    assert(radio_get_state(NULL)==(int)0x80410a03u);
+    state=0;assert(!radio_get_state(&radio.value) && !radio.value);forbid_log_io=0;
+    hooks.browser_owners[WIFI_NATIVE_RADIO]=123;browser_available=1;
+    assert(browser_alive());owned_net_modules=3;
+    assert(!release_network_modules() && owned_net_modules==3);
+    browser_available=0;assert(!browser_alive());hooks.browser_owners[WIFI_NATIVE_RADIO]=-1;
     hooks.browser_owners[0]=123;browser_available=1;
     assert(callback_owner(123) && browser_alive());
     cancel=0;assert(!del_handler(handler) && !cancel); /* Native browser retains the link. */

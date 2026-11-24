@@ -50,10 +50,12 @@ int main(void)
     bridge=(SceModule){.modid=1,.text_addr=0x09000000,.text_size=0x1000,.nsegment=2,.segmentaddr={0x09000000,0x09001000},.segmentsize={0x1000,0x3000}};
     netconf=(SceModule){.modid=2,.version={1,1},.text_addr=0x09010000,.text_size=157640};strcpy(netconf.modname,"sceVshNetconf_Module");
     api=(SceModule){.version={3,1},.text_addr=0x09080000,.text_size=0x11e9c};
-    wifi_native_hooks_t *request=(void *)0x09001000;request->magic=WIFI_NATIVE_HOOK_MAGIC;request->abi=3;
+    wifi_native_hooks_t *request=(void *)0x09001000;request->magic=WIFI_NATIVE_HOOK_MAGIC;request->abi=WIFI_NATIVE_HOOK_ABI;
     for(unsigned i=0;i<WIFI_NATIVE_CALLBACKS;++i)request->callbacks[i]=bridge.text_addr+16*i;
     unsigned saved=request->callbacks[0];request->callbacks[0]=0x88000000;
     assert(wifiNativeRegister((unsigned)(uintptr_t)request,sizeof(*request))<0 && !hooks);request->callbacks[0]=saved;
+    request->abi=3;assert(wifiNativeRegister((unsigned)(uintptr_t)request,sizeof(*request))<0 && !hooks);
+    request->abi=WIFI_NATIVE_HOOK_ABI;
     assert(!wifiNativeRegister((unsigned)(uintptr_t)request,sizeof(*request)));
 
     seed();unsigned *last=(void *)(uintptr_t)(netconf.text_addr+entries[10].offset);*last^=4;

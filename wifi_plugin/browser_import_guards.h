@@ -43,4 +43,12 @@ static const browser_import_entry_t browser_entries_3[]={
     {0x179e8,0x1830c,0x2befdf23,0x9e4,WIFI_NATIVE_INFO,"sceNetApctl"},
 };
 static const browser_import_guard_t browser_guard_3={"SceHttp_Library",1,2,0x18d1c,browser_libraries_3,1,browser_entries_3,1};
-static const browser_import_guard_t *const browser_import_guards[]={&browser_guard_0,&browser_guard_1,&browser_guard_2,&browser_guard_3};
+/* Radio's native playback core checks APCTL separately from NetFront. */
+static const browser_import_library_t browser_libraries_4[]={
+    {0x1e334,0x1e508,0x90011,0x10005,0x1e77c,0x1dd50,"sceNetApctl"},
+};
+static const browser_import_entry_t browser_entries_4[]={
+    {0x1dd50,0x1e77c,0x5deac81b,0xb7c,WIFI_NATIVE_RADIO_STATE,"sceNetApctl"},
+};
+static const browser_import_guard_t browser_guard_4={"radioshack_plugin_module",1,1,0x21358,browser_libraries_4,1,browser_entries_4,1};
+static const browser_import_guard_t *const browser_import_guards[]={&browser_guard_0,&browser_guard_1,&browser_guard_2,&browser_guard_3,&browser_guard_4};

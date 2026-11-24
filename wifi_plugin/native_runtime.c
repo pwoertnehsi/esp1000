@@ -149,7 +149,7 @@ int wifiNativeRegister(unsigned address,unsigned size)
     SceModule *m=sceKernelFindModuleByName("ESP WiFi XMB Bridge");
     if(!hooks && size==sizeof(wifi_native_hooks_t) && owned(m,address,size,0)) {
         wifi_native_hooks_t *request=(void *)address;
-        if(request->magic==WIFI_NATIVE_HOOK_MAGIC && request->abi==3) {
+        if(request->magic==WIFI_NATIVE_HOOK_MAGIC && request->abi==WIFI_NATIVE_HOOK_ABI) {
             unsigned i;for(i=0;i<WIFI_NATIVE_CALLBACKS;++i)if(!owned(m,request->callbacks[i],4,1))break;
             if(i==WIFI_NATIVE_CALLBACKS){hooks=request;bridge_owner=m->modid;bridge_text=m->text_addr;hooks->status=0;hooks->owner=-1;for(unsigned j=0;j<WIFI_NATIVE_CONSUMERS;++j)hooks->browser_owners[j]=-1;result=0;}
         }
