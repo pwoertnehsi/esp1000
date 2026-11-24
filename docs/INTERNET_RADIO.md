@@ -32,7 +32,7 @@ Restart VSH after installing the matching debug XMB modules. Open an existing
 Internet Radio player, connect using the saved profile, allow its embedded plugin,
 and select a station. Record whether stations are listed, the player indicates
 buffering or an error, and whether audio plays. Then close the player and check
-that accessory power is released. Hardware playback is not yet confirmed.
+that accessory power is released. Hardware playback was confirmed on 2026-11-25 after fix 1a0efd0 (see below).
 
 In debug native-wifi.log, RADIO_STATE reports transitions from the radio's own
 state query: slot 4 with value 0 means the radio was given GOT_IP successfully;
@@ -88,8 +88,8 @@ Copy the generated PSP/RADIOPLAYER contents to the same directory on the PSP.
 Launch ESP1000 Direct Radio from XMB Internet Radio, allow its embedded plugin,
 then select a preset and press Play. If HTTP fails, try HTTPS and report both the
 Play return and native status. Report whether a connection chooser appears too.
-This player has not yet been hardware-validated; file-origin plugin/network
-behavior is part of this test, not an assumed success.
+Direct Radio playback was confirmed on hardware on 2026-11-25 after the
+radio WLAN switch fix 1a0efd0.
 
 The preparation tool changes only bounded metadata strings in a copy, preserving
 container offsets, lengths of unrelated sections and the original private icon.
@@ -200,7 +200,11 @@ following GetState call are checked before writing. Foreign instructions reject
 the complete patch without partial writes. This fix applies to production too;
 debug phase 0x42 logs adapter transitions (slot 1 = on, 0 = off).
 
-The native playback result still needs a hardware test. Host tests cover the
+The user confirmed working audio in Direct Radio and Sony’s native Jazz player
+on 2026-11-25 after installing fix 1a0efd0. This confirms the physical-switch
+veto was a playback blocker. Validation used PSP-E1000 with ESP32-S3 externally
+powered and the UART bridge running; this run does not establish long-duration
+playback, every station, or side-rail-only radio operation. Host tests cover the
 connected/not-started/not-ready/finished/disconnected cases, call-site refusal,
 matching hook ABI and repeated hook refresh. The separate trace-only commit
 249f486 is not the switch fix.
