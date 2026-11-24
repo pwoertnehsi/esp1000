@@ -70,7 +70,7 @@ stations). No live playback through either project has been verified here.
 For a controlled stream test, the original radio_player/index.html uses Sony's
 native radio object with direct URLs. It is ES3-style HTML/JavaScript with no
 external UI assets or station directory. Play and Stop call the native APIs;
-status is displayed as returned, without invented interpretations of its codes.
+status is displayed numerically with Sony's documented state label.
 The default and alternate HTTP presets are transport tests, not verified live
 endpoints. The HTTPS MP3 URLs are listed on
 [SomaFM's official Groove Salad stream page](https://somafm.com/groovesalad/directstreamlinks.html).
@@ -101,10 +101,10 @@ If a player stays on its initial text and Play/Stop do not respond, first check
 browser Tools > Settings > View Settings > JavaScript is On, then reload. Sony
 lists this setting in its [browser settings manual](https://manuals.playstation.net/document/en/psp/current/network/browser/settings.html).
 The embedded-plugin permission prompt alone does not confirm that page scripts
-are running. The local page now includes a noscript message and a standalone
-Test JavaScript button that updates its own label without touching the radio
-API or the player's DOM status helper. This separates disabled scripting from
-player initialization/reporting failures; it is not a claim about stream access.
+are running. The local page includes a noscript message. Its former Test JavaScript button
+was removed after the user reported that its label did not update despite
+successful native Play calls. The button was not a reliable scripting diagnostic
+on this browser; a native Play return of 0 already confirms script execution.
 
 The user confirmed JavaScript is On and the native-plugin prompt appeared, yet
 Play/Stop did not change the initial page. The local page now uses named form
@@ -122,3 +122,22 @@ that a DOM method caused the hardware failure or that audio now works. Its host
 JavaScript test deliberately supplies neither getElementById/createTextNode nor
 document.psp, and covers missing-plugin failure, retry and title-query failure.
 No firmware or browser preference change is required for this page update.
+
+## Queued request versus playback
+
+Sony's sysRadioPlayStream return 0 accepts a queued command; it does not prove
+a stream has connected or decoded. The direct player now sets its sub-volume
+after the Play command, matching the ordering in Sony's examples, rather than
+only during initialization. Whether that ordering caused this hardware silence
+remains unconfirmed.
+
+Native status and buffer are now near the controls, queried immediately after
+Play and by a manual Status button as well as the timer. Documented status
+values are 0 idle, 1 playing, 2 fetching playlist, 3 parsing playlist, 4 connecting,
+and -1 error. Buffer is the native 0-255 indicator of compressed/decoded audio
+accumulation, not a percentage or a guarantee of audible output. Optional
+metrics remain guarded so unavailable methods do not hide the base status.
+The control test checks Play-then-volume ordering and status/error labels.
+
+Source: Sony-authored [Internet Radio Player Development Guide](https://manuals.plus/m/9afcb4ba41412facb1e1f5882b9432a60f208da3632938ae3282dd313391e4c4),
+sysRadioPlayStream, sysRadioGetPlayerStatus and sysRadioGetStreamBufferLevel.
